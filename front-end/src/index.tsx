@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Login from './login-registre/LoginInterface';
+import Registration from './login-registre/registration';
+import Login from './login-registre/login';
 import reportWebVitals from './reportWebVitals';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <Login />
+    <Login></Login>
+    {/* <Registration /> */}
     {/* <div className="bg-red-500 text-white p-4 m-4 text-2xl"> */}
   {/* TAILWIND TEST
 </div> */}
