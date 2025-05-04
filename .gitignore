@@ -1,1 +1,2 @@
-/home/rachid-aarag/Project-management-intern/front-end/.gitignore
+.env
+node_modules
