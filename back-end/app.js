@@ -7,7 +7,7 @@ const cors=require('cors');
 app.use(express.json());
 require('dotenv').config();
 
-database.Connect();;;
+database.Connect();;
 
 const corsOptions = {
   origin: 'http://localhost:3000', // Replace with your frontend's URL

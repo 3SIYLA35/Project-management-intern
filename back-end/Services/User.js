@@ -7,7 +7,7 @@ exports.getUser=async(email)=>{
             console.log("User not found");
             return null;
         }
-        return {User};
+        return User;
     }catch(err){
         console.error(err.message);
     }

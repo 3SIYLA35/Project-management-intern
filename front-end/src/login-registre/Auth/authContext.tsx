@@ -1,8 +1,36 @@
 import {createContext,useState,useEffect,useContext, Children} from 'react';
-const AuthContext=createContext();
 
-export const Authprovider=({Children})=>{
-    const [user,setuser]=useState(null);
+interface AuthContextType {
+    user: any;
+    token: string | null;
+    login: (email: string, password: string) => Promise<boolean>;
+    logout: () => void;
+    loading: boolean;
+    isAuthenticated: boolean;
+    isAdmin: boolean;
+    isMember: boolean;
+}
+interface User{
+    role:'admin'|'member';
+}
+const AuthContext=createContext<AuthContextType>({
+    user: null,
+    token: null,
+    login: async () => false,
+    logout: () => {},
+    loading: true,
+    isAuthenticated: false,
+    isAdmin: false,
+    isMember: false
+  });
+
+
+  interface AuthproviderProps{
+    children:React.ReactNode;
+  }
+  
+export const Authprovider=({children}:AuthproviderProps)=>{
+    const [user,setuser]=useState<User|null>(null);
     const [token,settoken]=useState(localStorage.getItem('token'));
     const [loading,setLoading]=useState(true);
 
@@ -32,18 +60,18 @@ export const Authprovider=({Children})=>{
 
 
     //login fct
-    const login=async (email,password)=>{
+    const login=async (email:string,password:string)=>{
         try{
             const response=await fetch("http://localhost:8000/auth/login",{
                 method:"POST",
                 headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({email,password});
+                body:JSON.stringify({email,password})
             });
         if(!response.ok) throw new Error("Login failed");
         const data=await response.json()
         settoken(data.token);
         setuser(data.user);
-        localStorage.setItem('token',data.toke);
+        localStorage.setItem('token',data.token);
 
         return true;
         
@@ -60,8 +88,8 @@ export const Authprovider=({Children})=>{
         setuser(null);
     }
 
-    const hasrole=(role)=>{
-        return user && user.role===role;
+    const hasrole=(role:User['role'])=>{
+        return user && user?.role===role;
     }
 
     return (
@@ -71,15 +99,14 @@ export const Authprovider=({Children})=>{
             login,
             logout,
             loading,
-            loading,
-            isAuthneticated:!!user,
-            isAdmin:hasrole('admin'),
-            isMember:hasrole('member')
+            isAuthenticated:!!user,
+            isAdmin:!hasrole('admin'),
+            isMember:!hasrole('member')
         }}>
 
-            {Children}
+            {children}
         </AuthContext.Provider>
     )
 }
 
-export const usAuth=()=>useContext(AuthContext);
+export const useAuth=()=>useContext(AuthContext);

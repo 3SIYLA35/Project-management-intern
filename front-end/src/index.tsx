@@ -4,6 +4,7 @@ import './index.css';
 import Registration from './login-registre/registration';
 import Login from './login-registre/login';
 import reportWebVitals from './reportWebVitals';
+import App from './App';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const root = ReactDOM.createRoot(
@@ -11,7 +12,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <Login></Login>
+    <App></App>
     {/* <Registration /> */}
     {/* <div className="bg-red-500 text-white p-4 m-4 text-2xl"> */}
   {/* TAILWIND TEST

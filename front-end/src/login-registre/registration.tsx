@@ -7,7 +7,7 @@ import avatar5 from '../img/avatar-5.jpg';
 import { useRef, useState } from "react";
 
 
-export default function registration(){
+export default function Registration(){
     const [phonesection,setphonesection]=useState(true);
     // const [registrevisible,setregistrevisible]=useState(false);
     const [passwordsection,setpasswordsection]=useState(false);
