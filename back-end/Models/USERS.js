@@ -17,6 +17,11 @@ const UserSchema=new Schema({
         type:String,
         required:false
     },
+    Number:{
+        type:Number,
+        required:false,
+        unique:true
+    },
     LastName:{
         type:String,
         required:false

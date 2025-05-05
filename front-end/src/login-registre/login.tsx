@@ -2,7 +2,7 @@ import { useState,useRef } from "react"
 import loginImage from '../img/loginilustration.jpg';
 import Google_log from '../img/icons/icons8-google.svg';
 import { GoogleOAuthProvider,GoogleLogin } from "@react-oauth/google";
-
+import { Input } from "../components/ui/ui";
 
 export default function Login(){
     const [useaccGoogle,setaccGoogle]=useState(false);

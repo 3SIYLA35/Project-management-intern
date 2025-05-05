@@ -5,6 +5,7 @@ import avatar3 from '../img/avatar-3.jpg';
 import avatar4 from '../img/avatar-4.jpg';
 import avatar5 from '../img/avatar-5.jpg';
 import { useRef, useState } from "react";
+import { Input } from "../components/ui/ui";
 
 
 export default function Registration(){
@@ -57,10 +58,11 @@ export default function Registration(){
          <form id="regis-form" className="space-y-8">
             <div >
                 <div className="relative">
-                    <i className="fas fa-phone absolute top-4 left-4 text-gray-400"></i>
-                    <input type="number" id="phone" 
+                    <i className="fas fa-phone absolute  top-3.5 left-3.5    text-gray-400"></i>
+                    {/* <input type="number" id="phone" 
                            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 outline-none focus:border-green-200 transition-colors" 
-                           placeholder="Your Number Phone"/>
+                           placeholder="Your Number Phone"/> */}
+                    <Input type='number' className=' focus:border-green-200 '/>
                 </div>
             </div>
 
