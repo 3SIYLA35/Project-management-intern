@@ -19,8 +19,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 
 app.use('/auth',require('./Routes/Login'));
+app.use('/hr',require('./Routes/hr'));
 app.listen(port,()=>{
-    console.log(`server is  runing at port :${port}`); 
+    console.log(`server is  runing at port :${port}`);;
 })
 
 app.use((err, req, res, next) => {

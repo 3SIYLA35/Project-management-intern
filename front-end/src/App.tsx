@@ -5,10 +5,10 @@ import Registration from './login-registre/registration';
 
 function App() {
   return (
-    // <Authprovider>
-    //   <AppRouter />
-    // </Authprovider>
-    <Registration/>
+    <Authprovider>
+      <AppRouter />
+    </Authprovider>
+    // <Registration/>
   );
 }
 

@@ -9,19 +9,24 @@ import { Input } from "../components/ui/ui";
 
 
 export default function Registration(){
-    const [phonesection,setphonesection]=useState(true);
     // const [registrevisible,setregistrevisible]=useState(false);
-    const [passwordsection,setpasswordsection]=useState(false);
+    const [passwordsection,setpasswordsection]=useState(true);
     const [selectedavatar,setselectedavatar]=useState<Number|null>(null);
     const [uploadavatar,setuploadedavatar]=useState<string|null>(null);
+    const [showpasswrord1,setshowpassword1]=useState(false);
+    const [showpasswrord2,setshowpassword2]=useState(false);
 
+    const togglePassword1=()=>{
+        setshowpassword1(!showpasswrord1);
+    }
+
+    const togglePassword2=()=>{
+        setshowpassword2(!showpasswrord2);
+    }
     
      const changevisible=async()=>{
-        if(phonesection){
-            setphonesection(false);
-            setpasswordsection(true);
-        }
-        else if(passwordsection){
+        
+       if(passwordsection){
             setpasswordsection(false);
         }
 
@@ -52,44 +57,27 @@ export default function Registration(){
         </div>
         <div id="form-regis-div" className="space-y-6">
         
-        {phonesection ? (
-            <>
-            <h2 className="text-3xl font-bold text-start text-gray-800">Welecom mr Amin Zahi </h2>
-         <form id="regis-form" className="space-y-8">
-            <div >
-                <div className="relative">
-                    <i className="fas fa-phone absolute  top-3.5 left-3.5    text-gray-400"></i>
-                    {/* <input type="number" id="phone" 
-                           className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 outline-none focus:border-green-200 transition-colors" 
-                           placeholder="Your Number Phone"/> */}
-                    <Input type='number' className=' focus:border-green-200 '/>
-                </div>
-            </div>
-
-            <button onClick={changevisible}  type="submit" 
-                    className="w-full  bg-green-300 text-white py-3 rounded-lg font-semibold 
-                           hover:bg-green-400 transform transition-all duration-300 hover:scale-[1.02]  tracking-widest 
-                           shadow-lg hover:shadow-purple-300">
-                Suivant
-            </button>
-        </form>
-        </>
-        ):passwordsection?(
+         
+        {passwordsection?(
         <>
      <h2 className="text-3xl font-bold text-start text-gray-800">Welecom mr Amin Zahi </h2>
 
         <form id="passwordsection" className="space-y-6">
             <div className="relative">
-                <i className="fas fa-lock absolute top-4 left-4 text-gray-400"></i>
-            <input type="password" className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 outline-none focus:border-green-200 transition-colors"
-            placeholder="type your password"
-            id="password-1"/>
+                <i className="fas fa-lock absolute   top-3.5 left-3.5 text-gray-400"></i>
+                <Input type={showpasswrord1?"text":"password"} className=" focus:border-green-200"
+                 placeholder="type your password"
+                 id="password-1"/>
+                 <i className={`fas fa-eye absolute top-4 right-4 text-[13px] text-gray-400 ${showpasswrord1?"":"hidden"}`}
+                 onClick={togglePassword1}></i>
             </div>
-            <div className="relative">
-            <i className="fas fa-lock absolute top-4 left-4 text-gray-400"></i>
-            <input type="password" className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 outline-none focus:border-green-200 transition-colors"
-            placeholder="retype your password"
-            id="password-2"/>
+            <div className="relative flex">
+                <i className="fas fa-lock absolute top-3.5 left-3.5 text-gray-400"></i>
+                <Input type={showpasswrord2?"text":"password"} className=" focus:border-green-200 "
+                placeholder="retype your password"
+                id="password-2"/>
+                <i className={`fas fa-eye absolute top-4 right-4 text-[13px] text-gray-400 ${showpasswrord2?"":"hidden"}`}
+                onClick={togglePassword2}></i>
             </div>
         </form>
 
