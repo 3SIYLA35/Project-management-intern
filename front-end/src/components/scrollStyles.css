@@ -1,0 +1,36 @@
+/* Hide scrollbar by default */
+.hideScrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hideScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Show scrollbar on hover for all browsers */
+.hideScrollbar:hover {
+  -ms-overflow-style: auto;  /* IE and Edge */
+  scrollbar-width: thin;  /* Firefox */
+}
+
+/* Show scrollbar on hover for Chrome, Safari and Opera */
+.hideScrollbar:hover::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+.hideScrollbar:hover::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 8px;
+}
+
+.hideScrollbar:hover::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 8px;
+}
+
+.hideScrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+} 

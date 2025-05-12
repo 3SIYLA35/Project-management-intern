@@ -18,11 +18,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
   },
   "include": [
     "src"
-  ],
+, "src/components/ui/ui.tsx"  ],
   "paths":{
     "@/*":["src/*"]
   }

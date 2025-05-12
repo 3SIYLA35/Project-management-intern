@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { inviteEmployee } from '../api/inviteService';
 
 export default function Dashboard() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const queryparams = new URLSearchParams(location.search);
-    const isloginSucces = queryparams.get('login') === 'success';
+    const location=useLocation();
+    const navigate=useNavigate();
+    const queryparams=new URLSearchParams(location.search);
+    const isloginSucces=queryparams.get('login')==='success';
     
     const [inviteData, setInviteData]=useState({
         email: "",
@@ -36,7 +36,6 @@ export default function Dashboard() {
                     type: "success"
                 });
                 
-                // Reset form
                 setInviteData({
                     email: "",
                     firstName: "",
@@ -62,8 +61,7 @@ export default function Dashboard() {
         }
     };
     
-    const handleLogout = () => {
-        // TODO: Implement logout functionality
+    const handleLogout=()=> {
         localStorage.removeItem('token');
         navigate('/login');
     };

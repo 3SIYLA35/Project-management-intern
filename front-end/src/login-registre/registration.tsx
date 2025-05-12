@@ -4,17 +4,74 @@ import avatar2 from '../img/avatar-2.jpg';
 import avatar3 from '../img/avatar-3.jpg';
 import avatar4 from '../img/avatar-4.jpg';
 import avatar5 from '../img/avatar-5.jpg';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "../components/ui/ui";
-
+import {jwtDecode} from 'jwt-decode';
+import { registerUser } from '../api/RegestrationService';
+interface UserData{
+    firstName?:string;
+    lastName?:string;
+    email?:string;
+    role?:'admin'|'member';
+}
 
 export default function Registration(){
     // const [registrevisible,setregistrevisible]=useState(false);
+    const [userdata,setuserdata]=useState<UserData|null>(null);
     const [passwordsection,setpasswordsection]=useState(true);
     const [selectedavatar,setselectedavatar]=useState<Number|null>(null);
     const [uploadavatar,setuploadedavatar]=useState<string|null>(null);
     const [showpasswrord1,setshowpassword1]=useState(false);
     const [showpasswrord2,setshowpassword2]=useState(false);
+    const [password1,setpassword1]=useState('');
+    const [password2,setpassword2]=useState('');
+
+    const handlepasswordchange=(e:React.ChangeEvent<HTMLInputElement>)=>{
+        const {id,value}=e.target;
+        if(id==='password-1'){
+            setpassword1(value);
+        }else if(id==='password-2'){
+            setpassword2(value);
+        }
+    }
+    const handlepasswordsubmit=async(e:React.FormEvent<HTMLFormElement>)=>{
+        e.preventDefault();
+        if(password1==null && password2==null){
+            alert('password is required');
+            return;
+        }
+        try{
+            const response=await registerUser({password1});
+            if(response.success){
+                console.log('success saving password ',);
+
+            }
+        }catch(error){
+            console.error('error saving password',error);
+
+        }
+    }
+
+    
+
+
+
+    useEffect(()=>{
+        const token=new URLSearchParams(window.location.search).get('token');
+        console.log('token',token);
+        
+        if(token){
+            try{
+                const decodedtoken=jwtDecode(token);
+                setuserdata(decodedtoken as UserData);
+                console.log('userdata',userdata);
+
+            }catch(error){
+                console.error('error decoding token ',error);
+                
+            }
+        }
+    },[]);
 
     const togglePassword1=()=>{
         setshowpassword1(!showpasswrord1);
@@ -60,7 +117,7 @@ export default function Registration(){
          
         {passwordsection?(
         <>
-     <h2 className="text-3xl font-bold text-start text-gray-800">Welecom mr Amin Zahi </h2>
+     <h2 className="text-3xl font-bold text-start text-gray-800">Welecom mr {userdata?.firstName} {userdata?.lastName} </h2>
 
         <form id="passwordsection" className="space-y-6">
             <div className="relative">

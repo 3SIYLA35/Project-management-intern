@@ -1,5 +1,7 @@
 import * as React from 'react';
 import {cn} from '../../lib/utils';
+import {toast} from "sonner";
+
  const Input=React.forwardRef<
  HTMLInputElement,
  React.ComponentProps<"input">
@@ -16,4 +18,10 @@ import {cn} from '../../lib/utils';
  }
 )
 Input.displayName="Input";
+
+
 export {Input};
+  function useToast(): { toast: any; } {
+    throw new Error('Function not implemented.');
+  }
+

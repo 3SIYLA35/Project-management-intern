@@ -15,5 +15,56 @@ code {
     monospace;
 }
 
+/* Hide scrollbar by default */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-x: hidden; /* Hide horizontal scrollbar in all browsers */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  height: 0; /* Hide horizontal scrollbar height */
+}
+
+/* Show scrollbar on hover for all browsers */
+.hide-scrollbar:hover {
+  -ms-overflow-style: auto;  /* IE and Edge */
+  scrollbar-width: thin;  /* Firefox */
+  overflow-x: hidden; /* Always hide horizontal scrollbar */
+}
+
+/* Show scrollbar on hover for Chrome, Safari and Opera */
+.hide-scrollbar:hover::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+/* Hide horizontal scrollbar even on hover */
+.hide-scrollbar:hover::-webkit-scrollbar:horizontal {
+  display: none;
+}
+
+.hide-scrollbar:hover::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 8px;
+}
+
+.hide-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 8px;
+}
+
+.hide-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Fix for the scaling items exceeding container */
+.transform-safe {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
 
 

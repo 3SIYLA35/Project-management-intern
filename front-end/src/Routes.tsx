@@ -1,13 +1,18 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import Dashboard from './components/Dashboard';
+import Dashboard from './interfaces/Dashboard';
 import Login from './login-registre/login';
 import Register from './login-registre/registration';
 import { useAuth } from './login-registre/Auth/authContext';
-
+import Invitepage from './interfaces/Invitepage';
+import Projectpage from './interfaces/Projects/Projects';
+import ProjectDetails from './interfaces/Projects/Projectdetails';
+import ProjectJump from './components/JumpToProject';
+import ProjectDashboard from './interfaces/Projects/Projects';
+import ProjectForm from './interfaces/Projects/ProjectForm';
 // Protected route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
+  const { isAuthenticated, loading }=useAuth();
   
   if (loading) return <div>Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" />;
@@ -16,8 +21,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Admin route component
-const AdminRoute=({ children }: { children: React.ReactNode }) => {
-  const { isAdmin, loading } = useAuth();
+const AdminRoute=({ children }: { children: React.ReactNode })=>{
+  const { isAdmin,loading}=useAuth();
   
   if (loading) return <div>Loading...</div>;
   if (!isAdmin) return <Navigate to="/dashboard" />;
@@ -45,7 +50,7 @@ const AuthCallback=()=> {
 };
 
 // Main Router component
-const AppRouter = () => {
+const AppRouter=()=> {
   return (
     <Router>
       <Routes>
@@ -58,15 +63,47 @@ const AppRouter = () => {
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
+            
           </ProtectedRoute>
         } />
+        <Route path='/project/jump' element={
+          <ProtectedRoute>
+            <ProjectJump showModal={false} searchTerm={''} setSearchTerm={function (term: string): void {
+              throw new Error('Function not implemented.');
+            } } projects={[]} toggleModal={function (): void {
+              throw new Error('Function not implemented.');
+            } } handleViewProject={function (id: string): void {
+              throw new Error('Function not implemented.');
+            } } />
+          </ProtectedRoute>
+        }/>
+        <Route path='/projects' element={
+          <ProtectedRoute>
+            <ProjectDashboard/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/new-project' element={
+          <ProtectedRoute>
+            <ProjectForm/>
+          </ProtectedRoute>
+        }/>
         
         {/* Admin routes example */}
-        <Route path="/admin/*" element={
+        <Route path="/admin/invite" element={
           <AdminRoute>
-            <div>Admin Panel</div>
+            <Invitepage />
           </AdminRoute>
         } />
+        <Route path='/admin/project' element={
+          <AdminRoute>
+            <Projectpage />
+          </AdminRoute>
+        }/>
+        <Route path='/admin/project-details' element={
+         <AdminRoute>
+          <ProjectDetails></ProjectDetails>
+         </AdminRoute>
+        }/>
         
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
