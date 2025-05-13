@@ -59,6 +59,9 @@ code {
 .hide-scrollbar:hover::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+input::placeholder {
+  color: #9da0a5;
+}
 
 /* Fix for the scaling items exceeding container */
 .transform-safe {

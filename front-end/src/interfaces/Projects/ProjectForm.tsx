@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project, Member } from '../../models/interfaces';
 import { XMarkIcon, ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { Select } from '@radix-ui/react-select';
 
 const ProjectForm: React.FC = () => {
   const navigate = useNavigate();
@@ -24,47 +25,49 @@ const ProjectForm: React.FC = () => {
   // Step 1: Project Details
   const renderProjectDetails = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium text-gray-900">Project Details</h3>
+      <h3 className="text-lg font-medium text-gray-200">Project Details</h3>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700">Project Name</label>
+        <label className="block text-sm font-medium text-gray-300">Project Name</label>
         <input
           type="text"
           value={formData.name || ''}
           onChange={(e) => handleChange('name', e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+          className="mt-1 text-gray-200 block w-full bg-gray-700 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
           placeholder="Enter project name"
         />
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700">Description</label>
+        <label className="block text-sm font-medium text-gray-300">Description</label>
         <textarea
           value={formData.description || ''}
           onChange={(e) => handleChange('description', e.target.value)}
           rows={3}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+          className="mt-1 block w-full text-gray-200 bg-gray-700 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
           placeholder="Describe your project"
         />
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Start Date</label>
+          <label className="block text-sm font-medium text-gray-300">Start Date</label>
           <input
             type="date"
             value={formData.startDate || ''}
             onChange={(e) => handleChange('startDate', e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+            className="mt-1 block w-full focus:text-gray-200 placeholder bg-gray-700 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+            placeholder='mm/dd/yyyy'
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">End Date</label>
+          <label className="block text-sm font-medium text-gray-300">End Date</label>
           <input
             type="date"
             value={formData.endDate || ''}
             onChange={(e) => handleChange('endDate', e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+            className="mt-1 block w-full placeholder:text-gray-400 bg-gray-700 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+            placeholder='dd/mm/yyyy'
           />
         </div>
       </div>
@@ -74,12 +77,12 @@ const ProjectForm: React.FC = () => {
   // Step 2: Project Settings
   const renderProjectSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium text-gray-900">Project Type</h3>
+      <h3 className="text-lg font-medium text-gray-200">Project Type</h3>
       
       <div className="grid grid-cols-2 gap-4">
         <div 
           className={`border rounded-lg p-4 cursor-pointer transition-all ${
-            formData.status === 'Planning' ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'
+            formData.status === 'Planning' ? 'border-purple-500 bg-gray-700' : 'border-gray-200 bg-slate-50 hover:border-purple-300'
           }`}
           onClick={() => handleChange('status', 'Planning')}
         >
@@ -93,7 +96,7 @@ const ProjectForm: React.FC = () => {
         
         <div 
           className={`border rounded-lg p-4 cursor-pointer transition-all ${
-            formData.status === 'Development' ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'
+            formData.status === 'Development' ? 'border-purple-500 bg-gray-700' : 'border-gray-200 bg-slate-50 hover:border-purple-300'
           }`}
           onClick={() => handleChange('status', 'Development')}
         >
@@ -102,12 +105,14 @@ const ProjectForm: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
-          <h4 className="text-center font-medium">Development</h4>
+          <h4 className={`text-center text-gray-200 font-medium ${
+            formData.status === 'Development' ? 'text-gray-200' : 'text-black'
+          }`}>Development</h4>
         </div>
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+        <label className="block text-sm font-medium text-gray-200 mb-2">Priority</label>
         <div className="flex space-x-4">
           {['Low', 'Medium', 'High', 'Critical'].map((priority) => (
             <button
@@ -127,7 +132,7 @@ const ProjectForm: React.FC = () => {
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Color Theme</label>
+        <label className="block text-sm font-medium text-gray-200 mb-2">Color Theme</label>
         <div className="flex space-x-4">
           {['purple', 'blue', 'green', 'red', 'yellow'].map((color) => (
             <button
@@ -135,7 +140,7 @@ const ProjectForm: React.FC = () => {
               type="button"
               onClick={() => handleChange('color', color)}
               className={`h-8 w-8 rounded-full border-2 ${
-                formData.color === color ? 'border-gray-800' : 'border-transparent'
+                formData.color === color ? 'border-white' : 'border-transparent'
               }`}
               style={{ backgroundColor: getColorHex(color) }}
             />
@@ -165,9 +170,9 @@ const ProjectForm: React.FC = () => {
     
     return (
       <div className="space-y-6">
-        <h3 className="text-lg font-medium text-gray-900">Add Team Members</h3>
+        <h3 className="text-lg font-medium text-gray-200">Add Team Members</h3>
         
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-100">
           Select team members to collaborate with on this project
         </p>
         
@@ -175,10 +180,10 @@ const ProjectForm: React.FC = () => {
           {availableMembers.map(member => (
             <div 
               key={member.id}
-              className={`flex items-center p-3 border rounded-lg cursor-pointer ${
+              className={`flex items-center p-3  rounded-lg cursor-pointer ${
                 (formData.members || []).some(m => m.id === member.id)
-                  ? 'border-purple-500 bg-purple-50'
-                  : 'border-gray-200 hover:border-purple-300'
+                  ? 'border border-purple-500 bg-gray-700'
+                  : ' bg-gray-700 hover:border-purple-300'
               }`}
               onClick={() => handleToggleMember(member)}
             >
@@ -186,8 +191,8 @@ const ProjectForm: React.FC = () => {
                 <img src={member.avatar} alt="" className="h-10 w-10 rounded-full" />
               </div>
               <div className="ml-4 flex-1">
-                <h4 className="text-sm font-medium">{member.name}</h4>
-                <p className="text-sm text-gray-500">{member.email}</p>
+                <h4 className="text-sm text-gray-200 font-medium">{member.name}</h4>
+                <p className="text-sm text-gray-100">{member.email}</p>
               </div>
               <input 
                 type="checkbox" 
@@ -204,10 +209,10 @@ const ProjectForm: React.FC = () => {
   
   // Step 4: Tasks
   const renderTasks = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium text-gray-900">Set Up Initial Tasks</h3>
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium text-gray-200">Set Up Initial Tasks</h3>
       
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-100">
         Define some initial tasks to get started with this project
       </p>
       
@@ -217,16 +222,16 @@ const ProjectForm: React.FC = () => {
             <input
               type="text"
               placeholder={`Task ${taskNum} title`}
-              className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
+              className="block w-full h-8 pl-2 rounded-md focus:border-2 focus:border-purple-500 focus:outline-none text-white border-0 bg-gray-700 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
             />
             <div className="flex justify-between mt-4">
               <div className="flex space-x-2">
-                <select className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                  <option>Low</option>
+                <select className="block w-full text-sm text-white  border-gray-300 bg-gray-700 focus:outline-none focus:border-2 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                  <option >Low</option>
                   <option>Medium</option>
                   <option>High</option>
                 </select>
-                <select className="block w-full text-sm border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <select className="block w-full text-sm text-white text-white border-gray-300 bg-gray-700 focus:outline-none focus:border-2 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                   <option>To Do</option>
                   <option>In Progress</option>
                   <option>Done</option>
@@ -309,8 +314,8 @@ const ProjectForm: React.FC = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50  flex flex-col items-center justify-center p-4 ">
+      <div className="bg-gray-800 rounded-lg shadow-lg w-full  max-w-2xl overflow-hidden ">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -322,7 +327,7 @@ const ProjectForm: React.FC = () => {
                 <ArrowLeftIcon className="h-5 w-5" />
               </button>
             )}
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-200">
               {currentStep === 1 && 'Create Project'}
               {currentStep === 2 && 'Project Type'}
               {currentStep === 3 && 'Team Members'}
@@ -375,7 +380,7 @@ const ProjectForm: React.FC = () => {
         </div>
         
         {/* Form Content */}
-        <div className="p-6">
+        <div className="p-6 ">
           {renderStep()}
         </div>
         
