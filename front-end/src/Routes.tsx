@@ -9,7 +9,7 @@ import Projectpage from './interfaces/Projects/Projects';
 import ProjectDetails from './interfaces/Projects/Projectdetails';
 import ProjectJump from './components/JumpToProject';
 import ProjectDashboard from './interfaces/Projects/Projects';
-import ProjectForm from './interfaces/Projects/ProjectForm';
+import ProjectForm from './components/ProjectForm';
 // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -82,11 +82,13 @@ const AppRouter=()=> {
             <ProjectDashboard/>
           </ProtectedRoute>
         }/>
-        <Route path='/new-project' element={
-          <ProtectedRoute>
-            <ProjectForm/>
-          </ProtectedRoute>
-        }/>
+          <Route path='/new-project' element={
+            <ProtectedRoute>
+              <ProjectForm showmodal={false} sourcepage='' togglemodal={function (): void {
+                throw new Error('Function not implemented.');
+              } } />
+            </ProtectedRoute>
+          }/>
         
         {/* Admin routes example */}
         <Route path="/admin/invite" element={

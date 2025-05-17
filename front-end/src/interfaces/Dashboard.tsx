@@ -8,11 +8,13 @@ import SideNav from '../components/SideNav';
 import Header from '../components/Header';
 import JumpToProject from '../components/JumpToProject';
 import ErrorBoundary from '../components/ErrorBoundary';
+import ProjectForm from '../components/ProjectForm';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [showJumpModal, setShowJumpModal] = useState(false);
+  const [showJumpModal, setShowJumpModal]=useState(false);
+  const [showProjectmodal,setprojectmodal]=useState(false);
   
   // Example projects data - replace with actual data fetching
   const [projects, setProjects] = useState<Project[]>([
@@ -22,6 +24,7 @@ export default function Dashboard() {
       description: 'A project management application with task tracking',
       startDate: '2023-01-01',
       endDate: '2023-12-31',
+      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
       priority: 'High',
       status: 'In Progress',
       members: [
@@ -39,6 +42,7 @@ export default function Dashboard() {
       description: 'Online shopping platform with user accounts',
       startDate: '2023-03-15',
       endDate: '2023-09-30',
+      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
       priority: 'Medium',
       status: 'Planning',
       members: [
@@ -56,6 +60,7 @@ export default function Dashboard() {
       description: 'Secure banking application for smartphones',
       startDate: '2023-02-10',
       endDate: '2023-11-15',
+      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
       priority: 'Critical',
       status: 'Development',
       members: [
@@ -73,11 +78,11 @@ export default function Dashboard() {
     navigate(path);
   };
   
-  const handleAddProject = () => {
-    navigate('/new-project');
+  const toggleProjectModal = () => {
+    setprojectmodal(!showProjectmodal);
   };
   
-  const toggleJumpToProject = () => {
+  const toggleJumpToProject=()=>{
     setShowJumpModal(!showJumpModal);
   };
   
@@ -94,17 +99,18 @@ export default function Dashboard() {
           <Header 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            handleAddProject={handleAddProject}
+            toggleProjectModal={toggleProjectModal}
             toggleJumpToProject={toggleJumpToProject}
+            sourcepage='dashboard'
           />
           
           <div className='flex-1 overflow-auto p-6'>
             {/* Dashboard content goes here */}
             <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
             <p>Welcome to your project dashboard</p>
-          </div>
         </div>
-        
+      </div>
+
         {/* Jump to project modal */}
         <JumpToProject 
           showModal={showJumpModal}
@@ -113,6 +119,11 @@ export default function Dashboard() {
           projects={projects}
           toggleModal={toggleJumpToProject}
           handleViewProject={handleViewProject}
+        />
+        <ProjectForm
+          showmodal={showProjectmodal}
+          togglemodal={toggleProjectModal}
+          sourcepage='dashboard'
         />
       </div>
     </ErrorBoundary>

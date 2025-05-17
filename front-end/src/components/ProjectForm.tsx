@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Project, Member } from '../../models/interfaces';
+import { Project, Member } from '../models/interfaces';
 import { XMarkIcon, ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { Select } from '@radix-ui/react-select';
 
-const ProjectForm: React.FC = () => {
+interface ProjectModalprops{
+  showmodal:boolean;
+  togglemodal:()=>void;
+  sourcepage:string;
+}
+
+
+
+const ProjectForm: React.FC<ProjectModalprops>=({
+  showmodal,
+  togglemodal,
+  sourcepage
+}) => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<Partial<Project>>({
@@ -82,7 +94,7 @@ const ProjectForm: React.FC = () => {
       <div className="grid grid-cols-2 gap-4">
         <div 
           className={`border rounded-lg p-4 cursor-pointer transition-all ${
-            formData.status === 'Planning' ? 'border-purple-500 bg-gray-700' : 'border-gray-200 bg-slate-50 hover:border-purple-300'
+            formData.status === 'Planning' ? 'border-purple-500 bg-gray-700 text-white' : 'border-gray-200 bg-slate-50 hover:border-purple-300 text-gray-800'
           }`}
           onClick={() => handleChange('status', 'Planning')}
         >
@@ -96,7 +108,7 @@ const ProjectForm: React.FC = () => {
         
         <div 
           className={`border rounded-lg p-4 cursor-pointer transition-all ${
-            formData.status === 'Development' ? 'border-purple-500 bg-gray-700' : 'border-gray-200 bg-slate-50 hover:border-purple-300'
+            formData.status === 'Development' ? 'border-purple-500 bg-gray-700 text-white' : ' text-gray-800 border-gray-200 bg-slate-50 hover:border-purple-300'
           }`}
           onClick={() => handleChange('status', 'Development')}
         >
@@ -105,9 +117,7 @@ const ProjectForm: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
-          <h4 className={`text-center text-gray-200 font-medium ${
-            formData.status === 'Development' ? 'text-gray-200' : 'text-black'
-          }`}>Development</h4>
+          <h4 className={`text-center  font-medium `}>Development</h4>
         </div>
       </div>
       
@@ -149,13 +159,19 @@ const ProjectForm: React.FC = () => {
       </div>
     </div>
   );
+
+  const handleimageerror=(e:React.SyntheticEvent<HTMLImageElement>)=>{
+    e.currentTarget.src='/img/default-avatar.webp';
+  }
   
   // Step 3: Team Members
   const renderTeamMembers = () => {
     const availableMembers = [
-      { id: 'user1', name: 'Olivia Smith', email: 'olivia@example.com', avatar: 'https://via.placeholder.com/40' },
-      { id: 'user2', name: 'Ethan Johnson', email: 'ethan@example.com', avatar: 'https://via.placeholder.com/40' },
-      { id: 'user3', name: 'Sophia Williams', email: 'sophia@example.com', avatar: 'https://via.placeholder.com/40' },
+      { id: 'user1', name: 'Olivia Smith', email: 'olivia@example.com', avatar: '/img/avatar-1.jpg' },
+      { id: 'user2', name: 'Ethan Johnson', email: 'ethan@example.com', avatar: '/img/avatar-2.jpg' },
+      { id: 'user3', name: 'Sophia Williams', email: 'sophia@example.com', avatar: '/img/avatar-3.jpg' },
+      { id: 'user4', name: 'Sophia ', email: 'sophia@example.com', avatar: '/img/avatar-5.jpg' },
+
     ];
     
     const handleToggleMember = (member: Member) => {
@@ -188,7 +204,7 @@ const ProjectForm: React.FC = () => {
               onClick={() => handleToggleMember(member)}
             >
               <div className="flex-shrink-0">
-                <img src={member.avatar} alt="" className="h-10 w-10 rounded-full" />
+                <img src={member.avatar} alt="" className="h-10 w-10 rounded-full" onError={handleimageerror} />
               </div>
               <div className="ml-4 flex-1">
                 <h4 className="text-sm text-gray-200 font-medium">{member.name}</h4>
@@ -280,10 +296,7 @@ const ProjectForm: React.FC = () => {
     navigate('/projects');
   };
   
-  // Close form
-  const handleClose = () => {
-    navigate('/projects');
-  };
+  
   
   // Helper function for color hex values
   const getColorHex = (color: string): string => {
@@ -313,7 +326,10 @@ const ProjectForm: React.FC = () => {
     }
   };
   
+  if (!showmodal) return null;
+
   return (
+
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50  flex flex-col items-center justify-center p-4 ">
       <div className="bg-gray-800 rounded-lg shadow-lg w-full  max-w-2xl overflow-hidden ">
         {/* Header */}
@@ -335,7 +351,7 @@ const ProjectForm: React.FC = () => {
             </h2>
           </div>
           <button 
-            onClick={handleClose}
+            onClick={togglemodal}
             className="text-gray-500 hover:text-gray-700"
           >
             <XMarkIcon className="h-5 w-5" />

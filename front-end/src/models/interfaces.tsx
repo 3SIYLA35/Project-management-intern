@@ -3,6 +3,7 @@ export interface Project{
     name:string;
     description:string;
     startDate:string;
+    owner:Member;
     endDate:string;
     priority:string;
     status:string;
@@ -18,6 +19,7 @@ export interface Member{
     name:string;
     email:string;
     avatar:string;
+
 }
 export interface User{
     id:string;

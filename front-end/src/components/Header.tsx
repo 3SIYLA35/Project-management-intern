@@ -4,15 +4,17 @@ import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 interface HeaderProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  handleAddProject: () => void;
   toggleJumpToProject: () => void;
+  toggleProjectModal: () => void;
+  sourcepage:string;
 }
 
 const Header: React.FC<HeaderProps> = ({
   searchTerm,
   setSearchTerm,
-  handleAddProject,
-  toggleJumpToProject
+  toggleJumpToProject,
+  toggleProjectModal,
+  sourcepage
 }) => {
   return (
     <header className="flex justify-between items-center p-4 border-b border-gray-800">
@@ -35,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
       <div className="flex items-center">
-        <button className="bg-purple-600 text-white px-4 py-2 rounded-md flex items-center" onClick={handleAddProject}>
+        <button className="bg-purple-600 text-white px-4 py-2 rounded-md flex items-center" onClick={toggleProjectModal}>
           <PlusIcon className="h-5 w-5 mr-1" />
           Add
         </button>
