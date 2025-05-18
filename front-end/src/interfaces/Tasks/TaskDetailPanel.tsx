@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy, faEye, faPaperPlane, faShare, faTrash} from '@fortawesome/free-solid-svg-icons';
+import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy, faEye, faFaceSmile, faPaperclip, faPaperPlane, faShare, faTrash} from '@fortawesome/free-solid-svg-icons';
 import { faNoteSticky } from '@fortawesome/free-regular-svg-icons';
 import { IoIosAddCircleOutline } from "react-icons/io";
+import Emojipicker, { EmojiClickData } from 'emoji-picker-react';
+import EmojiPicker from 'emoji-picker-react';
 
 interface Attachment {
   id: string;
@@ -59,7 +61,15 @@ interface TaskDetailProps {
 }
 
 const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) => {
+  const [emojipickeropen,setemojipickeropen]=useState(false);
+
+  const handleEmojiClick=(event:EmojiClickData)=>{
+    console.log(event);
+    
+    setemojipickeropen(false);
+  }
   if (!isOpen || !task) return null;
+
 
   return (
     <div className="h-full  overflow-y-auto hover:hide-scrollbar hide-scrollbar ">
@@ -209,7 +219,6 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
             </div>
           </div>
         </div>
-
         {/* Activities Section */}
         <div className="mb-6 px-6">
           <div className='flex items-center mb-3 '>
@@ -218,10 +227,11 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
           </div>
           
           {/* User Status */}
-          <div className=" rounded-lg p-3 mb-4 flex items-center space-x-1 ">
+          <div className=" rounded-lg p-3 mb-4   ">
+           <div className='flex items-center'>
             <img src="/img/avatar-1.jpg" alt="Avatar" className="w-9 relative bottom-2  h-9 rounded-full mr-2" />
-              <div className='flex flex-col w-full'>
-            <div className="flex justify-between items-start  pt-2 pr-5 pl-7 h-[55px]  bg-violet-900 pl-4 rounded-tl-lg custom-rounded-tr-tl">
+            <div className='flex flex-col w-full'>
+             <div className="flex justify-between items-start  pt-2 pr-5 pl-7 h-[55px]  bg-violet-900 pl-4 rounded-tl-lg custom-rounded-tr-tl">
               <div className="flex items-center">
                 <span className="text-white">Ronak is out of office</span>
               </div>
@@ -230,8 +240,8 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-            </div>
-            <div className="flex p-1  items-center relative bottom-5 bg-white  px-4 custom-rounded">
+             </div>
+             <div className="flex p-1  items-center relative bottom-5 bg-white  px-4 custom-rounded">
               <textarea 
                 placeholder="Ask a question or send any update" 
                 className="flex-1  bg-transparent text-black rounded-lg px-3 py-2 focus:outline-none h-10"
@@ -246,9 +256,29 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
+             </div>
             </div>
-            </div>
+           </div>
+           <div className='pl-16 relative bottom-3' >
+             <button className='text-gray-300 hover:text-white'>
+              <FontAwesomeIcon icon={faPaperclip} className='text-[18px] '/>
+             </button>
+             <button className='text-gray-300 hover:text-white'
+             onClick={()=>{
+              setemojipickeropen(!emojipickeropen);
+             }}>
+              <FontAwesomeIcon icon={faFaceSmile} className='text-[18px] ml-4 ' />
+               
+             </button>
+              {emojipickeropen? 
+              <div className=''>
+                <EmojiPicker open={emojipickeropen} width={390} height={200} skinTonesDisabled={true}  searchDisabled={true} onEmojiClick={handleEmojiClick}></EmojiPicker>
+              </div>:''}
+           </div>
+
           </div>
+
+
           
           {/* Activity Comments */}
           <div className="space-y-4">
