@@ -10,6 +10,7 @@ import ProjectDetails from './interfaces/Projects/Projectdetails';
 import ProjectJump from './components/JumpToProject';
 import ProjectDashboard from './interfaces/Projects/Projects';
 import ProjectForm from './components/ProjectForm';
+import TasksPage from './interfaces/Tasks/taskspage';
 // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -105,6 +106,11 @@ const AppRouter=()=> {
          <AdminRoute>
           <ProjectDetails></ProjectDetails>
          </AdminRoute>
+        }/>
+        <Route path='/admin/tasks' element={
+          <AdminRoute>
+            <TasksPage/>
+          </AdminRoute>
         }/>
         
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}
