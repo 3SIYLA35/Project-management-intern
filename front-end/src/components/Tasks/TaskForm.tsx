@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoAdd, IoClose } from 'react-icons/io5';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
+import './TaskForm.css';
 
 // Sample data for users and projects
-const sampleUsers=[
+const sampleUsers = [
   { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
   { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
   { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
@@ -14,7 +15,7 @@ const sampleUsers=[
   { id: '5', name: 'User 5', avatar: '/img/avatar-5.jpg' },
 ];
 
-const sampleProjects=[
+const sampleProjects = [
   { id: '1', name: 'Marketing Website Redesign' },
   { id: '2', name: 'Mobile App Development' },
   { id: '3', name: 'Content Strategy' },
@@ -35,9 +36,10 @@ interface Project {
 interface TaskFormProps {
   onClose: () => void;
   onSave: (task: any) => void;
+  isopen: boolean;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('High');
@@ -47,8 +49,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   // New states for enhanced functionality
-  const [assignees, setAssignees]=useState<User[]>([]);
-  const [showAssigneeSelector,setShowAssigneeSelector]=useState(false);
+  const [assignees, setAssignees] = useState<User[]>([]);
+  const [showAssigneeSelector, setShowAssigneeSelector] = useState(false);
   
   const [phase, setPhase] = useState('');
   const [showPhaseInput, setShowPhaseInput] = useState(false);
@@ -57,7 +59,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
   const [assignedProject, setAssignedProject] = useState<Project | null>(null);
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   
-  const handleAddChecklistItem=() => {
+  const handleAddChecklistItem = () => {
     setChecklist([...checklist, '']);
   };
   
@@ -110,10 +112,12 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
     onSave(newTask);
     onClose();
   };
+
+  if (!isopen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4 overflow-hidden">
+    <div className="task-form-container">
+      <div className="animate-slide-down bg-gray-800 rounded-lg w-full max-w-md mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-b-gray-600">
           <div className="flex items-center space-x-2">
             <span className="text-green-500 font-semibold">☑</span>
@@ -123,10 +127,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
         </div>
         
         <div className="p-4 max-h-[80vh] hide-scrollbar overflow-y-auto">
-                      <input
-              type="text"
-              placeholder="Task Name"
-              className="w-full text-lg bg-gray-800 text-white pb-2 mb-4 focus:outline-none"
+          <input
+            type="text"
+            placeholder="Task Name"
+            className="w-full text-lg bg-gray-800 text-white pb-2 mb-4 focus:outline-none"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
           />
@@ -135,7 +139,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
             <div className="relative">
               <p className="text-xs font-medium text-gray-500 mb-1">ASSIGNED TO</p>
               <div className="flex items-center flex-wrap gap-2">
-                {assignees.length>0 ? (
+                {assignees.length > 0 ? (
                   assignees.map(user => (
                     <div key={user.id} className="flex items-center bg-gray-600 text-white rounded-full pr-2 overflow-hidden">
                       <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full mr-1" />
@@ -270,8 +274,9 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
               <textarea
                 className="w-full border-none rounded-lg bg-gray-600 text-white hide-scrollbar p-2 min-h-[80px] focus:outline-none focus:border-blue-300"
                 onInput={(e)=>{
-                  e.currentTarget.style.height='20px';
-                  e.currentTarget.style.height=e.currentTarget.scrollHeight+'px';
+                  const textarea = e.currentTarget as HTMLTextAreaElement;
+                  textarea.style.height='20px';
+                  textarea.style.height=textarea.scrollHeight+'px';
                 }}
                 placeholder="Add a description..."
                 value={description}
@@ -297,10 +302,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
           </div>
           
           <div className="mb-4 relative">
-            <p className="  text-xs font-medium text-gray-500 mb-1">ASSIGNED PROJECT</p>
-                          <div className="flex items-center ">
-                {assignedProject ? (
-                  <div className="flex items-center justify-between w-full bg-gray-600 text-white px-3 py-1 rounded">
+            <p className="text-xs font-medium text-gray-500 mb-1">ASSIGNED PROJECT</p>
+            <div className="flex items-center">
+              {assignedProject ? (
+                <div className="flex items-center justify-between w-full bg-gray-600 text-white px-3 py-1 rounded">
                   <span>{assignedProject.name}</span>
                   <button 
                     className="text-gray-500 hover:text-red-500"
@@ -314,13 +319,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
                   className="text-gray-400 flex items-center hover:text-blue-500"
                   onClick={() => setShowProjectSelector(!showProjectSelector)}
                 >
-                  <IoAdd  className='mr-1'/> Link to Project
+                  <IoAdd className='mr-1'/> Link to Project
                 </button>
               )}
             </div>
             
-                          {showProjectSelector && (
-                <div className="absolute mt-1 z-10 bg-gray-700 text-white rounded shadow-lg border border-gray-600 max-h-48 w-full overflow-y-auto">
+            {showProjectSelector && (
+              <div className="absolute mt-1 z-10 bg-gray-700 text-white rounded shadow-lg border border-gray-600 max-h-48 w-full overflow-y-auto">
                 {sampleProjects.map(project => (
                   <div 
                     key={project.id} 
@@ -343,7 +348,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
           
           <div className="border-t pt-4">
             <div className="flex border-b border-gray-600">
-              <button className="text-gray-200 pb-2  font-medium mr-4">COMMENTS</button>
+              <button className="text-gray-200 pb-2 font-medium mr-4">COMMENTS</button>
             </div>
             
             <div className="mt-4 relative bg-gray-600 rounded-lg p-2">
@@ -351,14 +356,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
                 placeholder="Add Comment..."
                 className="w-full hide-scrollbar rounded-lg bg-gray-600 outline-none border-b-transparent border-b border-gray-200 pb-2 focus:outline-none"
                 onInput={(e)=>{
-                  e.currentTarget.style.height='30px';
-                  e.currentTarget.style.height=e.currentTarget.scrollHeight+'px';
+                  const textarea = e.currentTarget as HTMLTextAreaElement;
+                  textarea.style.height='30px';
+                  textarea.style.height=textarea.scrollHeight+'px';
                 }}
               />
               <div className="flex justify-between items-center">
                 <button className="bg-gray-800 rounded-lg font-semibold text-white px-4 py-1 rounded text-sm">
-                  
-                  Comment</button>
+                  Comment
+                </button>
                 <div className="flex space-x-2">
                   <button className="text-gray-400">
                     <FontAwesomeIcon icon={faPaperclip} className='text-gray-200' />
@@ -375,7 +381,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
           </div>
         </div>
         
-        <div className="flex justify-end p-4 ">
+        <div className="flex justify-end p-4">
           <button 
             className="px-4 py-2 mr-2 rounded border rounded-lg w-[115px] bg-gray-100 text-gray-600 font-semibold border-1 border-gray-200"
             onClick={onClose}
@@ -383,7 +389,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave }) => {
             Cancel
           </button>
           <button 
-            className="bg-black text-white font-semibold  rounded-lg border-gray-600 w-[115px] hover:bg-gray-700 px-4 py-2 rounded"
+            className="bg-black text-white font-semibold rounded-lg border-gray-600 w-[115px] hover:bg-gray-700 px-4 py-2 rounded"
             onClick={handleSaveTask}
           >
             Save Task

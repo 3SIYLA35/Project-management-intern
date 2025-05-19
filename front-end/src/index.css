@@ -66,3 +66,26 @@ input::placeholder {
 }
 
 
+.task-form-enter {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.task-form-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.task-form-exit {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.task-form-exit-active {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+

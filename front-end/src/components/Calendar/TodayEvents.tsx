@@ -1,0 +1,70 @@
+import React from 'react';
+import { EventProps } from './EventCard';
+
+interface TodayEventsProps {
+  events: EventProps[];
+  onEventClick: (id: string) => void;
+}
+
+const TodayEvents: React.FC<TodayEventsProps> = ({ events, onEventClick }) => {
+  // Filter events for today
+  const todayEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    const today = new Date();
+    return eventDate.getDate() === today.getDate() &&
+      eventDate.getMonth() === today.getMonth() &&
+      eventDate.getFullYear() === today.getFullYear();
+  });
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4 mb-4">
+      <h2 className="text-lg font-medium text-white mb-3">Today's Events</h2>
+      
+      {todayEvents.length === 0 ? (
+        <p className="text-gray-400 text-sm">No events scheduled for today.</p>
+      ) : (
+        <ul className="space-y-3">
+          {todayEvents.map(event => (
+            <li 
+              key={event.id}
+              className="bg-gray-750 rounded-md p-3 cursor-pointer hover:bg-gray-700"
+              onClick={() => onEventClick(event.id)}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-medium text-white">{event.title}</h3>
+                  <p className="text-sm text-gray-400">{event.startTime} - {event.endTime}</p>
+                </div>
+                
+                <div className="flex items-center">
+                  <div className="bg-green-500 h-2.5 w-2.5 rounded-full mr-2"></div>
+                  <span className="text-xs text-green-500">Today</span>
+                </div>
+              </div>
+              
+              {event.participants && event.participants.length > 0 && (
+                <div className="mt-2 flex items-center">
+                  <div className="flex -space-x-2">
+                    {event.participants.slice(0, 3).map((participant) => (
+                      <img 
+                        key={participant.id}
+                        src={participant.avatar} 
+                        alt={participant.name} 
+                        className="w-6 h-6 rounded-full border border-gray-800"
+                      />
+                    ))}
+                  </div>
+                  {event.participants.length > 3 && (
+                    <span className="text-xs text-gray-400 ml-2">+{event.participants.length - 3}</span>
+                  )}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default TodayEvents; 

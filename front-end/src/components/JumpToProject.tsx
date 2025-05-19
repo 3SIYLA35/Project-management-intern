@@ -8,7 +8,7 @@ interface JumpToProjectProps {
   setSearchTerm: (term: string) => void;
   projects: Project[];
   toggleModal: () => void;
-  handleViewProject: (id: string) => void;
+   handleViewProject: (project: Project) => void;
 }
 
 const JumpToProject: React.FC<JumpToProjectProps> = ({
@@ -62,7 +62,7 @@ const JumpToProject: React.FC<JumpToProjectProps> = ({
                   hoveredId === project.id ? 'bg-gray-600 shadow-lg -translate-y-1' : ''
                 }`}
                 onClick={() => {
-                  handleViewProject(project.id);
+                  handleViewProject(project);
                   toggleModal();
                 }}
                 onMouseEnter={() => setHoveredId(project.id)}

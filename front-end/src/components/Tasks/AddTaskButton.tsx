@@ -9,11 +9,12 @@ interface AddTaskButtonProps {
 const AddTaskButton: React.FC<AddTaskButtonProps> = ({ onTaskAdded }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   
-  const handleOpenForm = () => {
+  const handleOpenForm=()=>{
+    console.log('isFormOpen',isFormOpen);
     setIsFormOpen(true);
   };
   
-  const handleCloseForm = () => {
+  const handleCloseForm=()=>{
     setIsFormOpen(false);
   };
   
@@ -33,7 +34,8 @@ const AddTaskButton: React.FC<AddTaskButtonProps> = ({ onTaskAdded }) => {
       {isFormOpen && (
         <TaskForm 
           onClose={handleCloseForm} 
-          onSave={handleSaveTask} 
+          onSave={handleSaveTask}
+          isopen={isFormOpen} 
         />
       )}
     </>

@@ -6,12 +6,14 @@ import Register from './login-registre/registration';
 import { useAuth } from './login-registre/Auth/authContext';
 import Invitepage from './interfaces/Invitepage';
 import Projectpage from './interfaces/Projects/Projects';
-import ProjectDetails from './interfaces/Projects/Projectdetails';
 import ProjectJump from './components/JumpToProject';
 import ProjectDashboard from './interfaces/Projects/Projects';
 import ProjectForm from './components/ProjectForm';
 import TasksPage from './interfaces/Tasks/taskspage';
-// Protected route component
+import ConversationPage from './interfaces/Conversation/ConversationPage';
+import CalendarPage from './interfaces/Calendar/CalendarPage';
+import { Project } from './models/interfaces';
+  // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
   
@@ -73,7 +75,7 @@ const AppRouter=()=> {
               throw new Error('Function not implemented.');
             } } projects={[]} toggleModal={function (): void {
               throw new Error('Function not implemented.');
-            } } handleViewProject={function (id: string): void {
+            } } handleViewProject={function (project: Project): void {
               throw new Error('Function not implemented.');
             } } />
           </ProtectedRoute>
@@ -102,15 +104,23 @@ const AppRouter=()=> {
             <Projectpage />
           </AdminRoute>
         }/>
-        <Route path='/admin/project-details' element={
-         <AdminRoute>
-          <ProjectDetails></ProjectDetails>
-         </AdminRoute>
-        }/>
+        
         <Route path='/admin/tasks' element={
           <AdminRoute>
             <TasksPage/>
           </AdminRoute>
+        }/>
+        
+        <Route path='/conversation' element={
+          <ProtectedRoute>
+            <ConversationPage />
+          </ProtectedRoute>
+        }/>
+        
+        <Route path='/calendar' element={
+          <ProtectedRoute>
+            <CalendarPage />
+          </ProtectedRoute>
         }/>
         
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}

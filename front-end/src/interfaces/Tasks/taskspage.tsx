@@ -78,6 +78,7 @@ export default function TasksPage() {
 
   // Add a function to handle adding a new task
   const handleAddTask = (newTask: Task) => {
+    console.log('newTask',newTask);
     setTasks([...tasks, newTask]);
   };
 

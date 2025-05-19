@@ -86,8 +86,8 @@ export default function Dashboard() {
     setShowJumpModal(!showJumpModal);
   };
   
-  const handleViewProject = (id: string) => {
-    navigate(`/project/${id}`);
+  const handleViewProject = (project: Project) => {
+    navigate(`/project/${project.id}`);
   };
 
   return (
