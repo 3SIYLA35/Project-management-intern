@@ -6,6 +6,9 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 import Viewtoggle from '../../components/viewtoggle';
 import ProjectFilters from '../../components/projectfilters';
 import TaskDetailPanel from './TaskDetailPanel';
+import AddTaskButton from '../../components/Tasks/AddTaskButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface Task {
   id: string;
@@ -63,7 +66,7 @@ export default function TasksPage() {
   };
 
   // Handle task selection
-  const handleTaskClick = (task: Task) => {
+  const handleTaskClick=(task: Task)=>{
     setSelectedTask(task);
     setShowTaskDetail(true);
   };
@@ -73,204 +76,109 @@ export default function TasksPage() {
     setShowTaskDetail(false);
   };
 
+  // Add a function to handle adding a new task
+  const handleAddTask = (newTask: Task) => {
+    setTasks([...tasks, newTask]);
+  };
+
   // Mock tasks data
   useEffect(() => {
     const mockTasks: Task[] = [
-      {
-        id: '1',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'completed',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '2',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '3',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'completed',
-        assignees: [
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '4',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '5',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'not_started',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '6',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'completed',
-        assignees: [
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '7',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '8',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '9',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'not_started',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '10',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '11',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'in_progress',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
-      {
-        id: '12',
-        name: 'Process Page Illustration',
-        description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-        status: 'not_started',
-        assignees: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-          { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-        ],
-        assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-        assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-        dueDate: '25th February, 2020',
-        priority: 'High Priority',
-        comments: 8,
-        attachments: 12,
-      },
+        {
+          id: '1',
+          name: 'Process Documentation',
+          description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
+          status: 'completed',
+          assignees: [
+            { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
+            { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
+            { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
+          ],
+          assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
+          assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
+          dueDate: '25th February, 2020',
+          priority: 'High Priority',
+          comments: 8,
+          attachments: 12,
+        },
+        {
+          id: '2',
+          name: 'Launch Marketing Campaign',
+          description: 'Develop and execute a comprehensive marketing strategy to promote the new product launch. Focus on digital channels and track performance metrics.',
+          status: 'in_progress',
+          assignees: [
+            { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
+            { id: '5', name: 'User 5', avatar: '/img/avatar-5.jpg' },
+          ],
+          assignedBy: { id: '7', name: 'Alice Johnson', avatar: '/img/avatar-4.jpg' },
+          assignee: { id: '8', name: 'Bob Smith', avatar: '/img/avatar-5.jpg' },
+          dueDate: '15th March, 2023',
+          priority: 'Medium Priority',
+          comments: 3,
+          attachments: 5,
+        },
+        {
+          id: '3',
+          name: 'User Research Study',
+          description: 'Conduct interviews with target users to gather feedback on the new feature prototype. Analyze results and prepare a report with recommendations.',
+          status: 'not_started',
+          assignees: [
+            { id: '9', name: 'User 6', avatar: '/img/avatar-6.jpg' },
+          ],
+          assignedBy: { id: '10', name: 'Carol Davis', avatar: '/img/avatar-7.jpg' },
+          assignee: { id: '9', name: 'User 6', avatar: '/img/avatar-6.jpg' },
+          dueDate: '5th April, 2023',
+          priority: 'Low Priority',
+          comments: 1,
+          attachments: 2,
+        },
+        {
+          id: '4',
+          name: 'Database Optimization',
+          description: 'Review current database schema and implement optimizations to improve query performance. Document changes and measure performance improvements.',
+          status: 'in_progress',
+          assignees: [
+            { id: '11', name: 'User 7', avatar: '/img/avatar-8.jpg' },
+            { id: '12', name: 'User 8', avatar: '/img/avatar-9.jpg' },
+          ],
+          assignedBy: { id: '13', name: 'David Wilson', avatar: '/img/avatar-10.jpg' },
+          assignee: { id: '11', name: 'User 7', avatar: '/img/avatar-8.jpg' },
+          dueDate: '10th March, 2023',
+          priority: 'High Priority',
+          comments: 5,
+          attachments: 3,
+        },
+        {
+          id: '5',
+          name: 'UI Design Review',
+          description: 'Conduct a comprehensive review of the new user interface designs. Ensure consistency with brand guidelines and provide feedback to the design team.',
+          status: 'not_started',
+          assignees: [
+            { id: '14', name: 'User 9', avatar: '/img/avatar-11.jpg' },
+            { id: '15', name: 'User 10', avatar: '/img/avatar-12.jpg' },
+          ],
+          assignedBy: { id: '16', name: 'Emma Clark', avatar: '/img/avatar-13.jpg' },
+          assignee: { id: '14', name: 'User 9', avatar: '/img/avatar-11.jpg' },
+          dueDate: '20th March, 2023',
+          priority: 'Medium Priority',
+          comments: 0,
+          attachments: 8,
+        },
+        {
+          id: '6',
+          name: 'API Integration',
+          description: 'Integrate the payment gateway API with our platform. Implement error handling and conduct testing to ensure reliable operation.',
+          status: 'completed',
+          assignees: [
+            { id: '17', name: 'User 11', avatar: '/img/avatar-14.jpg' },
+          ],
+          assignedBy: { id: '18', name: 'Frank Miller', avatar: '/img/avatar-15.jpg' },
+          assignee: { id: '17', name: 'User 11', avatar: '/img/avatar-14.jpg' },
+          dueDate: '1st March, 2023',
+          priority: 'High Priority',
+          comments: 12,
+          attachments: 4,
+        }
     ];
     
     setTasks(mockTasks);
@@ -316,14 +224,16 @@ export default function TasksPage() {
         </ErrorBoundary>
 
         <main className="flex-1 overflow-y-auto p-4">
-          <div className="flex space-x-4 mb-4">
-            <h1 className="text-2xl flex-1 font-bold">Tasks</h1>
+          <div className="flex space-x-4 mb-4 justify-between">
+            
             <Viewtoggle 
               viewmode={viewmode}
               onviewchange={setViewmode}
               showfilters={showfilters}
               ontogglefilters={() => setShowfilters(!showfilters)}
             />
+            <AddTaskButton onTaskAdded={handleAddTask} />
+            
             {showfilters && (
               <div className="absolute right-8 top-32 z-50">
                 <ProjectFilters

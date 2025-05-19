@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy, faEye, faFaceSmile, faPaperclip, faPaperPlane, faShare, faTrash} from '@fortawesome/free-solid-svg-icons';
 import { faNoteSticky } from '@fortawesome/free-regular-svg-icons';
@@ -68,7 +68,13 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
     
     setemojipickeropen(false);
   }
+  useEffect(()=>{
+   if(task){
+     console.log('task is updated ',task);
+   }
+  },[task]);
   if (!isOpen || !task) return null;
+
 
 
   return (
@@ -276,8 +282,8 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
               </div>:''}
            </div>
 
+                <div className='w-full h-[2px] mx-2 bg-gray-700'></div>
           </div>
-
 
           
           {/* Activity Comments */}
@@ -303,23 +309,29 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
                   </button>
                 </div>
                 <div className="flex mt-2 space-x-3 text-xs text-gray-400">
-                  <button className="hover:text-white">Reply</button>
-                  <button className="hover:text-white">Share</button>
-                  <button className="hover:text-white">Send feedback</button>
+                  <button className="hover:text-white">
+                  <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
+                    Reply</button>
+                  <button className="hover:text-white">
+                  <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
+                    Share</button>
                 </div>
               </div>
             </div>
             
-            <div className="flex">
+            <div className="flex ml-12">
               <img src="/img/avatar-3.jpg" alt="Avatar" className="w-8 h-8 rounded-full mr-3" />
               <div className="flex-1">
                 <p className="text-gray-300">
                   <span className="text-white font-medium">Please see this artwork created from an website.</span>
                 </p>
                 <div className="flex mt-2 space-x-2">
-                  <button className="text-gray-400 hover:text-white text-xs">Reply</button>
-                  <button className="text-gray-400 hover:text-white text-xs">Share</button>
-                  <button className="text-gray-400 hover:text-white text-xs">Send feedback</button>
+                  <button className="text-gray-400 hover:text-white text-xs">
+                  <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
+                    Reply</button>
+                  <button className="text-gray-400 hover:text-white text-xs">
+                  <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />  
+                    Share</button>
                 </div>
               </div>
             </div>
