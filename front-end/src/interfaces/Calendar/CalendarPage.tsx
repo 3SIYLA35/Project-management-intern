@@ -14,7 +14,7 @@ import { EventFormData } from '../../components/Calendar/EventForm';
 export default function CalendarPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate]=useState(new Date());
   const [isEventFormOpen, setIsEventFormOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   
@@ -172,13 +172,13 @@ export default function CalendarPage() {
   ]);
 
   // Handle navigation for sidebar items
-  const handleNavigation = (path: string) => {
+  const handleNavigation=(path: string) => {
     navigate(path);
   };
 
   // Handle month navigation
   const handlePrevMonth = () => {
-    const prevMonth = new Date(currentDate);
+    const prevMonth=new Date(currentDate);
     prevMonth.setMonth(prevMonth.getMonth() - 1);
     setCurrentDate(prevMonth);
   };

@@ -7,12 +7,12 @@ interface WeeklyCalendarProps {
   onEventClick: (id: string) => void;
 }
 
-const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ events, currentDate, onEventClick }) => {
-  // Get the days of the week for the current date's week
+const WeeklyCalendar: React.FC<WeeklyCalendarProps>=({ events, currentDate, onEventClick }) => {
+  
   const getDaysOfWeek = () => {
-    const days = [];
-    const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const startOfWeek = new Date(currentDate);
+    const days=[];
+    const dayOfWeek=currentDate.getDay(); 
+    const startOfWeek=new Date(currentDate);
     
     // Set to Monday of the week
     startOfWeek.setDate(currentDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
@@ -48,7 +48,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ events, currentDate, on
   };
   
   // Hours to display in the calendar
-  const hours = Array.from({ length: 8 }, (_, i) => i + 9); // 9 AM to 4 PM
+  const hours = Array.from({ length: 8 }, (_, i) => i + 9);
 
   return (
     <div className="bg-gray-900 rounded-lg overflow-hidden">

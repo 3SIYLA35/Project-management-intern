@@ -18,7 +18,7 @@ export interface EventProps {
   onEventClick?: (id: string) => void;
 }
 
-const EventCard: React.FC<EventProps> = ({
+const EventCard: React.FC<EventProps>=({
   id,
   title,
   startTime,
@@ -31,8 +31,8 @@ const EventCard: React.FC<EventProps> = ({
   onEventClick
 }) => {
   // Determine the color and style based on event type
-  const getEventStyles = () => {
-    switch (type) {
+  const getEventStyles=()=>{
+    switch (type){
       case 'today':
         return {
           indicator: 'bg-green-500',
@@ -64,7 +64,7 @@ const EventCard: React.FC<EventProps> = ({
     }
   };
 
-  const styles = getEventStyles();
+  const styles=getEventStyles();
 
   return (
     <div 

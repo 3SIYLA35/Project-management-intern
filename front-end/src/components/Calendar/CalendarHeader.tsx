@@ -9,14 +9,14 @@ interface CalendarHeaderProps {
   onFilter: () => void;
 }
 
-const CalendarHeader: React.FC<CalendarHeaderProps> = ({ 
+const CalendarHeader: React.FC<CalendarHeaderProps>=({ 
   currentDate, 
   onPrevMonth, 
   onNextMonth, 
   onAddEvent,
   onFilter 
 }) => {
-  const formatMonth = () => {
+  const formatMonth=()=>{
     return currentDate.toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric'

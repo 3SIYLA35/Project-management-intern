@@ -12,6 +12,7 @@ import ProjectForm from './components/ProjectForm';
 import TasksPage from './interfaces/Tasks/taskspage';
 import ConversationPage from './interfaces/Conversation/ConversationPage';
 import CalendarPage from './interfaces/Calendar/CalendarPage';
+import ProfilePage from './interfaces/Profile/ProfilePage';
 import { Project } from './models/interfaces';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
@@ -120,6 +121,12 @@ const AppRouter=()=> {
         <Route path='/calendar' element={
           <ProtectedRoute>
             <CalendarPage />
+          </ProtectedRoute>
+        }/>
+        
+        <Route path='/profile' element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         }/>
         
