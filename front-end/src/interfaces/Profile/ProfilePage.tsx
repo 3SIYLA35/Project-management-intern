@@ -1,29 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SideNav from '../../components/SideNav';
 import Header from '../../components/Header';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import { UserProfile } from '../../components/Profile/types';
 
-interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  role: string;
-  department: string;
-  joinDate: string;
-  phone?: string;
-  location?: string;
-  bio?: string;
-  skills: string[];
-  timeZone: string;
-}
+// Import Profile Section Components
+import ProfileSection from '../../components/Profile/ProfileSection';
+import CoverUploadSection from '../../components/Profile/CoverUploadSection';
+import PersonalInfoSection from '../../components/Profile/PersonalInfoSection';
+
+// Lazy load other sections for better performance
+const WorkInfoSection =lazy(()=>import('../../components/Profile/WorkInfoSection'));
+const WorkingHoursSection=lazy(() => import('../../components/Profile/WorkingHoursSection'));
+const BioSection=lazy(()=>import('../../components/Profile/BioSection'));
+const SkillsSection=lazy(() => import('../../components/Profile/SkillsSection'));
+const ProjectsSection = lazy(() => import('../../components/Profile/ProjectsSection'));
+
+// Loading fallback for lazy-loaded components
+const SectionLoader = () => (
+  <div className="bg-gray-800 rounded-lg p-6 shadow-md animate-pulse">
+    <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
+    <div className="space-y-3">
+      <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+      <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+      <div className="h-4 bg-gray-700 rounded w-5/6"></div>
+    </div>
+  </div>
+);
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [avataruser,setAvataruser]=useState<File|null>(null);
+
   // Example profile data - replace with actual data fetching
   const [profile, setProfile] = useState<UserProfile>({
     id: '1',
@@ -37,7 +49,37 @@ export default function ProfilePage() {
     location: 'New York, USA',
     bio: 'Experienced project manager with over 8 years of expertise in agile methodologies and team leadership.',
     skills: ['Project Management', 'Agile', 'Scrum', 'Team Leadership', 'Strategic Planning'],
-    timeZone: 'UTC-5 (Eastern Time)'
+    timeZone: 'UTC-5 (Eastern Time)',
+    age: 32,
+    coverImage: null,
+    workingHours: {
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      startTime: '09:00 AM',
+      endTime: '05:00 PM'
+    },
+    recentProjects: [
+      {
+        id: 'p1',
+        name: 'E-commerce Website Redesign',
+        role: 'Project Manager',
+        progress: 75,
+        lastActive: '2023-09-15'
+      },
+      {
+        id: 'p2',
+        name: 'Mobile App Development',
+        role: 'Scrum Master',
+        progress: 45,
+        lastActive: '2023-09-20'
+      },
+      {
+        id: 'p3',
+        name: 'Customer Portal Upgrade',
+        role: 'Team Lead',
+        progress: 90,
+        lastActive: '2023-09-18'
+      }
+    ]
   });
 
   const [formData, setFormData] = useState<UserProfile>(profile);
@@ -69,14 +111,67 @@ export default function ProfilePage() {
   };
   
   const handleSaveProfile = () => {
-    // Here you would save the profile to your backend
-    setProfile(formData);
+    // Create a new profile object with potential cover image URL
+    const updatedProfile = {
+      ...formData,
+    };
+    
+    // Here you would typically upload the cover image and get a URL
+    if (coverImageFile) {
+      // This would be replaced with an actual upload and URL retrieval
+      console.log('Uploading cover image:', coverImageFile.name);
+      // updatedProfile.coverImage = uploadedUrl;
+    }
+    
+    // Save the updated profile
+    setProfile(updatedProfile);
     setIsEditing(false);
   };
   
   const handleCancelEdit = () => {
     setFormData(profile);
+    setCoverImageFile(null);
     setIsEditing(false);
+  };
+  
+  const handleCoverUpload=(file: File)=>{
+    setCoverImageFile(file);
+    setFormData({
+      ...formData,
+      coverImage:URL.createObjectURL(file)
+    });
+  };
+  
+  const handleViewProfile = () => {
+    // Navigate to public profile view
+    console.log('Viewing public profile');
+    // navigate('/public-profile/' + profile.id);
+  };
+
+  const handlechangeimageprofile=(e:React.ChangeEvent<HTMLInputElement>)=>{
+   const avatarr=e.target.files;
+   setAvataruser(avatarr?avatarr[0]:null);
+   const tempavatar=e.target.files?.[0];
+    setFormData({
+      ...formData,
+      avatar:URL.createObjectURL(tempavatar as unknown as Blob) 
+    })
+
+    setProfile({
+      ...profile,
+      avatar:URL.createObjectURL(tempavatar as unknown as Blob)
+    })
+  }
+  const fileinputRef=useRef<HTMLInputElement>(null)
+  const handleuploadimage=()=>{
+     if(fileinputRef.current){
+      fileinputRef.current.click();
+     }
+  }
+  // Format date function
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   return (
@@ -94,7 +189,7 @@ export default function ProfilePage() {
           />
           
           <div className='flex-1 overflow-auto p-6'>
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               {/* Profile Header with Actions */}
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">My Profile</h1>
@@ -125,200 +220,132 @@ export default function ProfilePage() {
                 </div>
               </div>
               
-              {/* Profile Content */}
-              <div className="bg-gray-800 rounded-lg overflow-hidden">
-                {/* Profile Banner & Avatar */}
-                <div className="relative h-48 bg-gradient-to-r from-purple-800 to-blue-700">
+              
+              
+              {/* Profile Banner & Avatar */}
+              <div className="bg-gray-800 rounded-lg overflow-hidden mb-6 shadow-md">
+                <div 
+                  className="relative h-48 bg-gradient-to-r from-purple-800 to-blue-700"
+                  style={
+                    formData.coverImage ? { backgroundImage: `url(${formData.coverImage})`,backgroundSize: 'cover', backgroundPosition: 'center' } 
+                      : {}
+                  }
+                >
                   <div className="absolute -bottom-12 left-8">
                     <div className="relative">
                       <img 
-                        src={profile.avatar || '/img/avatar-placeholder.jpg'} 
+                        src={profile.avatar || '/img/default-avatar.webp'} 
                         alt={profile.name} 
                         className="w-24 h-24 rounded-full border-4 border-gray-800"
                       />
                       {isEditing && (
-                        <button className="absolute bottom-0 right-0 bg-purple-600 rounded-full p-1 shadow-lg">
+                        <button className="absolute bottom-0 right-0 bg-purple-600 rounded-full p-1 shadow-lg"
+                         onClick={handleuploadimage}
+                        >
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
+                          <input type="file"
+                            onChange={(e)=>handlechangeimageprofile(e)}
+                            className='hidden'
+                            ref={fileinputRef}
+                            accept='image/*'
+
+                          />
                         </button>
                       )}
                     </div>
-                  </div>
-                </div>
-                
-                {/* Profile Info */}
+                  </div>      
+                            </div>
                 <div className="pt-16 px-8 pb-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Personal Information */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Full Name</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.name}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Email</label>
-                          {isEditing ? (
-                            <input
-                              type="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.email}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Phone</label>
-                          {isEditing ? (
-                            <input
-                              type="tel"
-                              name="phone"
-                              value={formData.phone || ''}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.phone || 'Not provided'}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Location</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="location"
-                              value={formData.location || ''}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.location || 'Not provided'}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Work Information */}
-                    <div>
-                      <h2 className="text-xl font-semibold mb-4">Work Information</h2>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Role</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="role"
-                              value={formData.role}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.role}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Department</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="department"
-                              value={formData.department}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.department}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Time Zone</label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              name="timeZone"
-                              value={formData.timeZone}
-                              onChange={handleInputChange}
-                              className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-gray-200">{profile.timeZone}</p>
-                          )}
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm text-gray-400 mb-1">Join Date</label>
-                          <p className="text-gray-200">{new Date(profile.joinDate).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Bio */}
-                  <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Bio</h2>
-                    {isEditing ? (
-                      <textarea
-                        name="bio"
-                        value={formData.bio || ''}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[100px]"
-                      />
-                    ) : (
-                      <p className="text-gray-200">{profile.bio || 'No bio provided.'}</p>
-                    )}
-                  </div>
-                  
-                  {/* Skills */}
-                  <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-4">Skills</h2>
-                    {isEditing ? (
-                      <div>
-                        <input
-                          type="text"
-                          value={formData.skills.join(', ')}
-                          onChange={handleSkillsChange}
-                          placeholder="Enter skills separated by commas"
-                          className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                        <p className="text-xs text-gray-400 mt-1">Separate skills with commas</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {profile.skills.map((skill, index) => (
-                          <span 
-                            key={index} 
-                            className="px-3 py-1 bg-gray-700 rounded-full text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <h1 className="text-2xl font-bold">{profile.name}</h1>
+                  <p className="text-gray-400">{profile.role} • {profile.department}</p>
                 </div>
+              </div>
+              <div className="mb-6">
+                <CoverUploadSection 
+                  isEditing={isEditing}
+                  onUpload={handleCoverUpload}
+                  coverImage={formData.coverImage}
+                  onSaveChanges={handleSaveProfile}
+                  onViewProfile={handleViewProfile}
+                />
+              </div>
+              
+              {/* Profile Content in Card Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Personal Information Card */}
+                <ProfileSection title="Personal Information">
+                  <PersonalInfoSection 
+                    profile={profile}
+                    formData={formData}
+                    isEditing={isEditing}
+                    handleInputChange={handleInputChange}
+                  />
+                </ProfileSection>
+                
+                {/* Work Information Card */}
+                <Suspense fallback={<SectionLoader />}>
+                  <ProfileSection title="Work Information">
+                    <WorkInfoSection 
+                      profile={profile}
+                      formData={formData}
+                      isEditing={isEditing}
+                      handleInputChange={handleInputChange}
+                      formatDate={formatDate}
+                    />
+                  </ProfileSection>
+                </Suspense>
+                
+                {/* Working Hours Card */}
+                <Suspense fallback={<SectionLoader />}>
+                  <ProfileSection title="Working Hours">
+                    <WorkingHoursSection 
+                      profile={profile}
+                      formData={formData}
+                      isEditing={isEditing}
+                      handleInputChange={handleInputChange}
+                    />
+                  </ProfileSection>
+                </Suspense>
+                
+                {/* Bio Card */}
+                <Suspense fallback={<SectionLoader />}>
+                  <ProfileSection title="Bio">
+                    <BioSection 
+                      profile={profile}
+                      formData={formData}
+                      isEditing={isEditing}
+                      handleInputChange={handleInputChange}
+                    />
+                  </ProfileSection>
+                </Suspense>
+              </div>
+              
+              {/* Full Width Cards */}
+              <div className="mt-6 space-y-6">
+                {/* Skills Card */}
+                <Suspense fallback={<SectionLoader />}>
+                  <ProfileSection title="Skills">
+                    <SkillsSection 
+                      profile={profile}
+                      formData={formData}
+                      isEditing={isEditing}
+                      handleSkillsChange={handleSkillsChange}
+                    />
+                  </ProfileSection>
+                </Suspense>
+                
+                {/* Recent Projects Card */}
+                <Suspense fallback={<SectionLoader />}>
+                  <ProfileSection title="Recent Projects">
+                    <ProjectsSection 
+                      profile={profile}
+                      formatDate={formatDate}
+                    />
+                  </ProfileSection>
+                </Suspense>
               </div>
             </div>
           </div>

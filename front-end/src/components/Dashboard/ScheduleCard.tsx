@@ -43,7 +43,7 @@ const ScheduleCard: React.FC<ScheduleCardProps> = ({ meetings, onViewAll }) => {
               <p className="text-gray-400 text-sm">{meeting.startTime} - {meeting.endTime} {meeting.isOnline && '(UTC)'}</p>
             </div>
             <button className='absolute top-0 right-0 p-2'>
-            <GoChevronDown  className='text-xl text-gray-400'/>
+            <GoChevronDown  className='text-xl hover:text-white transfrom hover:scale-[1.5] hover:duration-[0.5s] text-gray-400'/>
             </button>
 
 

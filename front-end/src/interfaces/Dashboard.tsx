@@ -340,8 +340,8 @@ export default function Dashboard() {
                 />
               </div>
             </div>
-          </div>
         </div>
+      </div>
 
         {/* Jump to project modal */}
         <JumpToProject 
