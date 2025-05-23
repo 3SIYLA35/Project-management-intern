@@ -11,20 +11,17 @@ const UserSchema=new Schema({
     },
     password:{
         type:String,
-        required:false
+        required:false,
+        trim:true
     },
-    FirstName:{
+    name:{
         type:String,
         required:false
     },
-    Number:{
+    Phone:{
         type:Number,
         required:false,
         unique:true
-    },
-    LastName:{
-        type:String,
-        required:false
     },
     Role:{
         type:String,
@@ -38,6 +35,48 @@ const UserSchema=new Schema({
     lastLogin:{
         type:Date,
 
-    }
+    },
+    department:{
+        type:String,
+        required:false
+    },
+    joinDate:{
+        type:Date,
+        required:false
+    },
+    location:{
+        type:String,
+        required:false
+    },
+    bio:{
+        type:String,
+        required:false
+    },
+    skills:[{
+        type:String,
+        required:false
+    }],
+    age:{
+        type:Number,
+        required:false
+    },
+    workinghours:{
+        days:[{
+            type:String,
+            required:false
+        }],
+        starttime:{
+            type:String,
+            required:false
+        },
+        endtime:{
+            type:String,
+            required:false
+        },
+    },
+    coverImage:{
+        type:String,
+        required:true
+    },
 }, {timestamps:true});
 module.exports=mongoose.model('users',UserSchema);
