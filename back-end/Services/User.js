@@ -12,3 +12,18 @@ exports.getUser=async(email)=>{
         console.error(err.message);
     }
 }
+
+const UserService={
+    getProfileData:async(userID)=>{
+         try{
+            const user=await Users.findById(userID)
+            .select('-password');
+            if(!user){
+                throw new Error('user not found');
+            }
+         }catch(err){
+            console.error(err.message);
+         }
+    }
+}
+module.exports =UserService;

@@ -5,12 +5,11 @@ export interface UserProfile{
   avatar: string;
   role: string;
   department: string;
-  joinDate: string;
-  phone?: string;
+  joinDate:Date;
+  phone?: number;
   location?: string;
   bio?: string;
   skills: string[];
-  timeZone: string;
   age?: number;
   workingHours?: {
     days: string[];
@@ -18,7 +17,9 @@ export interface UserProfile{
     endTime: string;
   };
   recentProjects?: Project[];
-  coverImage?: string | null;
+  coverImage?: string ;
+  lastLogin:Date;
+  timeZone: string;
 }
 
 export interface Project{
