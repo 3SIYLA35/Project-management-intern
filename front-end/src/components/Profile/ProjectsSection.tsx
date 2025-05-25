@@ -4,7 +4,7 @@ import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 interface ProjectsSectionProps {
-  profile: UserProfile;
+  profile: UserProfile | null;
   formatDate: (dateString: string) => string;
   className?: string;
 }
@@ -24,9 +24,9 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   
   return (
     <div className={`space-y-4 ${className}`}>
-      {profile.recentProjects && profile.recentProjects.length > 0 ? (
+      {profile?.recentProjects && profile?.recentProjects.length > 0 ? (
         <div className="space-y-6">
-          {profile.recentProjects.map((project) => (
+          {profile?.recentProjects.map((project) => (
             <div key={project.id} className="bg-gray-750 rounded-md p-4">
               <div className="flex justify-between items-start">
 

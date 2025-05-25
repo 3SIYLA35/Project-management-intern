@@ -3,15 +3,16 @@ import { UserProfile } from "@/components/Profile/types";
 
 interface ApiUserprofile{
     _id:string;
-    name:string;
+    firstName:string;
+    lastName:string;
     email:string;
     password?:string;
     Phone?:number;
-    Role?:string;
+    role?:string;
     avatarUrl?:string;
     lastLogin?:Date;
     department?:string;
-    joinDate?:Date;
+    joinDate?:string; 
     location?:string;
     bio?:string;
     skills?:string[];
@@ -24,17 +25,28 @@ interface ApiUserprofile{
     coverImage?:string;
 
 }
+export type ApiUserProfile=ApiUserprofile;
 
 
 export const adaptuserProfile=(apiClient:ApiUserprofile):UserProfile=>{
    return {
     id:apiClient._id,
-    name:apiClient.name,
+    name:apiClient.firstName+' '+apiClient.lastName, 
     email:apiClient.email,
     avatar:apiClient.avatarUrl|| '/img/default-avatar.webp',
-    role:apiClient.Role||'member',
+    role:apiClient.role||'member',
     department:apiClient.department || 'unassigned',
-    joinDate:apiClient.joinDate|| new Date(),
+    joinDate: apiClient.joinDate ? new Date(apiClient.joinDate).toLocaleDateString('en-US',
+        {year:'numeric',
+            month:'long',
+            day:'numeric'
+        }
+    ) : new Date().toLocaleDateString('en-US',
+        {year:'numeric',
+            month:'long',
+            day:'numeric'
+        }
+    ),
     location:apiClient.location,
     bio:apiClient.bio,
     skills:apiClient.skills||[],
@@ -50,10 +62,14 @@ export const adaptuserProfile=(apiClient:ApiUserprofile):UserProfile=>{
 
 export const addaptProfileforapi=(profile:Partial<UserProfile>):Partial<ApiUserprofile>=>{
     const apiprofile:Partial<ApiUserprofile>={};
-    if(profile.name!==undefined) apiprofile.name=profile.name;
+    if(profile.name!==undefined){
+        const [firstName,lastName]=profile.name.split(' ');
+        apiprofile.firstName=firstName;
+        apiprofile.lastName=lastName;
+    }
     if(profile.email!==undefined) apiprofile.email=profile.email;
     if(profile.avatar!==undefined) apiprofile.avatarUrl=profile.avatar;
-    if(profile.role!==undefined) apiprofile.Role=profile.role;
+    if(profile.role!==undefined) apiprofile.role=profile.role;
     if(profile.department!==undefined) apiprofile.department=profile.department;
     if(profile.joinDate!==undefined) apiprofile.joinDate=profile.joinDate;
     if(profile.location!==undefined) apiprofile.location=profile.location;
@@ -64,7 +80,7 @@ export const addaptProfileforapi=(profile:Partial<UserProfile>):Partial<ApiUserp
     if(profile.coverImage!==undefined) apiprofile.coverImage=profile.coverImage;
     if(profile.lastLogin!==undefined) apiprofile.lastLogin=profile.lastLogin;
     if(profile.phone!==undefined) apiprofile.Phone=profile.phone;
-    
+
     // if(profile.recentProjects!==undefined) apiprofile.recentProjects=profile.recentProjects;
     // if(profile.timeZone!==undefined) apiprofile.timeZone=profile.timeZone;
 

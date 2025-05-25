@@ -5,7 +5,7 @@ export interface UserProfile{
   avatar: string;
   role: string;
   department: string;
-  joinDate:Date;
+  joinDate:string;
   phone?: number;
   location?: string;
   bio?: string;

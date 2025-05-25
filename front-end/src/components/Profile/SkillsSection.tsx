@@ -2,8 +2,8 @@ import React from 'react';
 import { UserProfile } from './types';
 
 interface SkillsSectionProps {
-  profile: UserProfile;
-  formData: UserProfile;
+  profile: UserProfile | null;
+  formData: Partial<UserProfile> | null;
   isEditing: boolean;
   handleSkillsChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
@@ -25,7 +25,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             <input
               type="text"
               name="skills"
-              value={formData.skills.join(', ')}
+              value={formData?.skills?.join(', ')}
               onChange={handleSkillsChange}
               className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Enter skills separated by commas"
@@ -34,8 +34,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {profile.skills && profile.skills.length > 0 ? (
-              profile.skills.map((skill, index) => (
+            {profile?.skills && profile?.skills.length > 0 ? (
+              profile?.skills.map((skill, index) => (
                 <span 
                   key={index} 
                   className="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm"
@@ -50,7 +50,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         )}
       </div>
       
-      {!isEditing && profile.skills && profile.skills.length > 0 && (
+      {!isEditing && profile?.skills && profile?.skills.length > 0 && (
         <div className="pt-2">
           <div className="flex items-center space-x-2 text-gray-400">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

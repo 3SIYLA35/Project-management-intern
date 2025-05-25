@@ -14,6 +14,7 @@ import ConversationPage from './interfaces/Conversation/ConversationPage';
 import CalendarPage from './interfaces/Calendar/CalendarPage';
 import ProfilePage from './interfaces/Profile/ProfilePage';
 import { Project } from './models/interfaces';
+import { ProfileProvider } from './Contexts/ProfileContext';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -125,9 +126,11 @@ const AppRouter=()=> {
         }/>
         
         <Route path='/profile' element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
+          <ProfileProvider>
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          </ProfileProvider>
         }/>
         
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}

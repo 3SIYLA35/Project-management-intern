@@ -2,8 +2,8 @@ import React from 'react';
 import { UserProfile } from './types';
 
 interface WorkingHoursSectionProps {
-  profile: UserProfile;
-  formData: UserProfile;
+  profile: UserProfile | null;
+  formData: Partial<UserProfile> | null;
   isEditing: boolean;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   className?: string;
@@ -37,7 +37,7 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
 
   // Handler for working days checkboxes
   const handleDayChange = (day: string, checked: boolean) => {
-    const currentDays = formData.workingHours?.days || [];
+    const currentDays = formData?.workingHours?.days || [];
     let newDays;
     
     if (checked) {
@@ -48,7 +48,7 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
     
     // We need to update the nested workingHours object
     const updatedWorkingHours = {
-      ...(formData.workingHours || { startTime: '', endTime: '' }),
+      ...(formData?.workingHours || { startTime: '', endTime: '' }),
       days: newDays
     };
     
@@ -73,7 +73,7 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
   // Handler for time changes
   const handleTimeChange = (timeType: 'startTime' | 'endTime', value: string) => {
     const updatedWorkingHours = {
-      ...(formData.workingHours || { days: [] }),
+      ...(formData?.workingHours || { days: [] }),
       [timeType]: value
     };
     
@@ -100,7 +100,7 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
                 <input
                   type="checkbox"
                   id={`day-${day}`}
-                  checked={formData.workingHours?.days?.includes(day) || false}
+                  checked={formData?.workingHours?.days?.includes(day) || false}
                   onChange={(e) => handleDayChange(day, e.target.checked)}
                   className="mr-2 h-4 w-4 bg-gray-700 border-gray-600 rounded text-purple-600 focus:ring-purple-500"
                 />
@@ -110,7 +110,7 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
           </div>
         ) : (
           <p className="text-gray-200">
-            {profile.workingHours ? formatWorkingDays(profile.workingHours.days) : 'Not specified'}
+            {profile?.workingHours ? formatWorkingDays(profile?.workingHours.days) : 'Not specified'}
           </p>
         )}
       </div>
@@ -121,12 +121,12 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
           {isEditing ? (
             <input
               type="time"
-              value={formData.workingHours?.startTime || ''}
+              value={formData?.workingHours?.startTime || ''}
               onChange={(e) => handleTimeChange('startTime', e.target.value)}
               className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           ) : (
-            <p className="text-gray-200">{profile.workingHours?.startTime || 'Not specified'}</p>
+            <p className="text-gray-200">{profile?.workingHours?.startTime || 'Not specified'}</p>
           )}
         </div>
         
@@ -135,19 +135,19 @@ const WorkingHoursSection: React.FC<WorkingHoursSectionProps> = ({
           {isEditing ? (
             <input
               type="time"
-              value={formData.workingHours?.endTime || ''}
+              value={formData?.workingHours?.endTime || ''}
               onChange={(e) => handleTimeChange('endTime', e.target.value)}
               className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           ) : (
-            <p className="text-gray-200">{profile.workingHours?.endTime || 'Not specified'}</p>
+              <p className="text-gray-200">{profile?.workingHours?.endTime || 'Not specified'}</p>
           )}
         </div>
       </div>
       
-      {!isEditing && profile.workingHours && (
+      {!isEditing && profile?.workingHours && (
         <div className="mt-2 text-gray-400 text-sm">
-          <p>Works {formatWorkingDays(profile.workingHours.days)} from {profile.workingHours.startTime} to {profile.workingHours.endTime}</p>
+          <p>Works {formatWorkingDays(profile?.workingHours.days)} from {profile?.workingHours.startTime} to {profile?.workingHours.endTime}</p>
         </div>
       )}
     </div>

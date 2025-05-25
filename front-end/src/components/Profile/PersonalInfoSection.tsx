@@ -1,19 +1,11 @@
 import React from 'react';
+import { UserProfile } from './types';
 
-interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  age?: number;
-  phone?: string;
-  location?: string;
-  [key: string]: any; // Allow additional properties
-}
+
 
 interface PersonalInfoSectionProps {
-  profile: UserProfile;
-  formData: UserProfile;
+  profile: UserProfile |null;  
+  formData: Partial<UserProfile>|null;
   isEditing: boolean;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   className?: string;
@@ -34,12 +26,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           <input
             type="text"
             name="name"
-            value={formData.name}
+            value={formData?.name}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.name}</p>
+          <p className="text-gray-200">{profile?.name}</p>
         )}
       </div>
       
@@ -49,12 +41,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           <input
             type="email"
             name="email"
-            value={formData.email}
+            value={formData?.email}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.email}</p>
+          <p className="text-gray-200">{profile?.email}</p>
         )}
       </div>
       
@@ -64,12 +56,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           <input
             type="number"
             name="age"
-            value={formData.age || ''}
+            value={formData?.age || ''}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.age || 'Not provided'}</p>
+          <p className="text-gray-200">{profile?.age || 'Not provided'}</p>
         )}
       </div>
       
@@ -79,12 +71,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           <input
             type="tel"
             name="phone"
-            value={formData.phone || ''}
+            value={formData?.phone || ''}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.phone || 'Not provided'}</p>
+          <p className="text-gray-200">{profile?.phone || 'Not provided'}</p>
         )}
       </div>
       
@@ -94,12 +86,12 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           <input
             type="text"
             name="location"
-            value={formData.location || ''}
+            value={formData?.location || ''}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.location || 'Not provided'}</p>
+          <p className="text-gray-200">{profile?.location || 'Not provided'}</p>
         )}
       </div>
     </div>

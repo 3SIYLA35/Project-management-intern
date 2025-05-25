@@ -2,8 +2,8 @@ import React from 'react';
 import { UserProfile } from './types';
 
 interface BioSectionProps {
-  profile: UserProfile;
-  formData: UserProfile;
+  profile: UserProfile | null;
+  formData: Partial<UserProfile> | null;
   isEditing: boolean;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   className?: string;
@@ -23,7 +23,7 @@ const BioSection: React.FC<BioSectionProps> = ({
         {isEditing ? (
           <textarea
             name="bio"
-            value={formData.bio || ''}
+            value={formData?.bio || ''}
             onChange={handleInputChange}
             rows={5}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -31,8 +31,8 @@ const BioSection: React.FC<BioSectionProps> = ({
           />
         ) : (
           <div className="text-gray-200">
-            {profile.bio ? (
-              <p>{profile.bio}</p>
+            {profile?.bio ? (
+              <p>{profile?.bio}</p>
             ) : (
               <p className="text-gray-400 italic">No bio information provided.</p>
             )}
@@ -40,7 +40,7 @@ const BioSection: React.FC<BioSectionProps> = ({
         )}
       </div>
       
-      {!isEditing && profile.bio && (
+      {!isEditing && profile?.bio && (
         <div className="pt-2">
           <div className="flex items-center space-x-2 text-gray-400">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -2,8 +2,8 @@ import React from 'react';
 import { UserProfile } from './types';
 
 interface WorkInfoSectionProps {
-  profile: UserProfile;
-  formData: UserProfile;
+  profile: UserProfile | null;    
+  formData: Partial<UserProfile> | null;
   isEditing: boolean;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   formatDate: (dateString: string) => string;
@@ -26,12 +26,12 @@ const WorkInfoSection: React.FC<WorkInfoSectionProps> = ({
           <input
             type="text"
             name="role"
-            value={formData.role}
+            value={formData?.role}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.role}</p>
+          <p className="text-gray-200">{profile?.role}</p>
         )}
       </div>
       
@@ -41,12 +41,12 @@ const WorkInfoSection: React.FC<WorkInfoSectionProps> = ({
           <input
             type="text"
             name="department"
-            value={formData.department}
+            value={formData?.department}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.department}</p>
+          <p className="text-gray-200">{profile?.department}</p>
         )}
       </div>
       
@@ -56,12 +56,12 @@ const WorkInfoSection: React.FC<WorkInfoSectionProps> = ({
           <input
             type="date"
             name="joinDate"
-            value={formData.joinDate}
+            value={formData?.joinDate}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{formatDate(profile.joinDate)}</p>
+          <p className="text-gray-200">{profile?.joinDate}</p>
         )}
       </div>
       
@@ -71,12 +71,12 @@ const WorkInfoSection: React.FC<WorkInfoSectionProps> = ({
           <input
             type="text"
             name="timeZone"
-            value={formData.timeZone || ''}
+            value={formData?.timeZone || ''}
             onChange={handleInputChange}
             className="w-full bg-gray-700 text-white border-none rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         ) : (
-          <p className="text-gray-200">{profile.timeZone || 'Not provided'}</p>
+          <p className="text-gray-200">{profile?.timeZone || 'Not provided'}</p>
         )}
       </div>
     </div>
