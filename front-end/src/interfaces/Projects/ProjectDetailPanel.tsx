@@ -5,6 +5,8 @@ import { faNoteSticky, faChartBar } from '@fortawesome/free-regular-svg-icons';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import EmojiPicker from 'emoji-picker-react';
 import { Project } from '../../components/Profile/types';
+import Editmodal from '../../components/Main components/editmodal';
+import { useProjectContext } from '../../Contexts/ProjectContext';
 
 interface Attachment {
   id: string;
@@ -44,17 +46,43 @@ interface ProjectDetailProps {
 const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,project }) => {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [comment, setComment] = useState('');
+  const [editmodalopen,seteditmodalopen]=useState(false);
+  const [editfield,seteditfield]=useState<string|null>(null);
+  const [editvalue,seteditvalue]=useState<string|null>(null);
+  const projectContext=useProjectContext();
+  const {updateproject}=projectContext;
+  const [localproject,setlocalproject]=useState<Project|null>(project);
+  useEffect(()=>{
+    setlocalproject(project);
+  },[project]);
+
+  const [editedproject,seteditedproject]=useState<Partial<Project>|null>(null);
+
+  const handleeditclick=(field:string,value:string)=>{
+    seteditfield(field);
+    seteditvalue(value);
+    seteditmodalopen(true);
+  }
+  const handlesaveedit=()=>{
+    console.log('editfield',editfield,editvalue);
+    if(localproject && editfield ){
+      console.log('id',localproject?.id);
+      if(localproject?.id){
+        // console.error('Project ID is required to update project');
+        seteditedproject({[editfield]:editvalue});
+        updateproject(localproject?.id,editedproject as Partial<Project>);
+        setlocalproject(prev=>prev?{...prev,[editfield]:editvalue}:null);
+      }
+      seteditmodalopen(false);
+    }
+  }
 
   const handleEmojiClick=(emojiData: any)=>{
     setComment(comment + emojiData.emoji);
     setEmojiPickerOpen(false);
   };
 
-  useEffect(()=>{
-    if (project) {
-      console.log('project is updated ', project);
-    }
-  }, [project]);
+ 
 
   if (!isOpen || !project) return null;
 
@@ -122,13 +150,15 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           <div className="flex items-center">
             <FontAwesomeIcon icon={faBarsProgress} className='text-[15px] mr-2' />
             <h3 className="text-white text-lg font-medium">Project Name</h3>
-            <button className="ml-2 text-gray-400 hover:text-white">
+            <button className="ml-2 text-gray-400 hover:text-white"
+             onClick={()=>handleeditclick('name',localproject?.name || '')}
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
           </div>
-          <p className="text-white mt-2 ml-4">{project.name}</p>
+          <p className="text-white mt-2 ml-4">{localproject?.name}</p>
         </div>
 
         {/* Description */}
@@ -136,14 +166,16 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           <div className="flex items-center">
             <FontAwesomeIcon icon={faNoteSticky} className='text-[15px] mr-2' />
             <h3 className="text-white text-lg font-medium">Description</h3>
-            <button className="ml-2 text-gray-400 hover:text-white">
+            <button className="ml-2 text-gray-400 hover:text-white"
+            onClick={()=>handleeditclick('description',localproject?.description || '')}
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
           </div>
           <p className="text-gray-300 mt-2 ml-4">
-            {project.description || 'No description provided.'}
+            {localproject?.description || 'No description provided.'}
           </p>
         </div>
 
@@ -172,15 +204,15 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Project Owner</h4>
             <div className="flex items-center">
-              <img src={project.owner.avatar} alt="Avatar" className="w-6 h-6 rounded-full mr-2" />
-              <span className="text-gray-300">{project.owner.name}</span>
+              <img src={localproject?.owner.avatar} alt="Avatar" className="w-6 h-6 rounded-full mr-2" />
+              <span className="text-gray-300">{localproject?.owner.name}</span>
             </div>
           </div>
           
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Status</h4>
             <span className={`text-white text-sm px-2 py-1 rounded-full ${statusColor}`}>
-              {project?.status && project?.status?.replace('_', ' ').charAt(0).toUpperCase() + project?.status?.replace('_', ' ').slice(1)}
+              {localproject?.status && localproject?.status?.replace('_', ' ').charAt(0).toUpperCase() + localproject?.status?.replace('_', ' ').slice(1)}
             </span>
           </div>
           
@@ -228,7 +260,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           </div>
           
           <div className="flex flex-wrap gap-2 ml-4">
-            {project?.members?.map((member) => (
+            {localproject?.members?.map((member) => (
               <div key={member.id} className="flex items-center bg-gray-700 p-2 rounded">
                 <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full mr-2" />
                 <div>
@@ -237,7 +269,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
                 </div>
               </div>
             ))}
-            {project?.members && project.members.length === 0 && (
+            {localproject?.members && localproject.members.length === 0 && (
               <p className="text-gray-400">No team members added yet.</p>
             )}
           </div>
@@ -258,15 +290,15 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           <div className="bg-gray-700 rounded-lg p-3 ml-4">
             <div className="flex justify-between mb-2">
               <p className="text-white">Completed Tasks</p>
-              <p className="text-white">{project.completedTasks}</p>
+              <p className="text-white">{localproject?.completedTasks}</p>
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-white">Total Tasks</p>
-              <p className="text-white">{project.totalTasks}</p>
+              <p className="text-white">{localproject?.totalTasks}</p>
             </div>
             <div className="flex justify-between">
               <p className="text-white">Remaining Tasks</p>
-              <p className="text-white">{project?.totalTasks && project?.completedTasks && project?.totalTasks - project?.completedTasks}</p>
+              <p className="text-white">{localproject?.totalTasks && localproject?.completedTasks && localproject?.totalTasks - localproject?.completedTasks}</p>
             </div>
           </div>
         </div>
@@ -379,6 +411,14 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           </div>
         </div>
       </div>
+      <Editmodal
+        isOpen={editmodalopen}
+        onsave={handlesaveedit}
+        onChange={(value:string)=>seteditvalue(value)}
+        onclose={()=>seteditmodalopen(false)}
+        fieldname={editfield || ''}
+        value={editvalue || ''}
+      />
     </div>
   );
 };

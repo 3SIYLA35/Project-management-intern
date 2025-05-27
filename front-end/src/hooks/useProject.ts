@@ -24,9 +24,7 @@ export const useProject=()=>{
         try{
             setloading(true);
             const data=await ProjectApi.updateproject(projectid,updatedata);
-            setprojects(
-                prev=>prev? prev?.map(project=>project.id===projectid?data:project):null
-            );
+            setprojects(prev=>prev?prev.map(project=>project.id===projectid?data:project):null);
             setloading(false);
         }catch(err){
             seterror('failed to update project');

@@ -17,6 +17,18 @@ const ProjectService={
             console.error("error on service",err.message);
             return null;
         }
+    },
+    updateproject:async(projectid,updatedata)=>{
+        try{
+            const project=await projectmodel.findByIdAndUpdate(
+                projectid,
+                {$set:updatedata},
+                {new:true});
+            return project;
+        }catch(err){
+            console.error("error on service",err.message);
+            return null;
+        }
     }
 }
 

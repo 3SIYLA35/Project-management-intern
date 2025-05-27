@@ -44,6 +44,7 @@ export const adaptprojecct=(apiclient:ApiProject):Project=>{
 export const adaptprojectforapi=(project:Partial<Project>):Partial<ApiProject>=>{
     const apiProject:Partial<ApiProject>={};
 
+    console.log('project',project);
     if(project.name!==undefined)apiProject.name=project.name;
     if(project.description!==undefined)apiProject.description=project.description;
     if(project.endDate!==undefined)apiProject.endDate=project.endDate;

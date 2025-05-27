@@ -34,3 +34,23 @@ exports.getallprojects=async(req,res)=>{
         return res.status(500).json({message:"error on controller"});;
     }
 }
+
+exports.updateproject=async(req,res)=>{
+    try{
+        console.log("updateproject controller called");
+        const iduser=req.user.id;
+        if(!iduser){
+            return res.status(401).json({message:"unauthorized"});
+        }
+        const projectid=req.params.id;
+        const updatedata=req.body;
+        const project=await projectService.updateproject(projectid,updatedata);
+        if(!project){
+            return res.status(404).json({message:"project not found"});
+        }
+        return res.status(200).json(project);
+    }catch(err){
+        console.error("error on controller",err.message);
+        return res.status(500).json({message:"error on controller"});;
+    }
+}
