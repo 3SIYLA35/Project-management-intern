@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use('/auth',require('./Routes/Login'));
 app.use('/hr',require('./Routes/hr'));
 app.use('/employee',require('./Routes/User'));
+app.use('/project',require('./Routes/project'));
 app.listen(port,()=>{
     console.log(`server is  runing at port :${port}`);;
 })

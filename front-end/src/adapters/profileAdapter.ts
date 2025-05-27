@@ -80,7 +80,7 @@ export const addaptProfileforapi=(profile:Partial<UserProfile>):Partial<ApiUserp
     if(profile.coverImage!==undefined) apiprofile.coverImage=profile.coverImage;
     if(profile.lastLogin!==undefined) apiprofile.lastLogin=profile.lastLogin;
     if(profile.phone!==undefined) apiprofile.Phone=profile.phone;
-
+     apiprofile._id=profile.id;
     // if(profile.recentProjects!==undefined) apiprofile.recentProjects=profile.recentProjects;
     // if(profile.timeZone!==undefined) apiprofile.timeZone=profile.timeZone;
 

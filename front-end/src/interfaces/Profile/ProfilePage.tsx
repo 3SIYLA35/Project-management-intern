@@ -1,8 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../../components/SideNav';
-import Header from '../../components/Header';
-import ErrorBoundary from '../../components/ErrorBoundary';
+import SideNav from '../../components/Main components/SideNav';
+import Header from '../../components/Main components/Header';
+import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import { UserProfile } from '../../components/Profile/types';
 
 // Import Profile Section Components

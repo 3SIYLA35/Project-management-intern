@@ -39,6 +39,16 @@ const UserService={
         }catch(err){
             console.error(err.message);
         }
+    },
+    getallemployees:async()=>{
+        try{
+            const employees=await Users.find();
+            console.log('employees fetched from service',employees);
+            return employees;
+        }catch(err){
+            console.log(err.message);
+            return null
+        }
     }
 
 }

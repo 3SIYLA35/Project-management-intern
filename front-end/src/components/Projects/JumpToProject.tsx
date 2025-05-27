@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { Project } from '../models/interfaces';
+import { Project } from '../Profile/types';
 
 interface JumpToProjectProps {
   showModal: boolean;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  projects: Project[];
+  projects: Project[]|null;
   toggleModal: () => void;
    handleViewProject: (project: Project) => void;
 }
@@ -54,12 +54,12 @@ const JumpToProject: React.FC<JumpToProjectProps> = ({
         
         <div className="space-y-3 max-h-80 overflow-y-auto overflow-x-hidden  px-1 ">
           {projects
-            .filter(project => project.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            ?.filter(project => project?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
             .map(project => (
               <div 
-                key={project.id} 
+                key={project?.id} 
                 className={`flex items-center p-3 bg-gray-700 rounded-lg cursor-pointer transition-all duration-300 ${
-                  hoveredId === project.id ? 'bg-gray-600 shadow-lg -translate-y-1' : ''
+                  hoveredId === project?.id ? 'bg-gray-600 shadow-lg -translate-y-1' : ''
                 }`}
                 onClick={() => {
                   handleViewProject(project);
@@ -71,7 +71,7 @@ const JumpToProject: React.FC<JumpToProjectProps> = ({
                 <div 
                   className={`w-8 h-8 flex items-center justify-center rounded-full text-white mr-3 transition-all duration-300`}
                   style={{ 
-                    backgroundColor: getColorHex(project.color),
+                    backgroundColor: getColorHex(project?.color || 'purple'),
                     transform: hoveredId === project.id ? 'scale(1.1) rotate(5deg)' : 'scale(1) rotate(0deg)'
                   }}
                 >
@@ -84,7 +84,7 @@ const JumpToProject: React.FC<JumpToProjectProps> = ({
               </div>
             ))
           }
-          {projects.filter(project => project.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+          {projects?.filter(project => project.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
             <div className="text-center text-gray-400 py-4">
               No projects found matching "{searchTerm}"
             </div>

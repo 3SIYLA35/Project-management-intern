@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PlusIcon, MagnifyingGlassIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import TimeTracker from './TimeTracker/TimeTracker';
+import TimeTracker from '../TimeTracker/TimeTracker';
+import { useProfile } from '../../hooks/useProfile';
 
 interface HeaderProps {
   searchTerm: string;
@@ -25,6 +26,8 @@ const Header: React.FC<HeaderProps> = ({
   const [showTimeTracker, setShowTimeTracker] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
+  const context=useProfile();
+  const {fetchallemployee}=context;
   // Close profile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

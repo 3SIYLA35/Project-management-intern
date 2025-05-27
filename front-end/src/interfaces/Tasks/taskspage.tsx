@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../../components/SideNav';
-import Header from '../../components/Header';
-import ErrorBoundary from '../../components/ErrorBoundary';
-import Viewtoggle from '../../components/viewtoggle';
-import ProjectFilters from '../../components/projectfilters';
+import SideNav from '../../components/Main components/SideNav';
+import Header from '../../components/Main components/Header';
+import ErrorBoundary from '../../components/Main components/ErrorBoundary';
+import Viewtoggle from '../../components/Main components/viewtoggle';
+import ProjectFilters from '../../components/Projects/projectfilters';
 import TaskDetailPanel from './TaskDetailPanel';
 import AddTaskButton from '../../components/Tasks/AddTaskButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

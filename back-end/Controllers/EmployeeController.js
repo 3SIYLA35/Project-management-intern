@@ -22,3 +22,20 @@ exports.updateprofileinfo=async(req,res)=>{
     }
 }
 
+exports.getallemployee=async(req,res)=>{
+    try{
+        const userid=req.user.id;
+        if(!userid){
+            return res.status(401).json({error:"unauthorized"});
+        }
+        const employees=await UserService.getallemployees();
+        if(!employees){
+            return res.status(404).json({error:"no employees found"});
+        }
+        return res.status(200).json(employees);
+    }catch(err){
+        console.error("error on controller",err.message);
+        return res.status(500).json({error:"failed to get all employee"});
+    }
+}
+

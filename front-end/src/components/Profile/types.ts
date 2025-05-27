@@ -25,9 +25,20 @@ export interface UserProfile{
 export interface Project{
   id: string;
   name: string;
-  role: string;
-  progress: number;
-  lastActive: string;
+  description?:string;
+  startDate:Date;
+  endDate:Date;
+  color?:string;
+  role?:string;
+  status?:string;
+  progress:number;
+  completedTasks?:number;
+  totalTasks?:number;
+  daysLeft?:number;
+  owner:UserProfile;
+  members?:UserProfile[];
+  createdAt?:string;
+  updatedAt?:string;
 }
 
 export interface BaseProfileSectionProps {

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Project } from '../models/interfaces';
+import { Project } from '../components/Profile/types';
 
 // Import components
-import SideNav from '../components/SideNav';
-import Header from '../components/Header';
-import JumpToProject from '../components/JumpToProject';
-import ErrorBoundary from '../components/ErrorBoundary';
-import ProjectForm from '../components/ProjectForm';
+import SideNav from '../components/Main components/SideNav';
+import Header from '../components/Main components/Header';
+import JumpToProject from '../components/Projects/JumpToProject';
+import ErrorBoundary from '../components/Main components/ErrorBoundary';
+import ProjectForm from '../components/Projects/ProjectForm';
 
 // Import Dashboard components
 import StatCard from '../components/Dashboard/StatCard';
@@ -18,6 +18,7 @@ import Communication from '../components/Dashboard/Communication';
 
 // Import time tracking component
 import TimeTracker from '../components/TimeTracker/TimeTracker';
+import { useProjectContext } from '../Contexts/ProjectContext';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -32,63 +33,8 @@ export default function Dashboard() {
     week: 24.5
   });
   
-  // Example projects data - replace with actual data fetching
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: '1',
-      name: 'Project Management App',
-      description: 'A project management application with task tracking',
-      startDate: '2023-01-01',
-      endDate: '2023-12-31',
-      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
-      priority: 'High',
-      status: 'In Progress',
-      members: [
-        { id: 'user1', name: 'John Doe', email: 'john@example.com', avatar: 'https://via.placeholder.com/40' }
-      ],
-      color: 'blue',
-      progress: 60,
-      completedTasks: 24,
-      totalTasks: 40,
-      daysLeft: 45
-    },
-    {
-      id: '2',
-      name: 'E-commerce Website',
-      description: 'Online shopping platform with user accounts',
-      startDate: '2023-03-15',
-      endDate: '2023-09-30',
-      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
-      priority: 'Medium',
-      status: 'Planning',
-      members: [
-        { id: 'user2', name: 'Jane Smith', email: 'jane@example.com', avatar: 'https://via.placeholder.com/40' }
-      ],
-      color: 'green',
-      progress: 30,
-      completedTasks: 12,
-      totalTasks: 40,
-      daysLeft: 120
-    },
-    {
-      id: '3',
-      name: 'Mobile Banking App',
-      description: 'Secure banking application for smartphones',
-      startDate: '2023-02-10',
-      endDate: '2023-11-15',
-      owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
-      priority: 'Critical',
-      status: 'Development',
-      members: [
-        { id: 'user3', name: 'Alex Johnson', email: 'alex@example.com', avatar: 'https://via.placeholder.com/40' }
-      ],
-      color: 'purple',
-      progress: 45,
-      completedTasks: 18,
-      totalTasks: 40,
-      daysLeft: 75
-    }
-  ]);
+  const projectContext=useProjectContext();
+  const {projects}=projectContext;
 
   // Mock tasks data
   const [tasks, setTasks] = useState([

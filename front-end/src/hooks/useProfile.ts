@@ -7,11 +7,11 @@ export const useProfile=()=>{
     const [profile,setprofile]=useState<UserProfile|null>(null);
     const [loading,setloading]=useState(false);
     const [error,seterror]=useState<string|null>(null);
+    const [employees,setemployees]=useState<UserProfile[]>([]);
     const fetchProfile=async()=>{
         try{
             setloading(true);
             const data=await userApi.getProfileinfo();
-            console.log('data fetched from hoook ',data);
             setprofile(data);
 
         }catch(err){
@@ -31,9 +31,22 @@ export const useProfile=()=>{
             setloading(false);
         }
     }
+
+    const fetchallemployee=async()=>{
+        try{
+            console.log('fetching employees');
+            setloading(true);
+            const data=await userApi.getallemployee();
+            setemployees(data);
+        }catch(err){
+            seterror('failed to fetch employees');
+        }finally{
+            setloading(false);
+        }
+    }
     useEffect(()=>{
         fetchProfile();
-        console.log('profile fetched',profile);
+        fetchallemployee();
     },[]);
-    return {profile,loading,error,updateprofile,fetchProfile};
+    return {profile,loading,error,updateprofile,fetchProfile,fetchallemployee,employees};
 }

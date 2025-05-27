@@ -21,7 +21,7 @@ const projecctSchema=new mongoose.Schema({
         type:String,
         enum:['in_progress','completed','cancelled'],
         default:'in_progress',
-        required:true
+        required:false
     },
     color:{
         type:String,
@@ -30,7 +30,7 @@ const projecctSchema=new mongoose.Schema({
     progress:{
         type:Number,
         default:0,
-        required:true
+        required:false
     },
     completedTasks:{
         type:Number,

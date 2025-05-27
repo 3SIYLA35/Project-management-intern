@@ -6,15 +6,16 @@ import Register from './login-registre/registration';
 import { useAuth } from './login-registre/Auth/authContext';
 import Invitepage from './interfaces/Invitepage';
 import Projectpage from './interfaces/Projects/Projects';
-import ProjectJump from './components/JumpToProject';
+import ProjectJump from './components/Projects/JumpToProject';
 import ProjectDashboard from './interfaces/Projects/Projects';
-import ProjectForm from './components/ProjectForm';
+import ProjectForm from './components/Projects/ProjectForm';
 import TasksPage from './interfaces/Tasks/taskspage';
 import ConversationPage from './interfaces/Conversation/ConversationPage';
 import CalendarPage from './interfaces/Calendar/CalendarPage';
 import ProfilePage from './interfaces/Profile/ProfilePage';
-import { Project } from './models/interfaces';
+import { Project } from './components/Profile/types';
 import { ProfileProvider } from './Contexts/ProfileContext';
+import { ProjectProvider } from './Contexts/ProjectContext';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -58,6 +59,7 @@ const AuthCallback=()=> {
 const AppRouter=()=> {
   return (
     <Router>
+      <ProjectProvider> 
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
@@ -89,9 +91,11 @@ const AppRouter=()=> {
         }/>
           <Route path='/new-project' element={
             <ProtectedRoute>
-              <ProjectForm showmodal={false} sourcepage='' togglemodal={function (): void {
-                throw new Error('Function not implemented.');
-              } } />
+              <ProjectProvider>
+                <ProjectForm showmodal={false} sourcepage='' togglemodal={function (): void {
+                  throw new Error('Function not implemented.');
+                } } />
+              </ProjectProvider>
             </ProtectedRoute>
           }/>
         
@@ -103,7 +107,9 @@ const AppRouter=()=> {
         } />
         <Route path='/admin/project' element={
           <AdminRoute>
-            <Projectpage />
+            <ProjectProvider>
+              <Projectpage />
+            </ProjectProvider>
           </AdminRoute>
         }/>
         
@@ -132,10 +138,11 @@ const AppRouter=()=> {
             </ProtectedRoute>
           </ProfileProvider>
         }/>
-        
+
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+        </ProjectProvider>
     </Router>
   );
 };

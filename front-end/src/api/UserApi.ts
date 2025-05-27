@@ -5,7 +5,6 @@ import { ApiUserProfile } from "../adapters/profileAdapter";
 export const userApi={
     getProfileinfo:async()=>{
         const response=await apiClient.get<ApiUserProfile>('/employee/get-profile-info');
-        console.log('data fetched from api',response);
         return adaptuserProfile(response);
     },
     updateprofileinfo:async(updatedData:Partial<UserProfile>)=>{
@@ -13,5 +12,9 @@ export const userApi={
             addaptProfileforapi(updatedData)
         )
         return adaptuserProfile(response);
+    },
+    getallemployee:async()=>{
+        const response=await apiClient.get<ApiUserProfile[]>('/employee/get-all-employees');
+        return response.map(adaptuserProfile);
     }
 }

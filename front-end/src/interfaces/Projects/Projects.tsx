@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StarIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import { Project } from '../../models/interfaces';
+import { Project } from '../../components/Profile/types';
 import {
   Select,
   SelectContent,
@@ -11,17 +11,19 @@ import {
 } from "../../components/ui/select"
 
 // Import components
-import SideNav from '../../components/SideNav';
-import Header from '../../components/Header';
-import JumpToProject from '../../components/JumpToProject';
-import ErrorBoundary from '../../components/ErrorBoundary';
-import ProjectForm from '../../components/ProjectForm';
-import ProjectFilters from '../../components/projectfilters';
-import Viewtoggle from '../../components/viewtoggle';
+import SideNav from '../../components/Main components/SideNav';
+import Header from '../../components/Main components/Header';
+import JumpToProject from '../../components/Projects/JumpToProject';
+import ErrorBoundary from '../../components/Main components/ErrorBoundary';
+import ProjectForm from '../../components/Projects/ProjectForm';
+import ProjectFilters from '../../components/Projects/projectfilters';
+import Viewtoggle from '../../components/Main components/viewtoggle';
 import ProjectDetailPanel from './ProjectDetailPanel';
+import { useProjectContext } from '../../Contexts/ProjectContext';
+import { useProfile } from '../../hooks/useProfile';
 
 export default function ProjectDashboard() {
-  const [projects, setProjects] = useState<Project[]>([]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all'); // all, active, completed
   const [showJumpModal, setShowJumpModal] = useState(false);
@@ -37,7 +39,10 @@ export default function ProjectDashboard() {
   });
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showProjectDetail, setShowProjectDetail] = useState(false);
-
+  const context=useProfile();
+  const {fetchallemployee ,employees}=context;
+  const projectContext=useProjectContext();
+  const {projects}=projectContext;
   const handlecolumnchange=(column:keyof typeof columns,value:boolean)=>{
     setcolumns({
       ...columns,
@@ -51,10 +56,10 @@ export default function ProjectDashboard() {
   };
 
   // Handle add project action
-  const handleAddProject = () => {
+  const handleAddProject=()=>{
     navigate('/admin/project');
   };
-  const toggleProjectModal = () => {
+  const toggleProjectModal=()=>{
     setprojectmodal(!showProjectmodal);
   };
 
@@ -74,96 +79,10 @@ export default function ProjectDashboard() {
     setShowJumpModal(!showJumpModal);
   };
 
-  // Mock projects - replace with actual API call
-  useEffect(() => {
-    // Simulating API call for demo purposes
-    const mockProjects = [
-      {
-        id: '1',
-        name: 'first',
-        description: 'Website Design',
-        status: 'in_progress',
-        owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-4.jpg', email: 'henry@example.com' },
-        priority: 'high',
-        completedTasks: 12,
-        totalTasks: 56,
-        progress: 21,
-        daysLeft: 12,
-        startDate: '2019-04-01',
-        endDate: '2019-04-09',
-        members: [
-          { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg', email: 'user1@example.com' },
-          { id: '2', name: 'User 2', avatar: '/img/avatar-5.jpg', email: 'user2@example.com' },
-          { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg', email: 'user3@example.com' }
-        ],
-        color: 'red'
-      },
-      {
-        id: '2',
-        name: 'second',
-        description: 'Motion Design',
-        status: 'in_progress',
-        owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-5.jpg', email: 'henry@example.com' },
-        priority: 'medium',
-        completedTasks: 7,
-        totalTasks: 16,
-        progress: 44,
-        daysLeft: 12,
-        startDate: '2019-04-01',
-        endDate: '2019-04-11',
-        members: [
-          { id: '4', name: 'Henry', avatar: '/img/avatar-5.jpg', email: 'henry@example.com' }
-        ],
-        color: 'blue'
-      },
-      {
-        id: '3',
-        name: 'third',
-        description: 'UX Design',
-        status: 'in_progress',
-        owner:{ id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
-        priority: 'low',
-        completedTasks: 12,
-        totalTasks: 56,
-        progress: 21,
-        daysLeft: 12,
-        startDate: '2019-04-01',
-        endDate: '2019-04-11',
-        members: [
-          { id: '5', name: 'Me', avatar: '/img/avatar-4.jpg', email: 'me@example.com' }
-        ],
-        color: 'green'
-      },
-      {
-        id: '4',
-        name: 'fourth',
-        description: 'Branding',
-        status: 'in_progress',
-        owner: { id: '4', name: 'Henry', avatar: '/img/avatar-1.jpg', email: 'henry@example.com' },
-        priority: 'medium',
-        completedTasks: 12,
-        
-        totalTasks: 56,
-        progress: 21,
-        daysLeft: 12,
-        startDate: '2019-04-01',
-        endDate: '2019-04-20',
-        members: [
-          { id: '6', name: 'Ronak', avatar: '/img/avatar-1.jpg', email: 'ronak@example.com' },
-          { id: '5', name: 'Me', avatar: '/img/avatar-5.jpg', email: 'me@example.com' },
-          { id: '5', name: 'Me', avatar: '/img/avatar-2.jpg', email: 'me@example.com' },
-          { id: '5', name: 'Me', avatar: '/img/avatar-3.jpg', email: 'me@example.com' }
+ 
 
-        ],
-        color: 'yellow'
-      }
-    ];
-    
-    setProjects(mockProjects);
-  }, []);
-
-  const recentProjects=projects.slice(0, 4);
-  const previousProjects=projects.slice(4, 8);
+  const recentProjects=projects?.slice(0, 4);
+  const previousProjects=projects?.slice(4, 8);
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -237,16 +156,16 @@ export default function ProjectDashboard() {
               <div className="mb-8">
                 {viewmode === 'grid' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {recentProjects.map((project, idx) => (
+                    {recentProjects?.map((project, idx) => (
                       <div 
                         key={idx} 
                         className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-750"
-                        onClick={() => handleViewProject(project)}
+                        onClick={() => handleViewProject(project as Project)}
                       >
                         <div className="p-5">
                           <div className="flex mb-4">
                             <div className={`w-8 h-8 flex items-center justify-center rounded bg-${project.color}-500 text-${project.color}-800`}>
-                              {project.color.charAt(0).toUpperCase()}
+                              {project?.color?.charAt(0).toUpperCase()}
                             </div>
                             <div className="ml-auto">
                               <span className="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded-full">
@@ -270,7 +189,7 @@ export default function ProjectDashboard() {
                           </div>
                           <div className="flex justify-between items-center">
                             <div className="flex -space-x-2">
-                              {project.members.slice(0, 3).map((member, index) => (
+                              {project?.members?.slice(0, 3).map((member, index) => (
                                 <img 
                                   key={index} 
                                   src={member.avatar} 
@@ -278,19 +197,19 @@ export default function ProjectDashboard() {
                                   className="w-8 h-8 rounded-full border-2 border-gray-800" 
                                 />
                               ))}
-                              {project.members.length > 3 && (
+                              {project?.members && project.members.length >3 && (
                                 <div className="w-8 h-8 rounded-full border-2 border-gray-800 bg-gray-700 flex items-center justify-center text-gray-300 text-xs">
-                                  +{project.members.length - 3}
+                                  +{project?.members?.length - 3}
                                 </div>
                               )}
                             </div>
                             <div>
-                              <span className={`text-xs px-2 py-1 rounded-full bg-${
-                                project.priority === 'high' ? 'red' : 
-                                project.priority === 'medium' ? 'yellow' : 'green'
+                              {/* <span className={`text-xs px-2 py-1 rounded-full bg-${
+                                project?.priority === 'high' ? 'red' : 
+                                project?.priority === 'medium' ? 'yellow' : 'green'
                               }-500 text-white`}>
                                 {project.priority.charAt(0).toUpperCase() + project.priority.slice(1)}
-                              </span>
+                              </span> */}
                             </div>
                           </div>
                         </div>
@@ -332,16 +251,16 @@ export default function ProjectDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-700">
-                        {recentProjects.map((project, idx) => (
+                        {recentProjects?.map((project, idx) => (
                           <tr 
                             key={idx} 
                             className="hover:bg-gray-750 cursor-pointer"
-                            onClick={() => handleViewProject(project)}
+                            onClick={() => handleViewProject(project as Project)}
                           >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className={`w-8 h-8 flex items-center justify-center rounded bg-${project.color}-500 text-${project.color}-800 mr-3`}>
-                                  {project.color.charAt(0).toUpperCase()}
+                                  {project?.color?.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
                                   <div className="text-sm font-medium text-white">{project.name}</div>
@@ -352,7 +271,7 @@ export default function ProjectDashboard() {
                             {columns.assigned && (
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex -space-x-2">
-                                  {project.members.slice(0, 3).map((member, index) => (
+                                  {project?.members?.slice(0, 3).map((member, index) => (
                                     <img 
                                       key={index} 
                                       src={member.avatar} 
@@ -360,9 +279,9 @@ export default function ProjectDashboard() {
                                       className="w-8 h-8 rounded-full border-2 border-gray-800" 
                                     />
                                   ))}
-                                  {project.members.length > 3 && (
+                                  {project?.members && project.members.length > 3 && (
                                     <div className="w-8 h-8 rounded-full border-2 border-gray-800 bg-gray-700 flex items-center justify-center text-gray-300 text-xs">
-                                      +{project.members.length - 3}
+                                      +{project?.members?.length - 3}
                                     </div>
                                   )}
                                 </div>
@@ -382,23 +301,23 @@ export default function ProjectDashboard() {
                             {columns.owner && (
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
-                                  <img src={project.owner.avatar} alt="Owner" className="w-6 h-6 rounded-full mr-2" />
-                                  <div className="text-sm text-gray-300">{project.owner.name}</div>
+                                  <img src={project?.owner?.avatar} alt="Owner" className="w-6 h-6 rounded-full mr-2" />
+                                  <div className="text-sm text-gray-300">{project?.owner?.name}</div>
                                 </div>
                               </td>
                             )}
                             {columns.lastmodified && (
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-300">{project.endDate}</div>
+                                <div className="text-sm text-gray-300">{project?.endDate.toLocaleDateString()}</div>
                               </td>
                             )}
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`text-xs px-2 py-1 rounded-full bg-${
-                                project.priority === 'high' ? 'red' : 
-                                project.priority === 'medium' ? 'yellow' : 'green'
+                              {/* <span className={`text-xs px-2 py-1 rounded-full bg-${
+                                project?.priority === 'high' ? 'red' : 
+                                project?.priority === 'medium' ? 'yellow' : 'green'
                               }-500 text-white`}>
-                                {project.priority.charAt(0).toUpperCase() + project.priority.slice(1)}
-                              </span>
+                                {project?.priority?.charAt(0).toUpperCase() + project?.priority?.slice(1)}
+                              </span> */}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                               <button className="text-gray-400 hover:text-white px-2">

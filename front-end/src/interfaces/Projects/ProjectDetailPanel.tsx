@@ -4,7 +4,7 @@ import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy
 import { faNoteSticky, faChartBar } from '@fortawesome/free-regular-svg-icons';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import EmojiPicker from 'emoji-picker-react';
-import { Project, Member } from '../../models/interfaces';
+import { Project } from '../../components/Profile/types';
 
 interface Attachment {
   id: string;
@@ -41,7 +41,7 @@ interface ProjectDetailProps {
   project: Project | null;
 }
 
-const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, project }) => {
+const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,project }) => {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [comment, setComment] = useState('');
 
@@ -180,7 +180,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, pro
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Status</h4>
             <span className={`text-white text-sm px-2 py-1 rounded-full ${statusColor}`}>
-              {project.status.replace('_', ' ').charAt(0).toUpperCase() + project.status.replace('_', ' ').slice(1)}
+              {project?.status && project?.status?.replace('_', ' ').charAt(0).toUpperCase() + project?.status?.replace('_', ' ').slice(1)}
             </span>
           </div>
           
@@ -196,12 +196,12 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, pro
           
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Priority</h4>
-            <span className={`text-white text-sm px-2 py-1 rounded-full ${
-              project.priority === 'high' ? 'bg-red-500' : 
-              project.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+            {/* <span className={`text-white text-sm px-2 py-1 rounded-full ${
+              project?.priority === 'high' ? 'bg-red-500' : 
+              project?.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
             }`}>
-              {project.priority.charAt(0).toUpperCase() + project.priority.slice(1)}
-            </span>
+              {project?.priority?.charAt(0).toUpperCase() + project?.priority?.slice(1)}
+            </span> */}
           </div>
           
           <div>
@@ -228,7 +228,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, pro
           </div>
           
           <div className="flex flex-wrap gap-2 ml-4">
-            {project.members.map((member) => (
+            {project?.members?.map((member) => (
               <div key={member.id} className="flex items-center bg-gray-700 p-2 rounded">
                 <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full mr-2" />
                 <div>
@@ -237,7 +237,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, pro
                 </div>
               </div>
             ))}
-            {project.members.length === 0 && (
+            {project?.members && project.members.length === 0 && (
               <p className="text-gray-400">No team members added yet.</p>
             )}
           </div>
@@ -266,7 +266,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose, pro
             </div>
             <div className="flex justify-between">
               <p className="text-white">Remaining Tasks</p>
-              <p className="text-white">{project.totalTasks - project.completedTasks}</p>
+              <p className="text-white">{project?.totalTasks && project?.completedTasks && project?.totalTasks - project?.completedTasks}</p>
             </div>
           </div>
         </div>
