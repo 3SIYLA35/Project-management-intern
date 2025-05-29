@@ -2,20 +2,24 @@ import { adaptAttachmentForApi } from "../adapters/attachmentAdapter";
 import { adaptTask, adaptTaskForAPi } from "../adapters/taskAdapter";
 import { Attachment, Task } from "../components/Profile/types";
 import axios from "axios";
+import { apiClient } from "./apiClient";
+import { taskApi } from "../adapters/taskAdapter";
 
 
 export const TaskApi={
     createTask:async(task:Task,attachments:Attachment[])=>{
         try{
-            const taskdata=adaptTaskForAPi(task)
+            console.log('task',task);
+            const taskdata=adaptTaskForAPi(task);
+            console.log('taskdata',taskdata);
             const attachmentdata=attachments.map(attachment=>adaptAttachmentForApi(attachment));
             const data={
                 taskdata:taskdata,
                 attachment:attachmentdata,
             }
-            const response=await axios.post('/task/create-task',data);
-            if(response.status===200){
-                return response.data;
+            const response=await apiClient.post<taskApi>('/task/create-task',data);
+            if(response){
+                return adaptTask(response);
             }
             return null;
         }catch(error:any){

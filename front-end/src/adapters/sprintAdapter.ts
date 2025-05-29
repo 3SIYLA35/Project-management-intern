@@ -1,7 +1,7 @@
 import { Project, Sprint } from "../components/Profile/types";
 
-interface SprintApi{
-    id:string;
+export interface SprintApi{
+    _id:string;
     name:string;
     projectId:Project;
     startDate:Date;
@@ -10,21 +10,21 @@ interface SprintApi{
     goals:string;
 }
 
-export const adaptSprint=(sprintApi:SprintApi):Sprint=>{
-    return{
-        id:sprintApi.id,
-        name:sprintApi.name,
-        projectId:sprintApi.projectId,
-        startDate:sprintApi.startDate,
-        endDate:sprintApi.endDate,
-        status:sprintApi.status,
-        goals:sprintApi.goals,
-    }
+export const adaptSprint=(sprintApi:SprintApi[]):Sprint[]=>{
+    return sprintApi.map(sprint=>({
+        id:sprint._id,
+        name:sprint.name,
+        projectId:sprint.projectId,
+        startDate:sprint.startDate,
+        endDate:sprint.endDate,
+        status:sprint.status,
+        goals:sprint.goals,
+    }))
 }
 
 export const adaptsprintforApi=(sprintApi:Partial<Sprint>):Partial<SprintApi>=>{
     const sprintapi:Partial<SprintApi>={
-        id:sprintApi.id,
+        _id:sprintApi.id,
     }
     if(sprintApi.name!==undefined) sprintapi.name=sprintApi.name;
     if(sprintApi.projectId!==undefined) sprintapi.projectId=sprintApi.projectId;

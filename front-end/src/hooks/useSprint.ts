@@ -13,11 +13,10 @@ export const useSprint=()=>{
         try{
             setLoading(true);
             const response=await sprintApi.getSprints(projectId);
-            if(response.status===200){
-                setSprints(response.data);
+            if(response){
+                setSprints(response as Sprint[]);
             }
-            console.log('sprints fetched',response.data);
-            return response.data;
+            console.log('sprints fetched',response);
         }catch(error){
             console.error('Error fetching sprints:',error);
             setError('Failed to fetch sprints');

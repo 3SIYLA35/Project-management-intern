@@ -1,7 +1,7 @@
 import { Project, Sprint, Task, UserProfile } from "../components/Profile/types";
 
 
-interface TaskApi{
+export interface taskApi{
     _id:string;
     name:string,
     description:string,
@@ -18,7 +18,7 @@ interface TaskApi{
 }
 
 
-export const adaptTask=(task:TaskApi):Task=>{
+export const adaptTask=(task:taskApi):Task=>{
     return {
         id:task._id,
         name:task.name,
@@ -34,8 +34,8 @@ export const adaptTask=(task:TaskApi):Task=>{
     }
 }
 
-export const adaptTaskForAPi=(task:Partial<Task>):Partial<TaskApi>=>{
-    const adaptedtask:Partial<TaskApi>={
+export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
+    const adaptedtask:Partial<taskApi>={
         _id:task.id,
     }
 

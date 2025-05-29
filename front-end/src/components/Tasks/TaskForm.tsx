@@ -8,9 +8,9 @@ import './TaskForm.css';
 import { Attachment, Project, Sprint, Task, UserProfile } from '../Profile/types';
 import { useTaskContext } from '../../Contexts/TaskContext';
 import { useProfileContext } from '../../Contexts/ProfileContext';
-import { Select, SelectItem, SelectValue } from '../ui/select';
+import { Select, SelectItem, SelectContent, SelectValue } from '../ui/select';
 import { useProjectContext } from '../../Contexts/ProjectContext';
-import { SelectTrigger, Value } from '@radix-ui/react-select';
+import {  SelectTrigger, Value } from '@radix-ui/react-select';
 import { useSprintContext } from '../../Contexts/SprintContext';
 
 
@@ -49,6 +49,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
 
   useEffect(()=>{
     // console.log('fetching employees',employees);
+    console.log('sprints',sprints);
     if(isopen && !task){
       setTask({
         name:'',
@@ -81,7 +82,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
     }
    
 
-  },[])
+  },[sprints])
 
   
   
@@ -118,7 +119,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
     }
   }
   const handleonchange=(e:React.ChangeEvent<HTMLInputElement>|React.ChangeEvent<HTMLSelectElement>|React.ChangeEvent<HTMLTextAreaElement>|React.ChangeEvent<HTMLSelectElement>)=>{
-    setTask(prev=>prev?{...prev,name:e.target.value}:null);
+    setTask(prev=>prev?{...prev,[e.target.name]:e.target.value}:null);
   }
   
   const handleSelectProject=(project:Project)=>{
@@ -126,6 +127,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
     setTask(prev=>prev?{...prev,projectId:project}:null);
     console.log('tas selected',task);
     console.log('project selected',task?.projectId);
+    sprintContext?.getSprints(project.id);
     setShowProjectSelector(false);
   };
   const attachmentRef=useRef<HTMLInputElement>(null);
@@ -186,7 +188,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             type="text"
             placeholder="Task Name"
             className="w-full text-lg bg-gray-800 text-white pb-2 mb-4 focus:outline-none"
-           
+           name='name'
             onChange={(e) => handleonchange(e)}
           />
           
@@ -242,12 +244,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
               <p className="text-xs font-medium text-gray-500 mb-1">PRIORITY</p>
               <select 
                 className="bg-gray-600 text-white border-none rounded px-2 py-1 w-full"
-                value={task?.priority||''}
+                
                 onChange={(e) => handleonchange(e)}
+                name='priority'
               >
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
+                <option value='high'>High</option>
+                <option value='medium'>Medium</option>
+                <option value='low'>Low</option>
               </select>
             </div>
           </div>
@@ -289,6 +292,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                   textarea.style.height='20px';
                   textarea.style.height=textarea.scrollHeight+'px';
                 }}
+                name='description'
                 placeholder="Add a description..."
                 onChange={(e) => handleonchange(e)}
               />
@@ -355,18 +359,22 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             <p className="text-xs font-medium text-gray-500 mb-1">PHASE</p>
             <div className="flex items-center">
               
-                <div className="flex items-center justify-between w-full text-semibold bg-gray-600 text-white  rounded">
-                  <span>{task?.sprintId?.name}</span>
+                <div className="flex items-center justify-between h-8 w-full text-semibold bg-gray-600 text-white  rounded">
+                   
                   <Select onValueChange={(value)=>handlesprintchange(value)}>
-                     <SelectTrigger className=' w-full rounded-md flex items-center pl-3 '>
-                       <SelectValue placeholder='Select a phase'/>
+                     <SelectTrigger className=' w-full rounded-md flex items-center pl-2 '>
+                       <SelectValue placeholder='Select a phase' className='text-[10px]'>{ task?.sprintId?.name?.length && task?.sprintId?.name?.length >22 ?
+                         task?.sprintId?.name?.slice(0,22)+' ...' 
+                         : task?.sprintId?.name ||'Select a phase'}</SelectValue>
                      </SelectTrigger>
-                     {sprints?.map(sprint=>{
-                      return(
-                        <SelectItem key={sprint.id} value={sprint.id}>{sprint.name}</SelectItem>
-                      )
-                     })}
+                     
+                     
+                        <SelectContent className='text-white bg-gray-800'>
+                          {sprints?.map(sprint=>
 
+                        <SelectItem key={sprint.id} value={sprint.id}>{sprint.name}</SelectItem>
+                          )}
+                      </SelectContent>
                   </Select>
                  
                 </div>
@@ -381,10 +389,45 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
           {/* Attachment*/}
           <div className="mb-4">
             <p className="text-xs font-medium text-gray-500 mb-1">ATTACHMENTS</p>
-            <button className="flex items-center text-sm text-gray-500 hover:text-blue-500">
+            <button className="flex items-center text-sm text-gray-500 hover:text-blue-500 "
+            onClick={handleInutattachment}
+            >
               <IoAdd className="mr-1" /> Add Attachment
+              <input type="file"
+              ref={attachmentRef}
+              className='hidden'
+              accept='image/*,video/*,file/*,pdf/*' 
+              onChange={handleaddAttachment}
+               />
             </button>
           </div>
+          {/* Display Attachments */}
+           {attachments.length > 0 && (
+             <div className="mb-4 mt-2">
+               <p className="text-xs font-medium text-gray-500 mb-2">Selected Attachments</p>
+               <div className="grid grid-cols-4 gap-2">
+                 {attachments.map((attachment, index) => (
+                   <div key={index} className="flex relative  h-20 justify-between bg-gray-700 p-2 rounded" 
+                   style={{backgroundImage:`url(${attachment.url})`,backgroundSize:'cover',backgroundPosition:'center'}}
+                   >
+                     
+                       
+                       <span className="text-xs text-white truncate max-w-[150px]">{attachment.name}</span>
+                     
+                     <button 
+                       className="text-gray-400 absolute top-1 right-1  font-semibold hover:text-red-500"
+                       onClick={() => setAttachments(prev => prev.filter((_, i) => i !== index))}
+                     >
+                       <IoClose size={16} />
+                     </button>
+                   </div>
+                 ))}
+               </div>
+             </div>
+           )}
+
+
+
           
           <div className="border-t pt-4">
             <div className="flex border-b border-gray-600">

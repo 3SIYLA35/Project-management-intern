@@ -23,8 +23,9 @@ app.use('/hr',require('./Routes/hr'));
 app.use('/employee',require('./Routes/User'));
 app.use('/project',require('./Routes/project'));
 app.use('/task',require('./Routes/task'));
+app.use('/sprint',require('./Routes/sprint'));
 app.listen(port,()=>{
-    console.log(`server is  runing at port :${port}`);;
+    console.log(`server is  runing at port :${port}`);;;
 })
 
 app.use((err, req, res, next) => {
