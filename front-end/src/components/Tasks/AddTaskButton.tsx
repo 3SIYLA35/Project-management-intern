@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IoAdd } from 'react-icons/io5';
 import TaskForm from './TaskForm';
+import { useTaskContext } from '../../Contexts/TaskContext';
 
 interface AddTaskButtonProps {
   onTaskAdded: (task: any) => void;
@@ -8,6 +9,9 @@ interface AddTaskButtonProps {
 
 const AddTaskButton: React.FC<AddTaskButtonProps> = ({ onTaskAdded }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const taskContext=useTaskContext();
+
   
   const handleOpenForm=()=>{
     console.log('isFormOpen',isFormOpen);

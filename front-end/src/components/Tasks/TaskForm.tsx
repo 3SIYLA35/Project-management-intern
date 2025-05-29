@@ -1,37 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { IoAdd, IoClose } from 'react-icons/io5';
+import React, { useState, useEffect, useRef } from 'react';
+import { IoAdd, IoArrowDown, IoClose } from 'react-icons/io5';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faSmile } from '@fortawesome/free-solid-svg-icons';
 import './TaskForm.css';
+import { Attachment, Project, Sprint, Task, UserProfile } from '../Profile/types';
+import { useTaskContext } from '../../Contexts/TaskContext';
+import { useProfileContext } from '../../Contexts/ProfileContext';
+import { Select, SelectItem, SelectValue } from '../ui/select';
+import { useProjectContext } from '../../Contexts/ProjectContext';
+import { SelectTrigger, Value } from '@radix-ui/react-select';
+import { useSprintContext } from '../../Contexts/SprintContext';
 
-// Sample data for users and projects
-const sampleUsers = [
-  { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-  { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-  { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-  { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-  { id: '5', name: 'User 5', avatar: '/img/avatar-5.jpg' },
-];
 
-const sampleProjects = [
-  { id: '1', name: 'Marketing Website Redesign' },
-  { id: '2', name: 'Mobile App Development' },
-  { id: '3', name: 'Content Strategy' },
-  { id: '4', name: 'Product Launch' },
-];
 
-interface User {
-  id: string;
-  name: string;
-  avatar: string;
-}
 
-interface Project {
-  id: string;
-  name: string;
-}
+
 
 interface TaskFormProps {
   onClose: () => void;
@@ -40,76 +25,146 @@ interface TaskFormProps {
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
-  const [taskName, setTaskName] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('High');
-  const [startDate, setStartDate] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  
   const [checklist, setChecklist] = useState<string[]>(['Inbox-Template']);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
-  // New states for enhanced functionality
-  const [assignees, setAssignees] = useState<User[]>([]);
   const [showAssigneeSelector, setShowAssigneeSelector] = useState(false);
-  
-  const [phase, setPhase] = useState('');
-  const [showPhaseInput, setShowPhaseInput] = useState(false);
-  const [phaseInputValue, setPhaseInputValue] = useState('');
   
   const [assignedProject, setAssignedProject] = useState<Project | null>(null);
   const [showProjectSelector, setShowProjectSelector] = useState(false);
+  const sprintContext=useSprintContext();
+  const sprints=sprintContext?.sprints||null;
+
+  const [task,setTask]=useState<Task|null>(null);
+  const [attachments,setAttachments]=useState<Attachment[]>([]);
+  const taskContext=useTaskContext();
+  const {createTask}=taskContext;
+  const profileContext=useProfileContext();
+  const projectCOntext=useProjectContext();
+  const projects=projectCOntext?.projects||null;
+  const employees=profileContext?.employees||null;
+  const UserContext=useProfileContext();
+  const profile=UserContext?.profile||null;
+
+  useEffect(()=>{
+    // console.log('fetching employees',employees);
+    if(isopen && !task){
+      setTask({
+        name:'',
+        description:'',
+        assignedTo:null,
+        priority:'',
+        sprintId:{
+          id:'',
+          name:'',
+          projectId:{
+            id:'',
+            name:'',
+            description:'',
+            startDate:new Date(),
+            endDate:new Date(),
+            progress:0,
+            owner:null as unknown as UserProfile,
+            status:'',
+
+          }as Project,
+          startDate:new Date(),
+          endDate:new Date(),
+          status:'',
+          goals:'',
+        }as Sprint,
+         projectId:null as unknown as Project,
+        startDate:new Date(),
+        dueDate:new Date(),
+      } as Task)
+    }
+   
+
+  },[])
+
   
-  const handleAddChecklistItem = () => {
+  
+  const handleAddChecklistItem =() => {
     setChecklist([...checklist, '']);
   };
   
   const handleEmojiSelect = (emoji: any) => {
-    setDescription(description + emoji.native);
-    setShowEmojiPicker(false);
+    // setDescription(description + emoji.native);
+    // setShowEmojiPicker(false);
   };
   
-  const handleAddAssignee = (user: User) => {
-    if (!assignees.some(a => a.id === user.id)) {
-      setAssignees([...assignees, user]);
-    }
+  const handleAddAssignee=(user:UserProfile)=>{
+    // if (!task?.assignedTo==null){
+    console.log('user added',user);
+    console.log('task',task);
+      setTask(prev=>prev?{...prev,assignedTo:user}:null);
+
+    // }
+
     setShowAssigneeSelector(false);
   };
   
-  const handleRemoveAssignee = (userId: string) => {
-    setAssignees(assignees.filter(a => a.id !== userId));
-  };
-  
-  const handleSubmitPhase = () => {
-    if (phaseInputValue.trim()) {
-      setPhase(phaseInputValue.trim());
-      setPhaseInputValue('');
-      setShowPhaseInput(false);
+  const handleRemoveAssignee=()=>{
+    if(task){
+      setTask(prev=>prev?{...prev,assignedTo:null}:null)
+      setShowAssigneeSelector(true);
     }
   };
   
-  const handleSelectProject = (project: Project) => {
-    setAssignedProject(project);
+  const handlesprintchange=(value:string)=>{
+    if(sprints){
+      setTask(prev=>prev?{...prev,sprintId:sprints.find(sprint=>sprint.id===value)as Sprint}:null)
+    }
+  }
+  const handleonchange=(e:React.ChangeEvent<HTMLInputElement>|React.ChangeEvent<HTMLSelectElement>|React.ChangeEvent<HTMLTextAreaElement>|React.ChangeEvent<HTMLSelectElement>)=>{
+    setTask(prev=>prev?{...prev,name:e.target.value}:null);
+  }
+  
+  const handleSelectProject=(project:Project)=>{
+    // if(!task?.projectId){
+    setTask(prev=>prev?{...prev,projectId:project}:null);
+    console.log('tas selected',task);
+    console.log('project selected',task?.projectId);
     setShowProjectSelector(false);
   };
+  const attachmentRef=useRef<HTMLInputElement>(null);
+  const handleInutattachment=()=>{
+    if(attachmentRef.current){
+      attachmentRef.current.click();
+    }
+  }
+  const handleaddAttachment=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const files=e.target.files;
+    if(files && files.length>0){
+      const file=files[0];
+      if(file && file.size>0){
+        const url=URL.createObjectURL(file);
+        const filename=file.name;
+        const filetype=file.type;
+        const time=new Date().toISOString();
+        const date=new Date().toLocaleDateString();
+        setAttachments(prev=>prev?[
+          ...prev,
+          {
+            name:filename,
+            type:filetype,
+            url:url,
+            time:time,
+            date:date,
+            taskId:task?.id,
+            uploadedBy:profile,
+          },
+        ] as Attachment[]:[]);
+      }
+
+    }
+  }
   
-  const handleSaveTask = () => {
-    const newTask = {
-      id: Date.now().toString(),
-      name: taskName,
-      description,
-      status: 'not_started',
-      priority: `${priority} Priority`,
-      phase,
-      startDate,
-      dueDate,
-      assignees,
-      assignedProject,
-      comments: 0,
-      attachments: 0,
-      checklist
-    };
+  const handleSaveTask=()=>{
+     createTask(task!,attachments);
     
-    onSave(newTask);
+    onSave(task);
     onClose();
   };
 
@@ -131,48 +186,45 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             type="text"
             placeholder="Task Name"
             className="w-full text-lg bg-gray-800 text-white pb-2 mb-4 focus:outline-none"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
+           
+            onChange={(e) => handleonchange(e)}
           />
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="relative">
               <p className="text-xs font-medium text-gray-500 mb-1">ASSIGNED TO</p>
               <div className="flex items-center flex-wrap gap-2">
-                {assignees.length > 0 ? (
-                  assignees.map(user => (
-                    <div key={user.id} className="flex items-center bg-gray-600 text-white rounded-full pr-2 overflow-hidden">
-                      <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full mr-1" />
-                      <span className="text-xs">{user.name}</span>
+                {task?.assignedTo ? (
+                 
+                    <div  className="flex items-center bg-gray-600 text-white rounded-full pr-2 overflow-hidden">
+                      <img src={task?.assignedTo?.avatar} alt={task?.assignedTo?.name} className="w-6 h-6 rounded-full mr-1" />
+                      <span className="text-xs">{task?.assignedTo?.name}</span>
                       <button 
                         className="ml-1 text-gray-500 hover:text-red-500"
-                        onClick={() => handleRemoveAssignee(user.id)}
+                        onClick={() => {
+                         
+                          handleRemoveAssignee()}}
                       >
                         <IoClose size={16} />
                       </button>
                     </div>
-                  ))
+                  
                 ) : (
                   <button 
                     className="text-gray-400 hover:text-blue-500"
-                    onClick={() => setShowAssigneeSelector(!showAssigneeSelector)}
+                    onClick={() => {
+                      setShowAssigneeSelector(!showAssigneeSelector);
+                    }}
                   >
                     <IoAdd />
                   </button>
                 )}
-                {assignees.length > 0 && (
-                  <button 
-                    className="text-gray-400 hover:text-blue-500"
-                    onClick={() => setShowAssigneeSelector(!showAssigneeSelector)}
-                  >
-                    <IoAdd />
-                  </button>
-                )}
+                
               </div>
               
               {showAssigneeSelector && (
                 <div className="absolute mt-1 z-10 bg-gray-700 hide-scrollbar text-white rounded shadow-lg border border-gray-600 max-h-48 w-full overflow-y-auto">
-                  {sampleUsers.map(user => (
+                  {employees?.map(user => (
                     <div 
                       key={user.id} 
                       className="p-2 hover:bg-gray-600 flex items-center cursor-pointer"
@@ -183,14 +235,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                   ))}
                 </div>
               )}
+              
             </div>
             
             <div>
               <p className="text-xs font-medium text-gray-500 mb-1">PRIORITY</p>
               <select 
                 className="bg-gray-600 text-white border-none rounded px-2 py-1 w-full"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
+                value={task?.priority||''}
+                onChange={(e) => handleonchange(e)}
               >
                 <option>High</option>
                 <option>Medium</option>
@@ -199,48 +252,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             </div>
           </div>
           
-          <div className="mb-4 relative">
-            <p className="text-xs font-medium text-gray-500 mb-1">PHASE</p>
-            <div className="flex items-center">
-              {phase ? (
-                <div className="flex items-center justify-between w-full bg-gray-600 text-white px-3 py-1 rounded">
-                  <span>{phase}</span>
-                  <button 
-                    className="text-gray-500 hover:text-red-500"
-                    onClick={() => setPhase('')}
-                  >
-                    <IoClose size={16} />
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  className="text-gray-400 hover:text-blue-500"
-                  onClick={() => setShowPhaseInput(!showPhaseInput)}
-                >
-                  <IoAdd />
-                </button>
-              )}
-            </div>
-            
-            {showPhaseInput && (
-              <div className="mt-1 flex">
-                <input
-                  type="text"
-                  placeholder="Enter phase name"
-                  className="bg-gray-600 text-white border-none rounded-l px-2 py-1 flex-grow focus:outline-none focus:border-blue-300"
-                  value={phaseInputValue}
-                  onChange={(e) => setPhaseInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubmitPhase()}
-                />
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded-r hover:bg-blue-600"
-                  onClick={handleSubmitPhase}
-                >
-                  Add
-                </button>
-              </div>
-            )}
-          </div>
+          
           
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -249,8 +261,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                 <input
                   type="date"
                   className="p-1 w-full bg-gray-600 text-white rounded-lg border-none"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(e) => handleonchange(e)}
                 />
               </div>
             </div>
@@ -261,8 +272,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                 <input
                   type="date"
                   className="p-1 w-full bg-gray-600 text-white rounded-lg border-none"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
+                  
+                  onChange={(e) => handleonchange(e)}
                 />
               </div>
             </div>
@@ -279,8 +290,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                   textarea.style.height=textarea.scrollHeight+'px';
                 }}
                 placeholder="Add a description..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => handleonchange(e)}
               />
               <button 
                 className="absolute right-2 bottom-2 text-gray-400 hover:text-blue-500"
@@ -300,16 +310,18 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
               )}
             </div>
           </div>
-          
-          <div className="mb-4 relative">
+
+          <div className='grid grid-cols-2 gap-4'>
+          {/* assigned project*/}
+             <div className="mb-4 relative">
             <p className="text-xs font-medium text-gray-500 mb-1">ASSIGNED PROJECT</p>
             <div className="flex items-center">
-              {assignedProject ? (
+              {task?.projectId ? (
                 <div className="flex items-center justify-between w-full bg-gray-600 text-white px-3 py-1 rounded">
-                  <span>{assignedProject.name}</span>
+                  <span>{task?.projectId?.name}</span>
                   <button 
                     className="text-gray-500 hover:text-red-500"
-                    onClick={() => setAssignedProject(null)}
+                    onClick={() => setTask(prev=>prev?{...prev,projectId:null as unknown as Project}:null)}
                   >
                     <IoClose size={16} />
                   </button>
@@ -326,7 +338,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             
             {showProjectSelector && (
               <div className="absolute mt-1 z-10 bg-gray-700 text-white rounded shadow-lg border border-gray-600 max-h-48 w-full overflow-y-auto">
-                {sampleProjects.map(project => (
+                {projects?.map(project => (
                   <div 
                     key={project.id} 
                     className="p-2 hover:bg-gray-600 cursor-pointer"
@@ -337,8 +349,36 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
                 ))}
               </div>
             )}
+              </div>
+          {/* Sprint*/}
+             <div className="mb-4 relative">
+            <p className="text-xs font-medium text-gray-500 mb-1">PHASE</p>
+            <div className="flex items-center">
+              
+                <div className="flex items-center justify-between w-full text-semibold bg-gray-600 text-white  rounded">
+                  <span>{task?.sprintId?.name}</span>
+                  <Select onValueChange={(value)=>handlesprintchange(value)}>
+                     <SelectTrigger className=' w-full rounded-md flex items-center pl-3 '>
+                       <SelectValue placeholder='Select a phase'/>
+                     </SelectTrigger>
+                     {sprints?.map(sprint=>{
+                      return(
+                        <SelectItem key={sprint.id} value={sprint.id}>{sprint.name}</SelectItem>
+                      )
+                     })}
+
+                  </Select>
+                 
+                </div>
+            </div>
+            
+           
+            </div>
           </div>
           
+          
+          
+          {/* Attachment*/}
           <div className="mb-4">
             <p className="text-xs font-medium text-gray-500 mb-1">ATTACHMENTS</p>
             <button className="flex items-center text-sm text-gray-500 hover:text-blue-500">

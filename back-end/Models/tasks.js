@@ -20,6 +20,10 @@ const taskSchema=new mongoose.Schema({
         enum:['low','medium','high'],
         default:'medium',
     },
+    startDate:{
+        type:Date,
+        required:true
+    },
     dueDate:{
         type:Date,
         required:true

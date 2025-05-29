@@ -34,10 +34,12 @@ export const useProfile=()=>{
 
     const fetchallemployee=async()=>{
         try{
+
             console.log('fetching employees');
             setloading(true);
             const data=await userApi.getallemployee();
             setemployees(data);
+            // console.log('employees fetched from hook',employees);
         }catch(err){
             seterror('failed to fetch employees');
         }finally{

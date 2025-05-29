@@ -16,7 +16,7 @@ export const ProfileProvider=({children}:{children:React.ReactNode})=>{
 
 export const useProfileContext=()=>{
     const context=useContext(ProfileContext);
-    if(!context===undefined){
+    if(context===undefined){
         throw new Error('useprofilecontext must be used within a profileprovider');
     };
     return  context;

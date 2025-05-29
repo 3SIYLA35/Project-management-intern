@@ -15,6 +15,8 @@ export const userApi={
     },
     getallemployee:async()=>{
         const response=await apiClient.get<ApiUserProfile[]>('/employee/get-all-employees');
-        return response.map(adaptuserProfile);
+        console.log('users fetched from api',response);
+        const transformedresponse=  response.map(employee=>adaptuserProfile(employee));
+        return transformedresponse;
     }
 }

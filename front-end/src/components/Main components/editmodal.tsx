@@ -32,6 +32,7 @@ const Editmodal:React.FC<EditmodalProps>=({
           className="w-full bg-gray-700 text-white p-3 rounded-md mb-4 min-h-[100px]"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e)=>e.key==='Enter' && onsave()}
         />
       ):(
         <input
@@ -39,6 +40,7 @@ const Editmodal:React.FC<EditmodalProps>=({
           className="w-full bg-gray-700 text-white p-3 rounded-md mb-4"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e)=>e.key==='Enter' && onsave()}
         />
       )}
       

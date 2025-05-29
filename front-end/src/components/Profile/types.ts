@@ -18,8 +18,8 @@ export interface UserProfile{
   };
   recentProjects?: Project[];
   coverImage?: string ;
-  lastLogin:Date;
-  timeZone: string;
+  lastLogin?:Date;
+  timeZone?: string;
 }
 
 export interface Project{
@@ -40,6 +40,41 @@ export interface Project{
   createdAt?:string;
   updatedAt?:string;
 }
+
+export interface Task{
+  id:string;
+  name:string;
+  description:string;
+  status:string;
+  priority:string;
+  startDate:Date;
+  dueDate:Date;
+  projectId:Project;
+  attachment?:Attachment[];
+  assignedBy:UserProfile;
+  assignedTo:UserProfile|null;
+  sprintId:Sprint;
+}
+export interface Attachment{
+  id:string;
+  name:string;
+  type:string;
+  url:string;
+  time:string;
+  date:string;
+  taskId:Task;
+  uploadedBy:UserProfile;
+}
+
+  export interface Sprint{
+    id:string;
+    name:string;
+    projectId:Project;
+    startDate:Date;
+    endDate:Date;
+    status:string;
+    goals:string;
+  }
 
 export interface BaseProfileSectionProps {
   isEditing: boolean;

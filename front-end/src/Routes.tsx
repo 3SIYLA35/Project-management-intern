@@ -16,6 +16,8 @@ import ProfilePage from './interfaces/Profile/ProfilePage';
 import { Project } from './components/Profile/types';
 import { ProfileProvider } from './Contexts/ProfileContext';
 import { ProjectProvider } from './Contexts/ProjectContext';
+import { TaskProvider } from './Contexts/TaskContext';
+import { SprintProvider } from './Contexts/SprintContext';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -60,6 +62,10 @@ const AppRouter=()=> {
   return (
     <Router>
       <ProjectProvider> 
+        <TaskProvider>
+          <SprintProvider>
+          <ProfileProvider>
+             
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
@@ -132,17 +138,18 @@ const AppRouter=()=> {
         }/>
         
         <Route path='/profile' element={
-          <ProfileProvider>
             <ProtectedRoute>
               <ProfilePage />
             </ProtectedRoute>
-          </ProfileProvider>
         }/>
 
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
-        </ProjectProvider>
+      </ProfileProvider>
+        </SprintProvider>
+        </TaskProvider>
+      </ProjectProvider>
     </Router>
   );
 };
