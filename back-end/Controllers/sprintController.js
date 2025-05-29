@@ -2,7 +2,7 @@ const sprintService=require('../Services/sprintService.cjs');
 
 exports.getSprints=async(req,res)=>{
     try{
-        console.log('fetching sprints');
+        console.log('fetching sprints');;
         const userid=req.user.id;
         if(!userid){
             return res.status(401).json({

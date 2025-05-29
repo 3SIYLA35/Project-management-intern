@@ -9,35 +9,10 @@ import TaskDetailPanel from './TaskDetailPanel';
 import AddTaskButton from '../../components/Tasks/AddTaskButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-
-interface Task {
-  id: string;
-  name: string;
-  description?: string;
-  status: 'completed' | 'in_progress' | 'not_started';
-  assignees: {
-    id: string;
-    name: string;
-    avatar: string;
-  }[];
-  assignedBy?: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  assignee?: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  comments: number;
-  attachments: number;
-  priority?: string;
-  dueDate?: string;
-}
+import { useTaskContext } from '../../Contexts/TaskContext';
+import {Task} from '../../components/Profile/types';
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [viewmode, setViewmode] = useState<'grid' | 'list'>('list');
@@ -45,6 +20,9 @@ export default function TasksPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const navigate = useNavigate();
+
+  const TaskContext=useTaskContext();
+  const tasks=TaskContext?.tasks;
   
   const [columns, setColumns] = useState({
     assigned: true,
@@ -76,115 +54,7 @@ export default function TasksPage() {
     setShowTaskDetail(false);
   };
 
-  // Add a function to handle adding a new task
-  const handleAddTask = (newTask: Task) => {
-    console.log('newTask',newTask);
-    setTasks([...tasks, newTask]);
-  };
-
-  // Mock tasks data
-  useEffect(() => {
-    const mockTasks: Task[] = [
-        {
-          id: '1',
-          name: 'Process Documentation',
-          description: 'Choose from profitable SaaS startups, vetted by the platform. Review key metrics to find the right fit. Negotiate directly with founders, without the costly middlemen. Most deals close within 30 days.',
-          status: 'completed',
-          assignees: [
-            { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
-            { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },
-            { id: '3', name: 'User 3', avatar: '/img/avatar-3.jpg' },
-          ],
-          assignedBy: { id: '5', name: 'Ronak Chaitwal', avatar: '/img/avatar-1.jpg' },
-          assignee: { id: '6', name: 'Kajol Kashyap', avatar: '/img/avatar-2.jpg' },
-          dueDate: '25th February, 2020',
-          priority: 'High Priority',
-          comments: 8,
-          attachments: 12,
-        },
-        {
-          id: '2',
-          name: 'Launch Marketing Campaign',
-          description: 'Develop and execute a comprehensive marketing strategy to promote the new product launch. Focus on digital channels and track performance metrics.',
-          status: 'in_progress',
-          assignees: [
-            { id: '4', name: 'User 4', avatar: '/img/avatar-4.jpg' },
-            { id: '5', name: 'User 5', avatar: '/img/avatar-5.jpg' },
-          ],
-          assignedBy: { id: '7', name: 'Alice Johnson', avatar: '/img/avatar-4.jpg' },
-          assignee: { id: '8', name: 'Bob Smith', avatar: '/img/avatar-5.jpg' },
-          dueDate: '15th March, 2023',
-          priority: 'Medium Priority',
-          comments: 3,
-          attachments: 5,
-        },
-        {
-          id: '3',
-          name: 'User Research Study',
-          description: 'Conduct interviews with target users to gather feedback on the new feature prototype. Analyze results and prepare a report with recommendations.',
-          status: 'not_started',
-          assignees: [
-            { id: '9', name: 'User 6', avatar: '/img/avatar-6.jpg' },
-          ],
-          assignedBy: { id: '10', name: 'Carol Davis', avatar: '/img/avatar-7.jpg' },
-          assignee: { id: '9', name: 'User 6', avatar: '/img/avatar-6.jpg' },
-          dueDate: '5th April, 2023',
-          priority: 'Low Priority',
-          comments: 1,
-          attachments: 2,
-        },
-        {
-          id: '4',
-          name: 'Database Optimization',
-          description: 'Review current database schema and implement optimizations to improve query performance. Document changes and measure performance improvements.',
-          status: 'in_progress',
-          assignees: [
-            { id: '11', name: 'User 7', avatar: '/img/avatar-8.jpg' },
-            { id: '12', name: 'User 8', avatar: '/img/avatar-9.jpg' },
-          ],
-          assignedBy: { id: '13', name: 'David Wilson', avatar: '/img/avatar-10.jpg' },
-          assignee: { id: '11', name: 'User 7', avatar: '/img/avatar-8.jpg' },
-          dueDate: '10th March, 2023',
-          priority: 'High Priority',
-          comments: 5,
-          attachments: 3,
-        },
-        {
-          id: '5',
-          name: 'UI Design Review',
-          description: 'Conduct a comprehensive review of the new user interface designs. Ensure consistency with brand guidelines and provide feedback to the design team.',
-          status: 'not_started',
-          assignees: [
-            { id: '14', name: 'User 9', avatar: '/img/avatar-11.jpg' },
-            { id: '15', name: 'User 10', avatar: '/img/avatar-12.jpg' },
-          ],
-          assignedBy: { id: '16', name: 'Emma Clark', avatar: '/img/avatar-13.jpg' },
-          assignee: { id: '14', name: 'User 9', avatar: '/img/avatar-11.jpg' },
-          dueDate: '20th March, 2023',
-          priority: 'Medium Priority',
-          comments: 0,
-          attachments: 8,
-        },
-        {
-          id: '6',
-          name: 'API Integration',
-          description: 'Integrate the payment gateway API with our platform. Implement error handling and conduct testing to ensure reliable operation.',
-          status: 'completed',
-          assignees: [
-            { id: '17', name: 'User 11', avatar: '/img/avatar-14.jpg' },
-          ],
-          assignedBy: { id: '18', name: 'Frank Miller', avatar: '/img/avatar-15.jpg' },
-          assignee: { id: '17', name: 'User 11', avatar: '/img/avatar-14.jpg' },
-          dueDate: '1st March, 2023',
-          priority: 'High Priority',
-          comments: 12,
-          attachments: 4,
-        }
-    ];
-    
-    setTasks(mockTasks);
-  }, []);
-
+  
   // Function to get status badge class
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -198,6 +68,10 @@ export default function TasksPage() {
         return 'bg-gray-500 text-white';
     }
   };
+
+  const handleAddTask=async()=>{
+
+  }
 
   // Function to format status display text
   const formatStatus = (status: string) => {
@@ -251,7 +125,7 @@ export default function TasksPage() {
             <div className={`${showTaskDetail ? 'w-[50%] pr-4' : 'w-full'} overflow-y-auto hide-scrollbar transition-all duration-300`}>
             {viewmode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tasks.map((task)=>(
+                {tasks?.map((task)=>(
                   <div 
                     key={task.id} 
                     className="bg-gray-800 rounded-lg overflow-hidden p-4 cursor-pointer hover:bg-gray-750"
@@ -279,14 +153,13 @@ export default function TasksPage() {
                     </div>
                     <div className="flex justify-between items-center mt-4">
                       <div className="flex -space-x-2">
-                        {task.assignees.map((assignee, index) => (
+                        
                           <img
-                            key={index}
-                            src={assignee.avatar}
-                            alt={assignee.name}
+                            src={task.assignedTo?.avatar }
+                            alt={task.assignedTo?.name }
                             className="w-8 h-8 rounded-full border-2 border-gray-800"
                           />
-                        ))}
+                        
                       </div>
                       <div className={`px-3 py-1 rounded-full text-xs ${getStatusBadgeClass(task.status)}`}>
                         {formatStatus(task.status)}
@@ -297,13 +170,13 @@ export default function TasksPage() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                         </svg>
-                        {task.comments}
+                        {/* {task.comments} */}
                       </div>
                       <div className="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                         </svg>
-                        {task.attachments}
+                        {/* {task.attachments} */}
                       </div>
                     </div>
                   </div>
@@ -345,11 +218,11 @@ export default function TasksPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
-                    {tasks.map((task) => (
+                    {tasks?.map((task) => (
                       <tr 
                         key={task.id} 
                         className="hover:bg-gray-700 cursor-pointer"
-                        onClick={() => handleTaskClick(task)}
+                        onClick={() => handleTaskClick(task as Task)}
                       >
                         <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <input 
@@ -362,14 +235,12 @@ export default function TasksPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex -space-x-2">
-                            {task.assignees.map((assignee, index) => (
                               <img
-                                key={index}
-                                src={assignee.avatar}
-                                alt={assignee.name}
+                                src={task.assignedTo?.avatar}
+                                alt={task.assignedTo?.name}
                                 className="w-8 h-8 rounded-full border-2 border-gray-800"
                               />
-                            ))}
+                            
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -383,7 +254,7 @@ export default function TasksPage() {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                               </svg>
-                              {task.attachments}
+                              {/* {task.attachments} */}
                             </div>
                           </td>
                         )}
@@ -393,7 +264,7 @@ export default function TasksPage() {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                               </svg>
-                              {task.comments}
+                              {/* {task.comments} */}
                             </div>
                           </td>
                         )}

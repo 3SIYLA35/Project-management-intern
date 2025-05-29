@@ -3,7 +3,7 @@ import { UserProfile } from "../components/Profile/types";
 import { Task } from "../components/Profile/types";
 
 
-interface AttachmentApi{
+export interface AttachmentApi{
     _id:string;
     name:string;
     type:string;

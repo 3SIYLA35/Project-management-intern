@@ -4,6 +4,7 @@ import { Attachment, Task } from "../components/Profile/types";
 import axios from "axios";
 import { apiClient } from "./apiClient";
 import { taskApi } from "../adapters/taskAdapter";
+import { AttachmentApi } from "../adapters/attachmentAdapter";
 
 
 export const TaskApi={
@@ -29,9 +30,10 @@ export const TaskApi={
     },
     getTask:async()=>{
         try{
-            const response=await axios.get('/task/get-my-tasks');
-            if(response.status===200){
-                return response.data;
+            const response=await apiClient.get<{tasks:taskApi[]}>('/task/get-my-tasks');
+            console.log('response',response);
+            if(response){
+                return response.tasks.map(adaptTask) ;
             }
             return null;
 
@@ -40,17 +42,21 @@ export const TaskApi={
             return null;
         }
     },
-    updateTask:async(task:Task,attachment:Attachment)=>{
+    updateTask:async(task:Partial<Task>,taskid:string,attachment?:Attachment[])=>{
         try{
             const taskdata=adaptTaskForAPi(task);
-            const attachmentdata=adaptAttachmentForApi(attachment);
+            let attachmentdata:Partial<AttachmentApi>[]=[];
+            if(attachment && attachment.length>0){
+                attachmentdata=attachment.map(attachment=>adaptAttachmentForApi(attachment)) ;
+            }
             const data={
+                taskid:taskid,
                 taskdata:taskdata,
                 attachment:attachmentdata,
             }
-            const response=await axios.put('/task/update-task',data);
-            if(response.status===200){
-                return response.data;
+            const response=await apiClient.put<taskApi>('/task/update-task',data);
+            if(response){
+                return adaptTask(response);
             }
             return null;
 
@@ -61,9 +67,9 @@ export const TaskApi={
     },
     getalltask:async()=>{
         try{
-            const response=await axios.get('/task/get-all-tasks');
-            if(response.status===200){
-                return response.data;
+            const response=await apiClient.get<taskApi[]>('/task/get-all-tasks');
+            if(response){
+                return response.map((task:taskApi)=>adaptTask(task) );
             }
             return null;
         }catch(error:any){

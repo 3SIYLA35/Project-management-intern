@@ -82,7 +82,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
     }
    
 
-  },[sprints])
+  },[])
 
   
   

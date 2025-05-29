@@ -26,10 +26,11 @@ import { TaskApi } from "../api/Taskapi"
             setloading(false);
         }
     }
-    const updatetask=async(task:Task,attachment:Attachment)=>{
+    const updatetask=async(task:Partial<Task>,taskid:string,attachment?:Attachment[],)=>{
         try{
+            console.log('task',task);
            setloading(true);
-           const data=await TaskApi.updateTask(task,attachment);
+           const data=await TaskApi.updateTask(task,taskid,attachment);
            if(data){
             settasks(prev=>prev? prev.map(t=>t.id===task.id?data:t):null);
             setloading(false);
@@ -51,6 +52,7 @@ import { TaskApi } from "../api/Taskapi"
             if(data){
                 settasks(data);
                 setloading(false);
+                console.log('data',data);
             }else{
                 seterror('failed to fetch tasks');
                 setloading(false);

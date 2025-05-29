@@ -1,4 +1,5 @@
 import { Project, Sprint, Task, UserProfile } from "../components/Profile/types";
+import { adaptuserProfile, addaptProfileforapi, ApiUserProfile } from "./profileAdapter";
 
 
 export interface taskApi{
@@ -10,8 +11,8 @@ export interface taskApi{
     startDate:Date,
     dueDate:Date,
     projectId:Project,
-    assignedBy:UserProfile,
-    assignedTo?:UserProfile|null,
+    assignedBy:ApiUserProfile,
+    assignedTo?:ApiUserProfile|null,
     sprintId:Sprint,
     createdAt:Date,
     updatedAt:Date,
@@ -28,8 +29,8 @@ export const adaptTask=(task:taskApi):Task=>{
         startDate:task.startDate,
         dueDate:task.dueDate,
         projectId:task.projectId,
-        assignedBy:task.assignedBy,
-        assignedTo:task.assignedTo?task.assignedTo:null,
+        assignedBy:adaptuserProfile(task.assignedBy),
+        assignedTo:task.assignedTo?adaptuserProfile(task.assignedTo):null,
         sprintId:task.sprintId,
     }
 }
@@ -43,11 +44,11 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
     if(task.description!==undefined) adaptedtask.description=task.description;
     if(task.status!==undefined) adaptedtask.status=task.status;
     if(task.priority!==undefined) adaptedtask.priority=task.priority;
-    if(task.startDate!==undefined) adaptedtask.startDate=task.startDate;
-    if(task.dueDate!==undefined) adaptedtask.dueDate=task.dueDate;
+    if(task.startDate!==undefined) adaptedtask.startDate=new Date(task.startDate);
+    if(task.dueDate!==undefined) adaptedtask.dueDate=new Date(task.dueDate);
     if(task.projectId!==undefined) adaptedtask.projectId=task.projectId;
-    if(task.assignedBy!==undefined) adaptedtask.assignedBy=task.assignedBy;
-    if(task.assignedTo!==undefined) adaptedtask.assignedTo=task?.assignedTo?task.assignedTo:null;
+    if(task.assignedBy!==undefined) adaptedtask.assignedBy=addaptProfileforapi(task.assignedBy)as ApiUserProfile;
+    if(task.assignedTo!==undefined) adaptedtask.assignedTo=task?.assignedTo?addaptProfileforapi(task.assignedTo)as ApiUserProfile:null;
     if(task.sprintId!==undefined) adaptedtask.sprintId=task.sprintId;
 
 

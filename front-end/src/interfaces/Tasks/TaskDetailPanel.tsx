@@ -5,14 +5,10 @@ import { faNoteSticky } from '@fortawesome/free-regular-svg-icons';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Emojipicker, { EmojiClickData } from 'emoji-picker-react';
 import EmojiPicker from 'emoji-picker-react';
-
-interface Attachment {
-  id: string;
-  name: string;
-  type: string;
-  date: string;
-  time: string;
-}
+import { Task } from '../../components/Profile/types';
+import Editmodal from '../../components/Main components/editmodal';
+import { Attachment } from '../../components/Profile/types';
+import { useTaskContext } from '../../Contexts/TaskContext';
 
 interface Activity {
   id: string;
@@ -38,30 +34,24 @@ interface Activity {
 interface TaskDetailProps {
   isOpen: boolean;
   onClose: () => void;
-  task: {
-    id: string;
-    name: string;
-    description?: string;
-    status: 'completed' | 'in_progress' | 'not_started';
-    assignedBy?: {
-      id: string;
-      name: string;
-      avatar: string;
-    };
-    assignee?: {
-      id: string;
-      name: string;
-      avatar: string;
-    };
-    dueDate?: string;
-    priority?: string;
-    attachments?: number;
-    activities?: Activity[];
-  } | null;
+  task: Task;
 }
 
 const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) => {
   const [emojipickeropen,setemojipickeropen]=useState(false);
+  const [isEditing,setisEditing]=useState(false);
+  const [editfield,seteditfield]=useState('');
+  const [editvalue,seteditvalue]=useState('');
+  const taskCOntext=useTaskContext();
+  const updatetask=taskCOntext?.updatetask;
+  const handlesaveedit=()=>{
+    const updattedtask:Partial<Task>={
+      [editfield]:editvalue
+    }
+    updatetask(updattedtask,task.id);
+    setisEditing(false);
+  }
+
 
   const handleEmojiClick=(event:EmojiClickData)=>{
     console.log(event);
@@ -132,7 +122,11 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
           <div className="flex items-center">
            <FontAwesomeIcon icon={faBarsProgress} className='text-[15px] mr-2'/>
             <h3 className="text-white text-lg font-medium">Task Name</h3>
-            <button className="ml-2 text-gray-400 hover:text-white">
+            <button className="ml-2 text-gray-400 hover:text-white" 
+            onClick={()=>{
+              setisEditing(true);
+            }}
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
@@ -146,7 +140,11 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
           <div className="flex items-center">
            <FontAwesomeIcon icon={faNoteSticky} className='text-[15px] mr-2'/> 
             <h3 className="text-white text-lg font-medium">Description</h3>
-            <button className="ml-2 text-gray-400 hover:text-white">
+            <button className="ml-2 text-gray-400 hover:text-white"
+            onClick={()=>{
+              setisEditing(true);
+            }}
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
@@ -169,13 +167,19 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Assignee</h4>
             <div className="flex items-center">
-              <img src={task.assignee?.avatar || "/img/avatar-2.jpg"} alt="Avatar" className="w-6 h-6 rounded-full mr-2" />
-              <span className="text-gray-300">{task.assignee?.name || "Kajol Kashyap"}</span>
+              <img src={task.assignedTo?.avatar || "/img/avatar-2.jpg"} alt="Avatar" className="w-6 h-6 rounded-full mr-2" />
+              <span className="text-gray-300">{task.assignedTo?.name || "Kajol Kashyap"}</span>
             </div>
           </div>
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Due Date</h4>
-            <span className="text-gray-300">{task.dueDate || "25th February, 2020"}</span>
+            <span className="text-gray-300">{new Date(task.dueDate).toLocaleDateString(
+              'en-US',
+              {year:'numeric',
+              month:'long',
+              day:'numeric'
+            }
+            )}</span>
           </div>
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Priority</h4>
@@ -341,6 +345,16 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
         
         
       </div>
+      <Editmodal
+        isOpen={isEditing}
+        onclose={()=>{setisEditing(false);}}
+        fieldname={editfield}
+        value={editvalue}
+        onChange={(value)=>{
+          seteditvalue(value);
+        }}
+        onsave={handlesaveedit}
+      ></Editmodal>
     </div>
   );
 };
