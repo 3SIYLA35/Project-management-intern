@@ -25,8 +25,8 @@ exports.createtask=async(req,res)=>{
         }
         return res.status(201).json({message:"task created successfully",task,attachment:saveAttachment});
     }catch(err){
-        console.error("error on controller",err.message);
-        return res.status(500).json({message:"error on controller"});
+        console.error("Error creating task:", err);
+        next(err);
     }
 }
 
@@ -49,8 +49,8 @@ exports.getmytasks=async(req,res)=>{
         console.log('specifictaks',specifictaks);
         return res.status(200).json(specifictaks);
     }catch(err){
-        console.error("error on controller",err.message);
-        return res.status(500).json({message:"error on controller"});
+        console.error("Error getting tasks:", err);
+        next(err)
     }
 }
 
@@ -66,22 +66,41 @@ exports.updatetask=async(req,res)=>{
             return res.status(400).json({message:"taskid not found"});
         }
         if(attachment){
-            const saveattachment= await Promise.all(attachment.map(async(attachment)=>{
-                return await attachmentService.saveAttachment(attachment,task._id,userid);
-            }));
+            const saveattachment=attachmentService.saveAttachment(attachment,task._id,userid);
+            
             if(!saveattachment){
-                return res.status(400).json({message:"failed to save attachment"});
+                console.log('saveattachment',saveattachment);
+                return res.status(400).json(saveattachment);
             }
         }
         const updatedtask=await TaskService.updatedtask(taskdata,taskid);
         if(!updatedtask){
             return res.status(400).json({message:"failed to update task"});
         }
-        return res.status(200).json({message:"task updated successfully",task:updatedtask});
+        const  newattachment=await attachmentService.getattachmentsbytaskid(task._id,userid);
+        return res.status(200).json({task:updatedtask,attachments:newattachment});
 
 
-    }catch(error){
-        console.error("error on controller",err.message);
-        return res.status(500).json({message:"error on controller"});
+    }catch(err){
+        console.error("Error updating task:", err);
+        next(err)
+    }
+}
+
+exports.deleteattachments=async(req,res)=>{
+    try{
+        const userid=req.user.id;
+        const {attachmentid}=req.params;
+        if(!userid){
+            return res.status(401).json({message:"unauthorized"});
+        }
+        const deletedattachment=await attachmentService.deleteattachments(attachmentid);
+        if(!deletedattachment){
+            return res.status(400).json({message:"failed to delete attachment"});
+        }
+        return res.status(200).json({message:"attachment deleted successfully"});
+    }catch(err){
+     console.error("Error deleting attachments:", err);
+     next(err);
     }
 }

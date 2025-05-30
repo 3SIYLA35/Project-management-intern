@@ -57,7 +57,9 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
             createdAt:new Date(),
             updatedAt:new Date()
         },
-        attachments:task.attachment as Attachment[] || [] as AttachmentApi[]
+        attachments:task.attachment? 
+        task.attachment.map(att=>adaptAttachmentForApi(att) as AttachmentApi)
+        :[] as AttachmentApi[]
     }
     
 
@@ -72,7 +74,7 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
     if(task.assignedTo!==undefined) adaptedtask.task!.assignedTo=task?.assignedTo?addaptProfileforapi(task.assignedTo)as ApiUserProfile:null;
     if(task.sprintId!==undefined) adaptedtask.task!.sprintId=task.sprintId;
     if(task.attachment && task.attachment?.length>0){
-        adaptedtask.attachments=task.attachment.map(atta=>adaptAttachmentForApi(atta)) as AttachmentApi[];
+        adaptedtask.attachments=task.attachment.map(atta=>adaptAttachmentForApi(atta))as AttachmentApi[];
     }
     return adaptedtask;
    

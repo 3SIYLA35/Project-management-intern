@@ -77,7 +77,7 @@ export default function TasksPage() {
   }
 
   // Function to format status display text
-  const formatStatus = (status: string) => {
+  const formatStatus=(status: string) => {
     return status.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');

@@ -2,7 +2,7 @@ import { adaptAttachmentForApi } from "../adapters/attachmentAdapter";
 import { adaptTask, adaptTaskForAPi } from "../adapters/taskAdapter";
 import { Attachment, Task } from "../components/Profile/types";
 import axios from "axios";
-import { apiClient } from "./apiClient";
+import { apiClient, extractErrorDetails } from "./apiClient";
 import { taskApi } from "../adapters/taskAdapter";
 import { AttachmentApi } from "../adapters/attachmentAdapter";
 
@@ -46,6 +46,7 @@ export const TaskApi={
         try{
             const taskdata=adaptTaskForAPi(task);
             let attachmentdata:Partial<AttachmentApi>[]=[];
+            console.log('attachment from api',attachment);
             if(attachment && attachment.length>0){
                 attachmentdata=attachment.map(attachment=>adaptAttachmentForApi(attachment)) ;
             }
@@ -54,15 +55,21 @@ export const TaskApi={
                 taskdata:taskdata,
                 attachment:attachmentdata,
             }
-            const response=await apiClient.put<{task:taskApi}>('/task/update-task',data);
+            const response=await apiClient.put<taskApi>('/task/update-task',data);
            
             if(response){
-                return adaptTask(response.task);
+                console.log('response',response);
+                return adaptTask(response);
+            }
+            else{
+                console.log('response',response);
+
             }
             return null;
 
         }catch(error:any){
-            console.error("error on update task",error.message);
+            const erroEtils=extractErrorDetails(error);
+            console.error("error on update task",erroEtils.message);
             return null;
         }
     },
@@ -75,6 +82,19 @@ export const TaskApi={
             return null;
         }catch(error:any){
             console.error("error on get all task",error.message);
+            return null;
+        }
+    },
+    deleteattachments:async(attachmentid:string)=>{
+        try{
+            const response=await apiClient.delete<taskApi>(`/task/delete-attachment/${attachmentid}`);
+            if(response){
+                return response as unknown as Task;
+            }
+            return null;
+        }catch(err:any){
+            const erroEtils=extractErrorDetails(err);
+            console.error("error on delete attachments",erroEtils.message);
             return null;
         }
     }

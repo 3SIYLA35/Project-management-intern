@@ -26,14 +26,14 @@ import { TaskApi } from "../api/Taskapi"
             setloading(false);
         }
     }
-    const updatetask=async(task:Partial<Task>,taskid:string,attachment?:Attachment[],)=>{
+    const updatetask=async(task?:Partial<Task>,taskid?:string,attachment?:Attachment[],)=>{
         try{
             console.log('task',task);
            setloading(true);
-           const data=await TaskApi.updateTask(task,taskid,attachment);
+           const data=await TaskApi.updateTask(task||{},taskid||'',attachment);
            if(data){
             await fetchmytasks();
-            settasks(prev=>prev? prev.map(t=>t.id===task.id?data:t):null);
+            settasks(prev=>prev? prev.map(t=>t.id===task?.id?data:t):null);
             setloading(false);
             return tasks;
            }else{
@@ -77,12 +77,26 @@ import { TaskApi } from "../api/Taskapi"
             console.error('error on fetch tasks',err);
         }
     }
+    const deleteattachments=async(attachmentid:string,task:Task)=>{
+        try{
+            const data=await TaskApi.deleteattachments(attachmentid);
+            if(data){
+                await fetchmytasks();
+                setloading(false);
+                return data;
+            }
+            return null;
+        }catch(err){
+            console.error('error on delete attachments',err);
+            seterror('failed to delete attachments');
+        }
+    }
 
     useEffect(()=>{
         fetchmytasks();
     },[])
 
     return{
-        tasks,fetchalltasks,fetchmytasks,updatetask,createTask,loading,error
+        tasks,fetchalltasks,fetchmytasks,updatetask,createTask,loading,error,deleteattachments
     }
 }

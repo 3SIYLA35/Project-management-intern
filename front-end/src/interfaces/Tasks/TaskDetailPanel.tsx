@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy, faEye, faFaceSmile, faPaperclip, faPaperPlane, faShare, faTrash} from '@fortawesome/free-solid-svg-icons';
 import { faNoteSticky } from '@fortawesome/free-regular-svg-icons';
@@ -9,6 +9,7 @@ import { Task } from '../../components/Profile/types';
 import Editmodal from '../../components/Main components/editmodal';
 import { Attachment } from '../../components/Profile/types';
 import { useTaskContext } from '../../Contexts/TaskContext';
+import AttachmentModal from '../../components/Main components/AttachmentModal';
 
 interface Activity {
   id: string;
@@ -46,6 +47,9 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
   const updatetask=taskCOntext?.updatetask;
   const [localtask,setlocaltask]=useState<Task|null>(task);
   const tasks=taskCOntext?.tasks;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
+  const deleteattachments=taskCOntext?.deleteattachments
   
   const handlesaveedit=()=>{
     const updattedtask:Partial<Task>={
@@ -88,7 +92,22 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
   },[task]);
   if (!isOpen || !task) return null;
 
+  const handleAddAttachments=(newAttachments: Attachment[])=>{
+      const updatedTask:Attachment[]=newAttachments;
+      console.log('updatedTask',updatedTask);
+      updatetask(localtask||{},localtask?.id,updatedTask||[])
+        .then(()=>{
+          const updated=taskCOntext?.tasks?.find(t=>t.id===task.id);
+          if(updated){
+            setlocaltask(updated);
+          }
+        });
+    
+  };
 
+  const handleaddAttachment=()=>{
+    setIsAttachmentModalOpen(true);
+  };
 
   return (
     <div className="h-full  overflow-y-auto hover:hide-scrollbar hide-scrollbar ">
@@ -214,60 +233,67 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
 
         {/* Attachments */}
         <div className="mb-6 px-6">
-          <div className="flex items-center  mb-3">
-            <img src="/icons/attach-document.png"  className='w-[15px] h-[15px] mr-2' alt="" />
+          <div className="flex items-center mb-3">
+            <img src="/icons/attach-document.png" className='w-[15px] h-[15px] mr-2' alt="" />
             <h3 className="text-white text-lg font-medium">Attachment</h3>
-            <button className="ml-2 text-gray-300 hover:text-white">
-             
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" width="1em" height="1em">
-                  <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"/>
-                </svg>
-             
+            <button className="ml-2 text-gray-300 hover:text-white"
+             onClick={handleaddAttachment}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" width="1em" height="1em">
+                <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm90.5 224H272v74.5c0 8.8-7.2 16-16 16-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3V272h-74.5c-4.4 0-8.4-1.8-11.3-4.7-2.9-2.9-4.7-6.9-4.7-11.3 0-8.8 7.2-16 16-16H240v-74.5c0-8.8 7.2-16 16-16s16 7.2 16 16V240h74.5c8.8 0 16 7.2 16 16s-7.2 16-16 16z"/>
+              </svg>
             </button>
           </div>
           
-          {localtask?.attachment?.map(attachment=>{
-            return (
-          <div key={attachment.id} className="bg-gray-700 rounded-lg p-3 mb-3 ml-4">
-            <div className="flex">
-              <div style={
-                {backgroundImage:attachment.url?`url(${attachment.url})`:'none' ,
-                 backgroundSize:'cover',
-                 backgroundPosition:'center',
-              }
-              } className=" w-16 h-17 rounded-lg flex items-center justify-center text-yellow-600 mr-3">
-                {/* <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg> */}
-                <img 
-        src={attachment.url } 
-        alt={attachment.name} 
-        className="w-full h-full object-cover"
-      />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-white text-sm font-medium">{attachment.name}</h4>
-                <p className="text-gray-400 text-xs">Added {attachment.date} at {attachment.time}</p>
-                <div className="flex justify-between mt-4 text-sm pt-2 border-t-[1px] border-gray-400">
-                  <div className="flex space-x-3">
-                    <button className="text-gray-400 hover:text-white">
-                      <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
-                      Comment</button>
-                    <button className="text-gray-400 hover:text-white">
-                      <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
-                      Share</button>
-                    
+          {localtask?.attachment && localtask.attachment.length > 0 ? (
+            localtask.attachment.map((attachment, index) => (
+              <div key={index} className="bg-gray-700 rounded-lg p-3 mb-3 ml-4">
+                <div className="flex">
+                  <div className="w-16 h-16 rounded-lg flex items-center justify-center text-yellow-600 mr-3 overflow-hidden">
+                    {attachment.type.startsWith('image/') ? (
+                      <img 
+                        src={attachment.url} 
+                        alt={attachment.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    )}
                   </div>
-                  <button className="text-gray-400 hover:text-white">
-                    <FontAwesomeIcon icon={faTrash} className='text-[13px] mr-1' />
-                    Delete</button>
+                  <div className="flex-1">
+                    <h4 className="text-white text-sm font-medium">{attachment.name}</h4>
+                    <p className="text-gray-400 text-xs">Added {new Date(attachment.date).toLocaleDateString()} at {new Date(attachment.time).toLocaleTimeString()}</p>
+                    <div className="flex justify-between mt-4 text-sm pt-2 border-t-[1px] border-gray-400">
+                      <div className="flex space-x-3">
+                        <button className="text-gray-400 hover:text-white">
+                          <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
+                          Comment
+                        </button>
+                        <button className="text-gray-400 hover:text-white">
+                          <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
+                          Share
+                        </button>
+                      </div>
+                      <button 
+                        className="text-gray-400 hover:text-white"
+                        onClick={() =>{
+                          deleteattachments(attachment?.id||'',localtask||null)
+                         
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} className='text-[13px] mr-1' />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-            )
-          })}
+            ))
+          ) : (
+            <div className="text-gray-500 italic ml-4">No attachments yet</div>
+          )}
         </div>
         {/* Activities Section */}
         <div className="mb-6 px-6">
@@ -395,6 +421,14 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
         }}
         onsave={handlesaveedit}
       ></Editmodal>
+      
+      <AttachmentModal
+        isOpen={isAttachmentModalOpen}
+        onClose={() => setIsAttachmentModalOpen(false)}
+        onSave={handleAddAttachments}
+        taskId={localtask || null}
+        currentUser={localtask?.assignedBy}
+      />
     </div>
   );
 };
