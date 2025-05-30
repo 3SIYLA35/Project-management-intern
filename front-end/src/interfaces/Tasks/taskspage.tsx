@@ -23,6 +23,9 @@ export default function TasksPage() {
 
   const TaskContext=useTaskContext();
   const tasks=TaskContext?.tasks;
+  useEffect(()=>{
+    TaskContext?.fetchmytasks();
+  },[])
   
   const [columns, setColumns] = useState({
     assigned: true,

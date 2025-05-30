@@ -47,7 +47,7 @@ exports.getmytasks=async(req,res)=>{
             };
         }))
         console.log('specifictaks',specifictaks);
-        return res.status(200).json({tasks});
+        return res.status(200).json(specifictaks);
     }catch(err){
         console.error("error on controller",err.message);
         return res.status(500).json({message:"error on controller"});

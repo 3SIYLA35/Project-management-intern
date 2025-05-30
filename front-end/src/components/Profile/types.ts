@@ -54,6 +54,7 @@ export interface Task{
   assignedBy:UserProfile;
   assignedTo:UserProfile|null;
   sprintId:Sprint;
+  
 }
 export interface Attachment{
   id:string;

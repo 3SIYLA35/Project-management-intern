@@ -30,10 +30,10 @@ export const TaskApi={
     },
     getTask:async()=>{
         try{
-            const response=await apiClient.get<{tasks:taskApi[]}>('/task/get-my-tasks');
+            const response=await apiClient.get<taskApi[]>('/task/get-my-tasks');
             console.log('response',response);
             if(response){
-                return response.tasks.map(adaptTask) ;
+                return response.map(adaptTask) ;
             }
             return null;
 
@@ -54,9 +54,10 @@ export const TaskApi={
                 taskdata:taskdata,
                 attachment:attachmentdata,
             }
-            const response=await apiClient.put<taskApi>('/task/update-task',data);
+            const response=await apiClient.put<{task:taskApi}>('/task/update-task',data);
+           
             if(response){
-                return adaptTask(response);
+                return adaptTask(response.task);
             }
             return null;
 

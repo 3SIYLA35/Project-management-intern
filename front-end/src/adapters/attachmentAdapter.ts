@@ -4,7 +4,7 @@ import { Task } from "../components/Profile/types";
 
 
 export interface AttachmentApi{
-    _id:string;
+    _id?:string;
     name:string;
     type:string;
     url:string;
@@ -16,7 +16,7 @@ export interface AttachmentApi{
 
 export const adaptAttachment=(attachment:AttachmentApi):Attachment=>{
     return{
-        id:attachment._id,
+        id:attachment._id || '',
         name:attachment.name,
         type:attachment.type,
         url:attachment.url,

@@ -32,9 +32,10 @@ import { TaskApi } from "../api/Taskapi"
            setloading(true);
            const data=await TaskApi.updateTask(task,taskid,attachment);
            if(data){
+            await fetchmytasks();
             settasks(prev=>prev? prev.map(t=>t.id===task.id?data:t):null);
             setloading(false);
-            return data;
+            return tasks;
            }else{
             seterror('failed to update task');
             setloading(false);
