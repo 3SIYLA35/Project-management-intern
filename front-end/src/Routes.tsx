@@ -18,6 +18,7 @@ import { ProfileProvider } from './Contexts/ProfileContext';
 import { ProjectProvider } from './Contexts/ProjectContext';
 import { TaskProvider } from './Contexts/TaskContext';
 import { SprintProvider } from './Contexts/SprintContext';
+import {CommentProvider} from './Contexts/CommentContext';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -63,6 +64,7 @@ const AppRouter=()=> {
     <Router>
       <ProjectProvider> 
         <TaskProvider>
+          <CommentProvider>
           <SprintProvider>
           <ProfileProvider>
              
@@ -148,6 +150,7 @@ const AppRouter=()=> {
       </Routes>
       </ProfileProvider>
         </SprintProvider>
+        </CommentProvider>
         </TaskProvider>
       </ProjectProvider>
     </Router>

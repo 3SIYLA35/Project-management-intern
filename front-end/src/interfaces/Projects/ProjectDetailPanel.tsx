@@ -54,6 +54,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
   const [localproject,setlocalproject]=useState<Project|null>(project);
   useEffect(()=>{
     setlocalproject(project);
+    
   },[project]);
 
   const [editedproject,seteditedproject]=useState<Partial<Project>|null>(null);

@@ -1,7 +1,7 @@
 import { apiClient } from "@/api/apiClient";
 import { UserProfile } from "@/components/Profile/types";
 
-interface ApiUserprofile{
+export interface ApiUserprofile{
     _id:string;
     firstName:string;
     lastName:string;

@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useTaskContext } from '../../Contexts/TaskContext';
 import {Task} from '../../components/Profile/types';
+import { useCommentContext } from '../../Contexts/CommentContext';
 
 export default function TasksPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,14 +21,20 @@ export default function TasksPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const navigate = useNavigate();
+  const CommentCOntext=useCommentContext();
+  const fetchcomments=CommentCOntext?.fetchcomments;
 
   const TaskContext=useTaskContext();
   const tasks=TaskContext?.tasks;
   useEffect(()=>{
     TaskContext?.fetchmytasks();
+    if(selectedTask?.id){
+      fetchcomments(selectedTask.id);
+    }
   },[])
+  const comments=CommentCOntext?.comments;
   
-  const [columns, setColumns] = useState({
+  const [columns, setColumns]=useState({
     assigned: true,
     owner: true,
     lastmodified: true,
@@ -293,6 +300,7 @@ export default function TasksPage() {
                   isOpen={showTaskDetail}
                   onClose={handleCloseTaskDetail}
                   task={selectedTask as Task}
+                  comments={comments}
                 />
               </div>
             )}

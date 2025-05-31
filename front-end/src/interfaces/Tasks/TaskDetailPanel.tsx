@@ -5,40 +5,25 @@ import { faNoteSticky } from '@fortawesome/free-regular-svg-icons';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Emojipicker, { EmojiClickData } from 'emoji-picker-react';
 import EmojiPicker from 'emoji-picker-react';
-import { Task } from '../../components/Profile/types';
+import { Comment, Task } from '../../components/Profile/types';
 import Editmodal from '../../components/Main components/editmodal';
 import { Attachment } from '../../components/Profile/types';
 import { useTaskContext } from '../../Contexts/TaskContext';
 import AttachmentModal from '../../components/Main components/AttachmentModal';
+import CommentSection from '../../components/Comments/CommentSection';
+import { useProfileContext } from '../../Contexts/ProfileContext';
+import { useCommentContext } from '../../Contexts/CommentContext';
 
-interface Activity {
-  id: string;
-  user: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  content: string;
-  type: 'message' | 'comment' | 'attachment';
-  timestamp: string;
-  replies?: {
-    user: {
-      id: string;
-      name: string;
-      avatar: string;
-    };
-    content: string;
-    timestamp: string;
-  }[];
-}
+
 
 interface TaskDetailProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
+  comments:Comment[];
 }
 
-const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) => {
+const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task ,comments}) => {
   const [emojipickeropen,setemojipickeropen]=useState(false);
   const [isEditing,setisEditing]=useState(false);
   const [editfield,seteditfield]=useState('');
@@ -48,8 +33,11 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
   const [localtask,setlocaltask]=useState<Task|null>(task);
   const tasks=taskCOntext?.tasks;
   const fileRef = useRef<HTMLInputElement>(null);
-  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
-  const deleteattachments=taskCOntext?.deleteattachments
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen]=useState(false);
+  const deleteattachments=taskCOntext?.deleteattachments;
+  const commentContext=useCommentContext();
+  const fetchcomments=commentContext?.fetchcomments;
+  const commentsList=commentContext?.comments || [];
   
   const handlesaveedit=()=>{
     const updattedtask:Partial<Task>={
@@ -68,6 +56,11 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
 
   useEffect(()=>{
     setlocaltask(task);
+
+    if(task){
+      fetchcomments(task.id);
+    }
+
   },[task]);
 
   // Add a new useEffect to update local task when tasks change
@@ -295,121 +288,7 @@ const TaskDetailPanel: React.FC<TaskDetailProps> = ({ isOpen, onClose, task }) =
             <div className="text-gray-500 italic ml-4">No attachments yet</div>
           )}
         </div>
-        {/* Activities Section */}
-        <div className="mb-6 px-6">
-          <div className='flex items-center mb-3 '>
-           <FontAwesomeIcon icon={faChartLine} className='pr-2'/>
-           <h3 className="text-white text-lg font-medium ">Activities</h3>
-          </div>
-          
-          {/* User Status */}
-          <div className=" rounded-lg p-3 mb-4   ">
-           <div className='flex items-center'>
-            <img src="/img/avatar-1.jpg" alt="Avatar" className="w-9 relative bottom-2  h-9 rounded-full mr-2" />
-            <div className='flex flex-col w-full'>
-             <div className="flex justify-between items-start  pt-2 pr-5 pl-7 h-[55px]  bg-violet-900 pl-4 rounded-tl-lg custom-rounded-tr-tl">
-              <div className="flex items-center">
-                <span className="text-white">Ronak is out of office</span>
-              </div>
-              <button className="text-white hover:text-white">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-             </div>
-             <div className="flex p-1  items-center relative bottom-5 bg-white  px-4 custom-rounded">
-              <textarea 
-                placeholder="Ask a question or send any update" 
-                className="flex-1  bg-transparent text-black rounded-lg px-3 py-2 focus:outline-none h-10"
-                onInput={(e) => {
-                  const textarea=e.target as HTMLTextAreaElement;
-                  textarea.style.height='10px';
-                  textarea.style.height=`${textarea.scrollHeight}px`;
-                }}
-              />
-              <button className="ml-2  text-violet-900 bg-gray-200 rounded-full border-2 h-7 w-7 flex items-center justify-center">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-             </div>
-            </div>
-           </div>
-           <div className='pl-16 relative bottom-3' >
-             <button className='text-gray-300 hover:text-white'>
-              <FontAwesomeIcon icon={faPaperclip} className='text-[18px] '/>
-             </button>
-             <button className='text-gray-300 hover:text-white'
-             onClick={()=>{
-              setemojipickeropen(!emojipickeropen);
-             }}>
-              <FontAwesomeIcon icon={faFaceSmile} className='text-[18px] ml-4 ' />
-               
-             </button>
-              {emojipickeropen? 
-              <div className=''>
-                <EmojiPicker open={emojipickeropen} width={390} height={200} skinTonesDisabled={true}  searchDisabled={true} onEmojiClick={handleEmojiClick}></EmojiPicker>
-              </div>:''}
-           </div>
-
-                <div className='w-full h-[2px] mx-2 bg-gray-700'></div>
-          </div>
-
-          
-          {/* Activity Comments */}
-          <div className="space-y-4">
-            <div className="flex">
-              <img src="/img/avatar-2.jpg" alt="Avatar" className="w-8 h-8 rounded-full mr-3" />
-              <div className="flex-1">
-                <p className="text-gray-300">
-                  <span className="text-white font-medium">Adding a new comment to Pricing illustration.</span> Have you seen samples?
-                </p>
-                <div className="flex mt-2 space-x-2">
-                  <div className="bg-gray-700 w-16 h-16 rounded-md overflow-hidden">
-                    <img src="/img/sample1.jpg" alt="Sample" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="bg-gray-700 w-16 h-16 rounded-md overflow-hidden">
-                    <img src="/img/sample2.jpg" alt="Sample" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="bg-gray-700 w-16 h-16 rounded-md overflow-hidden">
-                    <img src="/img/sample3.jpg" alt="Sample" className="w-full h-full object-cover" />
-                  </div>
-                  <button className="flex items-center justify-center bg-gray-700 w-8 h-16 rounded-md text-white">
-                    +2
-                  </button>
-                </div>
-                <div className="flex mt-2 space-x-3 text-xs text-gray-400">
-                  <button className="hover:text-white">
-                  <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
-                    Reply</button>
-                  <button className="hover:text-white">
-                  <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
-                    Share</button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex ml-12">
-              <img src="/img/avatar-3.jpg" alt="Avatar" className="w-8 h-8 rounded-full mr-3" />
-              <div className="flex-1">
-                <p className="text-gray-300">
-                  <span className="text-white font-medium">Please see this artwork created from an website.</span>
-                </p>
-                <div className="flex mt-2 space-x-2">
-                  <button className="text-gray-400 hover:text-white text-xs">
-                  <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
-                    Reply</button>
-                  <button className="text-gray-400 hover:text-white text-xs">
-                  <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />  
-                    Share</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        
-        
+                <CommentSection task={localtask as Task} comments={commentsList} />
       </div>
       <Editmodal
         isOpen={isEditing}

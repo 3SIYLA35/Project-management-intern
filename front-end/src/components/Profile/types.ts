@@ -77,6 +77,26 @@ export interface Attachment{
     goals:string;
   }
 
+  export interface Reply{
+    id:string;
+    content:string;
+    user:UserProfile;
+    parentReplyId:Reply|null;
+    replyLevel:number;
+    createdAt:Date;
+    updatedAt:Date;
+}
+
+export interface Comment{
+    id:string;
+    content:string;
+    taskId:Task;
+    user:UserProfile;
+    replies:Reply[];
+    createdAt:Date;
+    updatedAt:Date;
+}
+
 export interface BaseProfileSectionProps {
   isEditing: boolean;
   className?: string;

@@ -1,26 +1,7 @@
 const express=require('express');
 const mongoose=require('mongoose');
+const replySchema=require('./reply');
 
-const replySchema=new mongoose.Schema({
-    content:{
-        type:String,
-        required: true,
-    },
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'users',
-        required: true,
-    },
-    parentReplyId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'replies',
-        default: null,
-    },
-    replyLevel:{
-        type:Number,
-        default:1,
-    },
-},{timestamps:true });
 
 const commentSchema=new mongoose.Schema({
     content:{
@@ -37,7 +18,11 @@ const commentSchema=new mongoose.Schema({
         ref:'users',
         required: true,
     },
-    replies:[replySchema],
+    replies:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'replies',
+        required:false,
+    }],
 }, {timestamps:true});
 
 module.exports=mongoose.model('comments',commentSchema);
