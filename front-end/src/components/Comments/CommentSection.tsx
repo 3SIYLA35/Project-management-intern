@@ -19,7 +19,7 @@ const CommentSection: React.FC<CommentSectionProps>=({ task, comments })=>{
   const profileContext=useProfileContext();
   const currentUser=profileContext?.profile;
   
-  const handleSubmitComment=async()=>{
+  const handleSubmitComment=()=>{
     if (newComment.trim() && currentUser && createComment){
       try {
         // Prepare a new comment object
@@ -36,12 +36,13 @@ const CommentSection: React.FC<CommentSectionProps>=({ task, comments })=>{
         // Clear the input field right away for better UX
         setNewComment('');
         
-        // Send to server
-        await createComment(comment);
+        // Send to server - use promise instead of await
+        createComment(comment).catch(error => {
+          console.error('Failed to create comment', error);
+        });
         
       } catch (error) {
         console.error('Failed to create comment', error);
-        // You could show an error message to the user here
       }
     }
   };

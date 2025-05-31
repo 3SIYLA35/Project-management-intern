@@ -9,7 +9,7 @@ export interface ReplyApi{
     _id:string;
     content:string;
     user:ApiUserprofile;
-    parentReplyId:ReplyApi;
+    parentReplyId:ReplyApi|null;
     replyLevel:number;
     createdAt:Date;
     updatedAt:Date;
@@ -142,7 +142,7 @@ export const adaptreplyforapi=(reply:Partial<Reply>):Partial<ReplyApi>=>{
     if(reply.id!==undefined) apiReply._id=reply.id;
     if(reply.content!==undefined) apiReply.content=reply.content;
     if(reply.user!==undefined) apiReply.user=safeUserAdapter(reply.user);
-    if(reply.parentReplyId!==undefined) apiReply.parentReplyId= reply.parentReplyId==null?undefined:adaptreplyforapi(reply.parentReplyId) as ReplyApi;
+    if(reply.parentReplyId!==undefined) apiReply.parentReplyId= reply.parentReplyId==null?null:adaptreplyforapi(reply.parentReplyId) as ReplyApi;
     if(reply.replyLevel!==undefined) apiReply.replyLevel=reply.replyLevel;
     if(reply.createdAt!==undefined) apiReply.createdAt=reply.createdAt;
     if(reply.updatedAt!==undefined) apiReply.updatedAt=reply.updatedAt;

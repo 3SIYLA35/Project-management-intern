@@ -8,7 +8,7 @@ Router.post('/task/create-comment',authenticateUser,commentController.createComm
 Router.put('/task/update-comment',authenticateUser,commentController.updateComment);
 Router.delete('/task/delete-comment/:commentId',authenticateUser,commentController.deleteComment);
 Router.post('/task/comment/:commentId/reply/create-reply',authenticateUser,commentController.createReply);
-Router.put('/task/comment/:commentId/reply/update-reply/:replyId',authenticateUser,commentController.updateReply);
+Router.put('/task/comment/reply/update-reply',authenticateUser,commentController.updateReply);
 Router.delete('/task/comment/:commentId/reply/delete-reply/:replyId',authenticateUser,commentController.deleteReply);
 
 module.exports=Router;

@@ -12,7 +12,6 @@ export const useComment=()=>{
             setloading(true);
             seterror(null);
             const response=await CommentApi.getComments(taskid);
-            
             if(response && Array.isArray(response)){
                 console.log('comments from useComment',response);
                 setcomments(response);
@@ -31,29 +30,16 @@ export const useComment=()=>{
     const createComment=async(comment:Comment)=>{
         try{
             setloading(true);
-            seterror(null);
-            
-            // Optimistically add the comment to the UI with a temporary ID
-            const optimisticComment = {...comment};
-            setcomments(prev => [...prev, optimisticComment]);
-            
-            // Send to server
+            const optimisticComment={...comment};
+            setcomments(prev=>[...prev,optimisticComment]);
             const response=await CommentApi.createComment(comment);
-            
             if(response){
                 console.log('response from createComment',response);
-                
-                // Replace the optimistic comment with the real one from server
-                // or add the new comment if optimistic update failed
-                setcomments(prev => {
-                    // Check if the optimistic comment is already in the list
-                    const hasOptimistic = prev.some(c => c.id === optimisticComment.id);
-                    
-                    if (hasOptimistic) {
-                        // Replace the optimistic comment
-                        return prev.map(c => c.id === optimisticComment.id ? response : c);
-                    } else {
-                        // Add the new comment from the server
+                setcomments(prev =>{
+                    const hasOptimistic=prev.some(c=>c.id===optimisticComment.id);
+                    if (hasOptimistic){
+                        return prev.map(c=>c.id===optimisticComment.id ? response : c);
+                    }else{
                         return [...prev, response];
                     }
                 });
@@ -76,27 +62,21 @@ export const useComment=()=>{
         try{
             setloading(true);
             seterror(null);
-            
-            // Optimistically update the comment in UI
-            setcomments(prev => prev.map(c => c.id === comment.id ? comment : c));
-            
+            setcomments(prev=>prev.map(c=>c.id===comment.id?comment as Comment:c));
             const response=await CommentApi.updateComment(comment);
-            
             if(response){
                 console.log('response from updateComment',response);
-                setcomments(prev => prev.map(c => c.id === comment.id ? response : c));
+                setcomments(prev=>prev.map(c=>c.id===comment.id?response:c));
                 return response;
             }
             return comment;
         }catch(err){
             console.error('error on update comment',err);
             seterror('Failed to update comment');
-            // Revert to original comment on error
-            setcomments(prev => {
-                // Find the original comment
-                const original = prev.find(c => c.id === comment.id);
-                if (!original) return prev;
-                return prev.map(c => c.id === comment.id ? original : c);
+            setcomments(prev=>{
+                const original=prev.find(c=>c.id===comment.id);
+                if(!original)return prev;
+                return prev.map(c=>c.id===comment.id?original:c);
             });
             throw err;
         } finally {
@@ -141,36 +121,30 @@ export const useComment=()=>{
         try{
             setloading(true);
             seterror(null);
-            
-            // Create an optimistic reply with temporary ID
-            const optimisticReply = {
+            const optimisticReply={
                 ...reply,
-                id: reply.id || 'temp-' + Date.now(),
-                createdAt: new Date(),
-                updatedAt: new Date()
+                id: reply.id||'temp-' + Date.now(),
+                createdAt:new Date(),
+                updatedAt:new Date()
             } as Reply;
-            
-            // Add to UI immediately
-            setcomments(prev => prev.map(comment => 
-                comment.id === commentId 
-                    ? {...comment, replies: [...comment.replies, optimisticReply]}
-                    : comment
+            setcomments(prev=>prev.map(comment=> 
+                comment.id===commentId 
+                    ?{...comment,replies:[...comment.replies,optimisticReply]}
+                    :comment
             ));
             
             const response=await CommentApi.createReply(reply,commentId);
-            
             if(response){
                 console.log('response from createReply',response);
-                // Replace temp reply with server response
-                setcomments(prev => prev.map(comment => 
-                    comment.id === commentId
-                        ? {
+                setcomments(prev=>prev.map(comment => 
+                    comment.id===commentId
+                        ?{
                             ...comment, 
-                            replies: comment.replies.map(r => 
-                                r.id === optimisticReply.id ? response : r
+                            replies:comment.replies.map(r=> 
+                                r.id===optimisticReply.id?response:r
                             )
                         }
-                        : comment
+                        :comment
                 ));
                 return response;
             }
@@ -178,15 +152,13 @@ export const useComment=()=>{
         }catch(err){
             console.error('error on create reply',err);
             seterror('Failed to create reply');
-            
-            // Remove optimistic reply on error
-            setcomments(prev => prev.map(comment => 
-                comment.id === commentId
-                    ? {
+            setcomments(prev=>prev.map(comment=> 
+                comment.id===commentId
+                    ?{
                         ...comment,
-                        replies: comment.replies.filter(r => r.id !== reply.id)
+                        replies:comment.replies.filter(r=>r.id!==reply.id)
                     }
-                    : comment
+                    :comment
             ));
             
             throw err;

@@ -42,16 +42,16 @@ export const CommentApi={
             console.error('error on create comment',err);
             throw err;
         }
+
     },
     updateComment:async(comment:Comment)=>{
         try{
-            const adaptedComment = adaptCommentforapi(comment);
-            console.log('Updating comment:', adaptedComment);
-            
-            const response = await apiClient.put<commentapi>(`/comments/task/update-comment`, adaptedComment);
-            
-            if(response && response._id){
-                console.log('response from updateComment', response);
+            const updatedcomment={id:comment.id,content:comment.content};
+            const adaptedComment=adaptCommentforapi(updatedcomment);
+            console.log('Updating comment:',adaptedComment);
+            const response=await apiClient.put<commentapi>(`/comments/task/update-comment`, adaptedComment);
+            if(response ){
+                console.log('response from updateComment',response);
                 return adaptComment(response);
             }
             return comment;
@@ -63,12 +63,11 @@ export const CommentApi={
     deleteComment:async(commentId:string)=>{
         try{
             const response=await apiClient.delete<commentapi>(`/comments/task/delete-comment/${commentId}`);
-            if(response && response._id){
+            if(response ){
                 console.log('response from deleteComment',response);
                 return adaptComment(response);
             }
-            // Return a basic object with the ID that was deleted
-            return { id: commentId } as Comment;
+            return { id: commentId }as Comment;
         }catch(err){
             console.error('error on delete comment',err);
             throw err;
@@ -76,24 +75,21 @@ export const CommentApi={
     },
     createReply:async(reply:Partial<Reply>,commentId:string)=>{
         try{
-            const adaptedReply = adaptreplyforapi(reply);
+            const adaptedReply=adaptreplyforapi(reply);
             console.log('Creating reply:', adaptedReply);
-            
-            const response = await apiClient.post<ReplyApi>(
+            const response=await apiClient.post<ReplyApi>(
                 `/comments/task/comment/${commentId}/reply/create-reply`,
                 adaptedReply
             );
-            
-            if(response && response._id){
+            if(response){
                 console.log('response from createReply',response);
                 return adaptreply(response);
             }
-            // Return the original reply with a temporary ID as fallback
-            return {
+            return{
                 ...reply,
-                id: 'temp-' + Date.now(),
-                createdAt: new Date(),
-                updatedAt: new Date()
+                id:'temp-'+Date.now(),
+                createdAt:new Date(),
+                updatedAt:new Date()
             } as Reply;
         }catch(err){
             console.error('error on create reply',err);
@@ -102,15 +98,13 @@ export const CommentApi={
     },
     updateReply:async(reply:Reply,commentId:string)=>{
         try{
-            const adaptedReply = adaptreplyforapi(reply);
+            const adaptedReply=adaptreplyforapi(reply);
             console.log('Updating reply:', adaptedReply);
-            
             const response = await apiClient.put<ReplyApi>(
-                `/comments/task/comment/${commentId}/reply/update-reply`,
+                `/comments/task/comment/reply/update-reply`,
                 adaptedReply
             );
-            
-            if(response && response._id){
+            if(response){
                 console.log('response from updateReply',response);
                 return adaptreply(response);
             }
@@ -123,12 +117,11 @@ export const CommentApi={
     deleteReply:async(replyId:string,commentId:string)=>{
         try{
             const response=await apiClient.delete<ReplyApi>(`/comments/task/comment/${commentId}/reply/delete-reply/${replyId}`);
-            if(response && response._id){
+            if(response ){
                 console.log('response from deleteReply',response);
                 return adaptreply(response);
             }
-            // Return a basic object with the ID that was deleted
-            return { id: replyId } as Reply;
+            return { id:replyId} as Reply;
         }catch(err){
             console.error('error on delete reply',err);
             throw err;

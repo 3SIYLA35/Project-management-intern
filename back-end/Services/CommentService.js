@@ -1,16 +1,27 @@
 const commentmodel=require('../Models/Comments.js');
 const replymodel=require('../Models/reply.js');
+const mongoose=require('mongoose');
 
 
 const CommentService={
     getComments:async(taskId)=>{
         try{
             const comments=await commentmodel.find({taskId})
-            .populate('replies')
-            .populate('user');
+            .populate('user')
+            .populate({
+                path:'replies',
+                populate:[
+                    {path: 'user'},
+                    { 
+                        path:'parentReplyId',
+                        populate:{path:'user'}
+                    }
+                ]
+            });
             if(!comments){
-                return null;
+                return [];
             }
+            
             return comments;
         }catch(err){
             console.error('error on getComments',err);
@@ -33,7 +44,24 @@ const CommentService={
             if(!comment){
                 return null;
             }
-            return comment;
+            const populatedComment=await commentmodel.findById(comment._id)
+            .populate('user')
+            .populate('taskId')
+            .populate({
+                path: 'replies',
+                populate: [
+                    { path: 'user' },
+                    { 
+                        path: 'parentReplyId',
+                        populate: { path: 'user' }
+                    }
+                ]
+            });
+            
+            if(!populatedComment){
+                return null;
+            }
+            return populatedComment;
         }catch(err){
             console.error('error on createComment',err);
             const error=new Error('Failed to create comment');
@@ -45,6 +73,7 @@ const CommentService={
     },
     updateComment:async(commentid,commentdata)=>{
         try{
+            console.log('commentid',commentid);
             const comment=await commentmodel.findByIdAndUpdate(
                 commentid,
                 {$set:commentdata}
@@ -52,7 +81,20 @@ const CommentService={
             if(!comment){
                 return null;
             }
-            return comment;
+            const populatedComment=await commentmodel.findById(commentid)
+            .populate('user')
+            .populate('taskId')
+            .populate({
+                path: 'replies',
+                populate: [
+                    { path: 'user' },
+                    { 
+                        path: 'parentReplyId',
+                        populate: { path: 'user' }
+                    }
+                ]
+            });
+            return populatedComment;
 
         }catch(err){
             console.error('error on updateComment',err);
@@ -65,6 +107,15 @@ const CommentService={
     },
     deleteComment:async(commentid)=>{
         try{
+            const replies=await commentmodel.findById(commentid).select('replies');
+            console.log('replies',replies.replies);
+            if(replies && replies.replies.length>0){
+                replies.replies.forEach(async(reply)=>{
+                    await replymodel.findByIdAndDelete(reply);
+
+                })
+                }
+            
             const comment=await commentmodel.findByIdAndDelete(commentid);
             if(!comment){
                 return null;
@@ -81,6 +132,8 @@ const CommentService={
     },
     createReply:async(replydata,commentid)=>{
         try{
+            console.log('replydata',replydata);
+            console.log('commentid',commentid);
             let defaultreply=1;
             if(replydata.parentReplyId){
                 const comment =await commentmodel.findOne(
@@ -91,21 +144,36 @@ const CommentService={
                     defaultreply=comment.replies[0].replyLevel+1;
                 }
             };
-            const reply={
+            const reply= await replymodel.create({
                 content:replydata.content,
-                user:replydata.userId,
+                user:new mongoose.Types.ObjectId(replydata.user._id),
                 replyLevel:defaultreply,
                 parentReplyId:replydata.parentReplyId,
-            };
+            });
+            if(!reply){
+                return null;
+            }
             const updatedComment=await commentmodel.findByIdAndUpdate(
                 commentid,
-                {$push:{replies:reply}},
+                {$push:{replies:reply._id}},
                 {new:true}
             );
             if(!updatedComment){
                 return null;
             }
-            return updatedComment;
+            
+            // Properly populate the reply with its nested fields
+            const populatedReply=await replymodel.findById(reply._id)
+            .populate('user')
+            .populate({
+                path: 'parentReplyId',
+                populate: { path: 'user' }
+            });
+            
+            if(!populatedReply){
+                return null;
+            }
+            return populatedReply;
 
         }catch(err){
             console.error('error on createReply',err);
@@ -123,6 +191,11 @@ const CommentService={
                 {$set:replydata},
                 {new:true}
             )
+            .populate('user')
+            .populate({
+                path:'parentReplyId',
+                populate:{ path: 'user' }
+            });
             if(!reply){
                 return null;
             }
@@ -138,15 +211,30 @@ const CommentService={
     },
     deleteReply:async(replyid,commentid)=>{
         try{
+            console.log('replyid',replyid);
+            console.log('commentid',commentid);
+            const reply=await replymodel.findByIdAndDelete(replyid);
+            if(!reply){
+                console.log('reply not found on deleteReply');
+                return null;
+            }
             const comment=await commentmodel.findOneAndUpdate(
-                {_id:commentid,"replies._id":replyid},
-                {$pull:{replies:{_id:replyid}}},
+                {_id:commentid},
+                {$pull:{replies:replyid}},
                 {new:true}
             );
             if(!comment){
                 return null;
             }
-            return comment;
+            const populatedComment=await commentmodel.findById(commentid)
+            .populate({
+                path:'replies',
+                populate:[
+                    {path:'user'},
+                    {path:'parentReplyId',populate:{path:'user'}}
+                ]
+            });
+            return populatedComment;
 
         }catch(err){
             console.error('error on deleteReply',err);

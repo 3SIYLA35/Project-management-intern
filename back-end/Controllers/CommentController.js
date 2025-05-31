@@ -48,7 +48,7 @@ exports.updateComment=async(req,res)=>{
         if(!userId){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const commentId=req.params.commentId;
+        const commentId=req.body._id;
         if(!commentId){
             return res.status(400).json({message:'Comment ID is required'});
         }
@@ -92,7 +92,7 @@ exports.createReply=async(req,res)=>{
         if(!commentId){
             return res.status(400).json({message:'Comment ID is required'});
         }
-        const reply=await CommentService.createReply(req.body,commentId);
+        const reply=await CommentService.createReply(req.body,commentId);;
         if(!reply){
             return res.status(400).json({message:'Failed to create reply'});
         }
@@ -108,11 +108,7 @@ exports.updateReply=async(req,res)=>{
         if(!userId){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const commentId=req.params.commentId;
-        if(!commentId){
-            return res.status(400).json({message:'Comment ID is required'});
-        }
-        const replyId=req.body.replyId;
+        const replyId=req.body._id;
         if(!replyId){
             return res.status(400).json({message:'Reply ID is required'});
         }

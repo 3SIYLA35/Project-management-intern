@@ -26,12 +26,23 @@ export default function TasksPage() {
 
   const TaskContext=useTaskContext();
   const tasks=TaskContext?.tasks;
+  const [commentsCount,setCommentsCount]=useState<number[]>([]);
   useEffect(()=>{
     TaskContext?.fetchmytasks();
+    tasks?.forEach((task)=>{
+      fetchcomments(task.id).then((comments)=>{
+        setCommentsCount(prev=>[...prev,comments?.length||0]);
+      })
+    })
+    console.log('commentsCount',commentsCount);
     if(selectedTask?.id){
       fetchcomments(selectedTask.id);
     }
   },[])
+
+  const getCommentsCount=(index:number)=>{
+    return commentsCount[index]||0;
+  }
   const comments=CommentCOntext?.comments;
   
   const [columns, setColumns]=useState({
@@ -228,7 +239,7 @@ export default function TasksPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
-                    {tasks?.map((task) => (
+                    {tasks?.map((task,index)=>(
                       <tr 
                         key={task.id} 
                         className="hover:bg-gray-700 cursor-pointer"
@@ -264,7 +275,7 @@ export default function TasksPage() {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                               </svg>
-                              {/* {task.attachments} */}
+                              {task!.attachment!.length}
                             </div>
                           </td>
                         )}
@@ -274,7 +285,7 @@ export default function TasksPage() {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                               </svg>
-                              {/* {task.comments} */}
+                              {getCommentsCount(index)}
                             </div>
                           </td>
                         )}
