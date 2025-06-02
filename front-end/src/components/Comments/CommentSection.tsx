@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Comment, Task, UserProfile } from '../../components/Profile/types';
+import { Comment, Project, Task, UserProfile } from '../../components/Profile/types';
 import { useCommentContext } from '../../Contexts/CommentContext';
 import { useProfileContext } from '../../Contexts/ProfileContext';
 import CommentItem from './CommentItem';
@@ -21,27 +21,22 @@ const CommentSection: React.FC<CommentSectionProps>=({ task, comments })=>{
   
   const handleSubmitComment=()=>{
     if (newComment.trim() && currentUser && createComment){
-      try {
-        // Prepare a new comment object
-        const comment: Comment={
-          id: 'temp-' + Date.now(), // Temporary ID until server responds
+      try{
+        const comment:Comment={
+          id:'temp-'+Date.now(),
           content:newComment,
           taskId:task,
+          projectId:{} as Project,
           user:currentUser,
           replies:[],
           createdAt:new Date(),
           updatedAt:new Date()
         };
-        
-        // Clear the input field right away for better UX
         setNewComment('');
-        
-        // Send to server - use promise instead of await
-        createComment(comment).catch(error => {
+        createComment(comment).catch(error =>{
           console.error('Failed to create comment', error);
         });
-        
-      } catch (error) {
+      }catch(error){
         console.error('Failed to create comment', error);
       }
     }
@@ -54,11 +49,9 @@ const CommentSection: React.FC<CommentSectionProps>=({ task, comments })=>{
     }
   };
   
-  // Filter out temporary comments that might have been created during this session
-  // and display comments based on creation date (newest last)
-  const sortedComments = [...comments]
-    .filter(comment => !comment.id.includes('temp-') || comment.id.startsWith('temp-'))
-    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const sortedComments=[...comments]
+    .filter(comment=>!comment.id.includes('temp-')||comment.id.startsWith('temp-'))
+    .sort((a,b)=>new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime());
 
   return (
     <div className="mb-6 px-6">
@@ -111,7 +104,7 @@ const CommentSection: React.FC<CommentSectionProps>=({ task, comments })=>{
       {/* comments list */}
       <div className="space-y-4 mt-6">
         {sortedComments && sortedComments.length>0? (
-          sortedComments.map(comment => (
+          sortedComments.map(comment=>(
             <CommentItem 
               key={comment.id} 
               comment={comment}

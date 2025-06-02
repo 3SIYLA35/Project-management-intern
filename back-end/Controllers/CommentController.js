@@ -1,7 +1,7 @@
 const CommentService=require('../Services/CommentService.js');
 
-
-exports.getComments=async(req,res)=>{
+// Task comments
+exports.getComments=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -11,7 +11,7 @@ exports.getComments=async(req,res)=>{
         if(!taskId){
             return res.status(400).json({message:'Task ID is required'});
         }
-        const comments=await CommentService.getComments(taskId,userId);
+        const comments=await CommentService.getComments(taskId);
         if(!comments){
             return res.status(404).json({message:'No comments found'});
         }
@@ -22,7 +22,7 @@ exports.getComments=async(req,res)=>{
     }
 }
 
-exports.createComment=async(req,res)=>{
+exports.createComment=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -42,7 +42,52 @@ exports.createComment=async(req,res)=>{
         next(err);
     }
 }
-exports.updateComment=async(req,res)=>{
+
+// Project comments
+exports.getProjectComments=async(req,res,next)=>{
+    try{
+        const userId=req.user.id;
+        if(!userId){
+            return res.status(401).json({message:'Unauthorized'});
+        }
+        const projectId=req.params.projectId;
+        if(!projectId){
+            return res.status(400).json({message:'Project ID is required'});
+        }
+        const comments=await CommentService.getProjectComments(projectId);
+        if(!comments){
+            return res.status(404).json({message:'No comments found'});
+        }
+        res.status(200).json(comments);
+    }catch(err){
+        console.error('error on getProjectComments',err);
+        next(err);
+    }
+}
+
+exports.createProjectComment=async(req,res,next)=>{
+    try{
+        const userId=req.user.id;
+        if(!userId){
+            return res.status(401).json({message:'Unauthorized'});
+        }
+        const {projectId}=req.body;
+        if(!projectId){
+            return res.status(400).json({message:'Project ID and content are required'});
+        }
+        const comment=await CommentService.createProjectComment(req.body);
+        if(!comment){
+            return res.status(400).json({message:'Failed to create project comment'});
+        }
+        res.status(201).json(comment);
+    }catch(err){
+        console.error('error on createProjectComment',err);
+        next(err);
+    }
+}
+
+// Common methods for both task and project comments
+exports.updateComment=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -62,7 +107,8 @@ exports.updateComment=async(req,res)=>{
         next(err);
     }
 }
-exports.deleteComment=async(req,res)=>{
+
+exports.deleteComment=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -82,7 +128,8 @@ exports.deleteComment=async(req,res)=>{
         next(err);
     }
 }
-exports.createReply=async(req,res)=>{
+
+exports.createReply=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -102,7 +149,8 @@ exports.createReply=async(req,res)=>{
         next(err);
     }
 }
-exports.updateReply=async(req,res)=>{
+
+exports.updateReply=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
@@ -122,25 +170,23 @@ exports.updateReply=async(req,res)=>{
         next(err);
     }
 }
-exports.deleteReply=async(req,res)=>{
+
+exports.deleteReply=async(req,res,next)=>{
     try{
         const userId=req.user.id;
         if(!userId){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const commentId=req.params.commentId;
-        if(!commentId){
-            return res.status(400).json({message:'Comment ID is required'});
-        }
         const replyId=req.params.replyId;
-        if(!replyId){
-            return res.status(400).json({message:'Reply ID is required'});
+        const commentId=req.params.commentId;
+        if(!replyId || !commentId){
+            return res.status(400).json({message:'Reply ID and Comment ID are required'});
         }
         const reply=await CommentService.deleteReply(replyId,commentId);
         if(!reply){
             return res.status(404).json({message:'Reply not found'});
         }
-        res.status(200).json({message:'Reply deleted successfully'});
+        res.status(200).json(reply);
     }catch(err){
         console.error('error on deleteReply',err);
         next(err);

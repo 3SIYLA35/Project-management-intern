@@ -1,8 +1,9 @@
-import { Comment, Reply, Task, UserProfile } from "../components/Profile/types";
+import { Comment, Project, Reply, Task, UserProfile } from "../components/Profile/types";
 import { adaptTask, taskApi } from "./taskAdapter";
 import { adaptuserProfile, addaptProfileforapi } from "./profileAdapter";
 import { ApiUserprofile } from "./profileAdapter";
 import { adaptTaskForAPi} from "./taskAdapter";
+import { ApiProject, adaptprojectforapi } from "./projectAdapter";
 
 
 export interface ReplyApi{
@@ -19,6 +20,7 @@ export interface CommentApi{
     _id:string;
     content:string;
     taskId:taskApi;
+    projectId:ApiProject;
     user:ApiUserprofile;
     replies:ReplyApi[];
     createdAt:Date;
@@ -31,7 +33,8 @@ export const adaptComment=(comment: CommentApi):Comment=>{
         return{
             id:comment._id,
             content:comment.content || '',
-            taskId:safetaskadapter(comment.taskId),
+            taskId:comment.taskId ? safetaskadapter(comment.taskId) : {} as Task,
+            projectId:comment.projectId ? safeProjectAdapter(comment.projectId) : {} as Project,
             user:safeUserAdapter(comment.user),
             replies:comment.replies?comment.replies.map(reply=>{
                 try {
@@ -49,8 +52,9 @@ export const adaptComment=(comment: CommentApi):Comment=>{
         return {
             id: comment._id || '',
             content: comment.content || '',
-            taskId:{}as Task,
-            user:{}as UserProfile,
+            taskId:{} as Task,
+            projectId:{} as Project,
+            user:{} as UserProfile,
             replies:[],
             createdAt:new Date(),
             updatedAt:new Date(),
@@ -99,6 +103,22 @@ const safetaskadapter=(task: any):any=>{
   }
 };
 
+const safeProjectAdapter = (project: any): any => {
+  if (typeof project === 'string') {
+    return { _id: project };
+  }
+  if (project && project.id) {
+    return { _id: project.id };
+  }
+  
+  try {
+    return adaptprojectforapi(project);
+  } catch (error) {
+    console.warn('Error adapting project, using ID only', error);
+    return { _id: project.id || project._id || '' };
+  }
+};
+
 const safeUserAdapter=(user:any):any=>{
   if(typeof user==='string'){
     return {_id: user};
@@ -128,6 +148,7 @@ export const adaptCommentforapi=(comment:Partial<Comment>):Partial<CommentApi>=>
     }
     if(comment.content!==undefined) apiComment.content=comment.content;
     if(comment.taskId!==undefined) apiComment.taskId=safetaskadapter(comment.taskId);
+    if(comment.projectId!==undefined) apiComment.projectId=safeProjectAdapter(comment.projectId);
     if(comment.user!==undefined) apiComment.user=safeUserAdapter(comment.user);
     if(comment.createdAt!==undefined) apiComment.createdAt=comment.createdAt;
     if(comment.updatedAt!==undefined) apiComment.updatedAt=comment.updatedAt;

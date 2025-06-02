@@ -11,7 +11,14 @@ const commentSchema=new mongoose.Schema({
     taskId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'tasks',
-        required:true,
+        required:false,
+        default:null,
+    },
+    projectId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'projects',
+        required:false,
+        default:null,
     },
     user:{
         type:mongoose.Schema.Types.ObjectId,

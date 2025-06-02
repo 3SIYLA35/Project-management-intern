@@ -2,7 +2,7 @@ import { Project, UserProfile } from "../components/Profile/types";
 import { adaptuserProfile, addaptProfileforapi, ApiUserProfile } from "./profileAdapter";
 
 
-interface ApiProject{
+export interface ApiProject{
     _id:string;
     name:string;
     description?:string;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsUpDownLeftRight, faBarsProgress, faChartLine, faComment, faCopy, faEye, faFaceSmile, faPaperclip, faPaperPlane, faShare, faTrash, faUsers, faCalendarAlt, faTasks } from '@fortawesome/free-solid-svg-icons';
 import { faNoteSticky, faChartBar } from '@fortawesome/free-regular-svg-icons';
@@ -7,6 +7,8 @@ import EmojiPicker from 'emoji-picker-react';
 import { Project } from '../../components/Profile/types';
 import Editmodal from '../../components/Main components/editmodal';
 import { useProjectContext } from '../../Contexts/ProjectContext';
+import ProjectCommentSection from '../../components/Comments/ProjectCommentSection';
+import { useProjectCommentContext } from '../../Contexts/ProjectCommentContext';
 
 interface Attachment {
   id: string;
@@ -43,9 +45,9 @@ interface ProjectDetailProps {
   project: Project | null;
 }
 
-const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,project }) => {
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
-  const [comment, setComment] = useState('');
+const ProjectDetailPanel: React.FC<ProjectDetailProps>=({isOpen,onClose,project})=>{
+  const [emojiPickerOpen, setEmojiPickerOpen]=useState(false);
+  const [comment, setComment]=useState('');
   const [editmodalopen,seteditmodalopen]=useState(false);
   const [editfield,seteditfield]=useState<string|null>(null);
   const [editvalue,seteditvalue]=useState<string|null>(null);
@@ -83,16 +85,35 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
     setEmojiPickerOpen(false);
   };
 
- 
-
-  if (!isOpen || !project) return null;
-
-  // Calculate days remaining
-  const today = new Date();
-  const endDate = new Date(project.endDate);
-  const daysRemaining = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const projectCommentContext=useProjectCommentContext();
+  const fetchComments=projectCommentContext?.fetchComments;
+  const commentsList=projectCommentContext?.comments || [];
+  const loading=projectCommentContext?.loading;
+  const createComment=projectCommentContext?.createComment;
+  const updateComment=projectCommentContext?.updateComment;
+  const deleteComment=projectCommentContext?.deleteComment;
+  const createReply=projectCommentContext?.createReply;
+  const updateReply=projectCommentContext?.updateReply;
+  const deleteReply=projectCommentContext?.deleteReply;
+  const refreshComments=useCallback(()=>{
+    if(project?.id){
+      fetchComments?.(project.id);
+    }
+  },[project,fetchComments]);
   
-  const statusColor = 
+  //initial fetch
+  useEffect(()=>{
+    refreshComments();
+  },[project]);
+  
+ 
+  if(!isOpen || !project) return null;
+
+  // calculate days remaining
+  const today=new Date();
+  const endDate=new Date(project.endDate);
+  const daysRemaining=Math.ceil((endDate.getTime()-today.getTime())/(1000*60*60*24));
+  const statusColor= 
     project.status==='completed' ? 'bg-green-500' : 
     project.status==='in_progress' ?'bg-yellow-500' : 
     'bg-red-500';
@@ -240,8 +261,8 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           <div>
             <h4 className="text-gray-400 text-sm mb-2">Days Left</h4>
             <span className={`text-white text-sm px-2 py-1 rounded-full ${
-              daysRemaining <= 3 ? 'bg-red-500' : 
-              daysRemaining <= 7 ? 'bg-yellow-500' : 'bg-green-500'
+              daysRemaining<=3 ?'bg-red-500': 
+              daysRemaining<=7 ?'bg-yellow-500':'bg-green-500'
             }`}>
               {daysRemaining} Days
             </span>
@@ -304,113 +325,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
           </div>
         </div>
 
-        {/* Activities Section */}
-        <div className="mb-6 px-6">
-          <div className='flex items-center mb-3'>
-            <FontAwesomeIcon icon={faChartLine} className='pr-2' />
-            <h3 className="text-white text-lg font-medium">Activities</h3>
-          </div>
-          
-          {/* Activity Input */}
-          <div className="rounded-lg p-3 mb-4">
-            <div className='flex items-center'>
-              <img src="/img/avatar-1.jpg" alt="Avatar" className="w-9 relative bottom-2 h-9 rounded-full mr-2" />
-              <div className='flex flex-col w-full'>
-                <div className="flex justify-between items-start pt-2 pr-5 pl-7 h-[55px] bg-violet-900 pl-4 rounded-tl-lg custom-rounded-tr-tl">
-                  <div className="flex items-center">
-                    <span className="text-white">Project Updates</span>
-                  </div>
-                  <button className="text-white hover:text-white">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex p-1 items-center relative bottom-5 bg-white px-4 custom-rounded">
-                  <textarea 
-                    placeholder="Share an update or ask a question" 
-                    className="flex-1 bg-transparent text-black rounded-lg px-3 py-2 focus:outline-none h-10"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    onInput={(e) => {
-                      const textarea = e.target as HTMLTextAreaElement;
-                      textarea.style.height = '10px';
-                      textarea.style.height = `${textarea.scrollHeight}px`;
-                    }}
-                  />
-                  <button className="ml-2 text-violet-900 bg-gray-200 rounded-full border-2 h-7 w-7 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className='pl-16 relative bottom-3'>
-              <button className='text-gray-300 hover:text-white'>
-                <FontAwesomeIcon icon={faPaperclip} className='text-[18px]' />
-              </button>
-              <button 
-                className='text-gray-300 hover:text-white'
-                onClick={() => setEmojiPickerOpen(!emojiPickerOpen)}
-              >
-                <FontAwesomeIcon icon={faFaceSmile} className='text-[18px] ml-4' />
-              </button>
-              {emojiPickerOpen ? (
-                <div className=''>
-                  <EmojiPicker 
-                    width={390} 
-                    height={200} 
-                    onEmojiClick={handleEmojiClick} 
-                  />
-                </div>
-              ) : ''}
-            </div>
-
-            <div className='w-full h-[2px] mx-2 bg-gray-700'></div>
-          </div>
-
-          {/* Sample Activities */}
-          <div className="space-y-4">
-            <div className="flex">
-              <img src="/img/avatar-2.jpg" alt="Avatar" className="w-8 h-8 rounded-full mr-3" />
-              <div className="flex-1">
-                <p className="text-gray-300">
-                  <span className="text-white font-medium">Project timeline has been updated.</span> Please check the new deadlines.
-                </p>
-                <div className="flex mt-2 space-x-3 text-xs text-gray-400">
-                  <button className="hover:text-white">
-                    <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
-                    Reply
-                  </button>
-                  <button className="hover:text-white">
-                    <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
-                    Share
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex">
-              <img src="/img/avatar-3.jpg" alt="Avatar" className="w-8 h-8 rounded-full mr-3" />
-              <div className="flex-1">
-                <p className="text-gray-300">
-                  <span className="text-white font-medium">New tasks have been assigned to team members.</span> Check your task list.
-                </p>
-                <div className="flex mt-2 space-x-3 text-xs text-gray-400">
-                  <button className="hover:text-white">
-                    <FontAwesomeIcon icon={faComment} className='text-[13px] mr-1' />
-                    Reply
-                  </button>
-                  <button className="hover:text-white">
-                    <FontAwesomeIcon icon={faShare} className='text-[13px] mr-1' />
-                    Share
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
       <Editmodal
         isOpen={editmodalopen}
@@ -420,6 +335,15 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps> = ({ isOpen, onClose,proj
         fieldname={editfield || ''}
         value={editvalue || ''}
       />
+      {/* show loading indicator for comments if needed */}
+      {loading ? (
+        <div className="px-6 py-4 text-center">
+          <p className="text-gray-400">Loading comments...</p>
+        </div>
+      ) : (
+        project && <ProjectCommentSection
+         project={project} comments={commentsList} />
+      )}
     </div>
   );
 };

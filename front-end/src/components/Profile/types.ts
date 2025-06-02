@@ -91,6 +91,7 @@ export interface Comment{
     id:string;
     content:string;
     taskId:Task;
+    projectId:Project;
     user:UserProfile;
     replies:Reply[];
     createdAt:Date;

@@ -32,6 +32,36 @@ const CommentService={
             throw error;
         }
     },
+    
+    getProjectComments:async(projectId)=>{
+        try{
+            const comments=await commentmodel.find({projectId})
+            .populate('user')
+            .populate({
+                path:'replies',
+                populate:[
+                    {path: 'user'},
+                    { 
+                        path:'parentReplyId',
+                        populate:{path:'user'}
+                    }
+                ]
+            });
+            if(!comments){
+                return [];
+            }
+            
+            return comments;
+        }catch(err){
+            console.error('error on getProjectComments',err);
+            const error=new Error('Failed to get project comments');
+            error.status=500;
+            error.message='Failed to get project comments';
+            error.name='CommentServiceError';
+            throw error;
+        }
+    },
+    
     createComment:async(commentdata)=>{
         try{
             console.log('commentdata',commentdata);
@@ -48,8 +78,8 @@ const CommentService={
             .populate('user')
             .populate('taskId')
             .populate({
-                path: 'replies',
-                populate: [
+                path:'replies',
+                populate:[
                     { path: 'user' },
                     { 
                         path: 'parentReplyId',
@@ -71,6 +101,47 @@ const CommentService={
             throw error;
         }
     },
+    
+    createProjectComment:async(commentdata)=>{
+        try{
+            console.log('project commentdata',commentdata);
+            const {projectId,content,user}=commentdata;
+            const comment=await commentmodel.create({
+                projectId:projectId._id,
+                content,
+                user:user._id,
+            });
+            if(!comment){
+                return null;
+            }
+            const populatedComment=await commentmodel.findById(comment._id)
+            .populate('user')
+            .populate('projectId')
+            .populate({
+                path:'replies',
+                populate:[
+                    { path: 'user' },
+                    { 
+                        path: 'parentReplyId',
+                        populate: { path: 'user' }
+                    }
+                ]
+            });
+            
+            if(!populatedComment){
+                return null;
+            }
+            return populatedComment;
+        }catch(err){
+            console.error('error on createProjectComment',err);
+            const error=new Error('Failed to create project comment');
+            error.status=500;
+            error.message='Failed to create project comment';
+            error.name='CommentServiceError';
+            throw error;
+        }
+    },
+    
     updateComment:async(commentid,commentdata)=>{
         try{
             console.log('commentid',commentid);
@@ -84,13 +155,14 @@ const CommentService={
             const populatedComment=await commentmodel.findById(commentid)
             .populate('user')
             .populate('taskId')
+            .populate('projectId')
             .populate({
-                path: 'replies',
-                populate: [
-                    { path: 'user' },
+                path:'replies',
+                populate:[
+                    {path:'user'},
                     { 
-                        path: 'parentReplyId',
-                        populate: { path: 'user' }
+                        path:'parentReplyId',
+                        populate:{path:'user'}
                     }
                 ]
             });
@@ -209,24 +281,29 @@ const CommentService={
             throw error;
         }
     },
-    deleteReply:async(replyid,commentid)=>{
+    deleteReply:async(replyId,commentId)=>{
         try{
-            console.log('replyid',replyid);
-            console.log('commentid',commentid);
-            const reply=await replymodel.findByIdAndDelete(replyid);
+            console.log('replyid',replyId);
+            console.log('commentid',commentId);
+            const reply=await replymodel.findByIdAndDelete(replyId);
             if(!reply){
                 console.log('reply not found on deleteReply');
                 return null;
             }
-            const comment=await commentmodel.findOneAndUpdate(
-                {_id:commentid},
-                {$pull:{replies:replyid}},
+            
+            // Modified query to properly find and update the comment
+            const comment=await commentmodel.findByIdAndUpdate(
+                commentId,
+                {$pull:{replies:replyId}},
                 {new:true}
             );
+            
             if(!comment){
+                console.log('comment not found on deleteReply');
                 return null;
             }
-            const populatedComment=await commentmodel.findById(commentid)
+            
+            const populatedComment=await commentmodel.findById(commentId)
             .populate({
                 path:'replies',
                 populate:[
@@ -235,7 +312,6 @@ const CommentService={
                 ]
             });
             return populatedComment;
-
         }catch(err){
             console.error('error on deleteReply',err);
             const error=new Error('Failed to delete reply');
@@ -244,7 +320,6 @@ const CommentService={
             error.name='CommentServiceError';
             throw error;
         }
-
     }
 }
 module.exports=CommentService;

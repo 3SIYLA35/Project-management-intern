@@ -40,7 +40,7 @@ export const useComment=()=>{
                     if (hasOptimistic){
                         return prev.map(c=>c.id===optimisticComment.id ? response : c);
                     }else{
-                        return [...prev, response];
+                        return[...prev, response];
                     }
                 });
                 
@@ -50,8 +50,7 @@ export const useComment=()=>{
         }catch(err){
             console.error('error on create comment',err);
             seterror('Failed to create comment');
-            // Remove the optimistic comment on error
-            setcomments(prev => prev.filter(c => c.id !== comment.id));
+            setcomments(prev=>prev.filter(c=>c.id!==comment.id));
             throw err;
         } finally {
             setloading(false);
@@ -132,14 +131,12 @@ export const useComment=()=>{
                     ?{...comment,replies:[...comment.replies,optimisticReply]}
                     :comment
             ));
-            
             const response=await CommentApi.createReply(reply,commentId);
             if(response){
                 console.log('response from createReply',response);
                 setcomments(prev=>prev.map(comment => 
                     comment.id===commentId
-                        ?{
-                            ...comment, 
+                        ?{...comment, 
                             replies:comment.replies.map(r=> 
                                 r.id===optimisticReply.id?response:r
                             )
@@ -154,8 +151,7 @@ export const useComment=()=>{
             seterror('Failed to create reply');
             setcomments(prev=>prev.map(comment=> 
                 comment.id===commentId
-                    ?{
-                        ...comment,
+                    ?{...comment,
                         replies:comment.replies.filter(r=>r.id!==reply.id)
                     }
                     :comment
@@ -171,28 +167,21 @@ export const useComment=()=>{
         try{
             setloading(true);
             seterror(null);
-            
-            // Optimistically update in UI
-            setcomments(prev => prev.map(comment => 
-                comment.id === commentId
-                    ? {
-                        ...comment,
-                        replies: comment.replies.map(r => r.id === reply.id ? reply : r)
+            setcomments(prev=>prev.map(comment=> 
+                comment.id===commentId
+                    ? {...comment,
+                        replies:comment.replies.map(r=>r.id===reply.id?reply:r)
                     }
-                    : comment
+                    :comment
             ));
-            
             const response=await CommentApi.updateReply(reply,commentId);
-            
             if(response){
                 console.log('response from updateReply',response);
-                setcomments(prev => prev.map(comment => 
-                    comment.id === commentId
-                        ? {
-                            ...comment,
-                            replies: comment.replies.map(r => r.id === reply.id ? response : r)
-                        }
-                        : comment
+                setcomments(prev=>prev.map(comment => 
+                    comment.id===commentId
+                        ? {...comment,
+                            replies:comment.replies.filter(r=>r.id!==reply.id)}
+                        :comment
                 ));
                 return response;
             }
@@ -200,9 +189,11 @@ export const useComment=()=>{
         }catch(err){
             console.error('error on update reply',err);
             seterror('Failed to update reply');
-            
-            // Could add rollback logic here if needed
-            
+            setcomments(prev=>prev.map(comment=>
+                comment.id===commentId?
+                {...comment,replies:comment.replies.map(r=>r.id!==reply.id?r:reply)}
+                :comment
+            ))
             throw err;
         } finally {
             setloading(false);
@@ -210,30 +201,16 @@ export const useComment=()=>{
     }
     
     const deleteReply=async(replyId:string,commentId:string)=>{
-        // Store for potential rollback
         let replyToDelete: Reply | undefined;
-        
         try{
             setloading(true);
             seterror(null);
-            
-            // Find and remove the reply, storing it for potential rollback
-            setcomments(prev => {
-                const updatedComments = prev.map(comment => {
-                    if (comment.id === commentId) {
-                        replyToDelete = comment.replies.find(r => r.id === replyId);
-                        return {
-                            ...comment,
-                            replies: comment.replies.filter(r => r.id !== replyId)
-                        };
-                    }
-                    return comment;
-                });
-                return updatedComments;
-            });
-            
+            setcomments(prev=>prev.map(comment=>
+                comment.id===commentId?
+                {...comment,replies:comment.replies.filter(r=>r.id!==replyId)}
+                :comment
+            ))
             const response=await CommentApi.deleteReply(replyId,commentId);
-            
             if(response){
                 console.log('response from deleteReply',response);
                 return response;
@@ -242,23 +219,20 @@ export const useComment=()=>{
         }catch(err){
             console.error('error on delete reply',err);
             seterror('Failed to delete reply');
-            
-            // Restore the reply if deletion failed and we have a valid reply to restore
-            if (replyToDelete) {
-                setcomments(prev => prev.map(comment => {
-                    if (comment.id === commentId && replyToDelete) {
-                        return {
-                            ...comment, 
-                            replies: [...comment.replies, replyToDelete as Reply]
-                        };
-                    }
-                    return comment;
-                }));
-            }
-            
+            setcomments(prev=>prev.map(comment=>
+                comment.id===commentId?
+                {...comment,replies:comment.replies.filter(r=>r.id!==replyId)}
+                :comment
+            ))
             throw err;
         } finally {
-            setloading(false);
+            const response=await CommentApi.deleteReply(replyId,commentId);
+            
+            if(response){
+                console.log('response from deleteReply',response);
+                return response;
+            }
+            return { id: replyId } as Reply;
         }
     }
     
