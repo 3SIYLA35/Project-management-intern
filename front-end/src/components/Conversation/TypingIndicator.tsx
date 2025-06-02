@@ -1,12 +1,19 @@
 import React from 'react';
 import './ChatStyles.css';
 
-const TypingIndicator:React.FC=()=>{
-  return(
-    <div className="typing-animation">
-      <span className="typing-dot"></span>
-      <span className="typing-dot"></span>
-      <span className="typing-dot"></span>
+interface TypingIndicatorProps {
+  userName?: string;
+}
+
+const TypingIndicator: React.FC<TypingIndicatorProps> = ({ userName }) => {
+  return (
+    <div className="flex items-center text-gray-500 text-sm italic mb-2">
+      <span>{userName ? `${userName} is typing` : 'Someone is typing'}</span>
+      <div className="typing-animation ml-1">
+        <span className="typing-dot"></span>
+        <span className="typing-dot"></span>
+        <span className="typing-dot"></span>
+      </div>
     </div>
   );
 };

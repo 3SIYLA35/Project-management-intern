@@ -10,7 +10,20 @@ import { useChat } from '../../hooks/useChat';
 export default function ConversationPage() {
   const [searchTerm, setSearchTerm]=useState('');
   const navigate=useNavigate();
-  const { chats, messages, loading, selectedChatId, setSelectedChatId, sendMessage }=useChat();
+  const { conversations,
+    activeConversation,
+    messages,
+    loading,
+    error,
+    unreadCount,
+    typingUsers,
+    setActiveConversation,
+    sendMessage,
+    loadMoreMessages,
+    markMessagesAsRead,
+    createConversation,
+    deleteConversation,
+    setTypingStatus}=useChat();
 
   // Handle navigation for sidebar items
   const handleNavigation = (path: string) => {
@@ -39,15 +52,20 @@ export default function ConversationPage() {
         <div className="flex flex-1 overflow-hidden">
           {/* Chat Sidebar */}
           <ChatSidebar 
-            selectedChat={selectedChatId}
-            onSelectChat={setSelectedChatId}
-            chats={chats}
+            selectedChat={activeConversation?._id || ''}
+            onSelectChat={(chatId:string)=>setActiveConversation(conversations.find(conv=>conv._id===chatId) || null)}
+            chats={conversations}
             loading={loading}
+            unreadCount={unreadCount}
+            typingUsers={typingUsers}
+            setTypingStatus={setTypingStatus}
+            activeConversation={activeConversation}
+            setActiveConversation={setActiveConversation}
           />
           
           {/* Chat Window */}
           <ChatWindow 
-            selectedChat={selectedChatId}
+            selectedChat={activeConversation?._id || ''}
             messages={messages}
             loading={loading}
             sendMessage={sendMessage}

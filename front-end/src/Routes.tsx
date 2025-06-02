@@ -85,12 +85,12 @@ const AppRouter=()=> {
         } />
         <Route path='/project/jump' element={
           <ProtectedRoute>
-            <ProjectJump showModal={false} searchTerm={''} setSearchTerm={function (term: string): void {
-              throw new Error('Function not implemented.');
-            } } projects={[]} toggleModal={function (): void {
-              throw new Error('Function not implemented.');
-            } } handleViewProject={function (project: Project): void {
-              throw new Error('Function not implemented.');
+            <ProjectJump showModal={false} searchTerm={''} setSearchTerm={function(term:string):void{
+              throw new Error('Function not implemented');
+            } } projects={[]} toggleModal={function ():void{
+              throw new Error('Function not implemented');
+            } } handleViewProject={function (project: Project):void{
+              throw new Error('Function not implemented');
             } } />
           </ProtectedRoute>
         }/>

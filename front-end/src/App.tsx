@@ -1,7 +1,7 @@
 import React from 'react';
 import AppRouter from './Routes';
 import { Authprovider } from './login-registre/Auth/authContext';
-import Registration from './login-registre/registration';
+import SocketInitializer from './components/Conversation/SocketInitializer';
 import { Toaster } from "./components/ui/sonner"
 
 

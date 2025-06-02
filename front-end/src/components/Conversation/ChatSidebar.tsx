@@ -1,170 +1,150 @@
 import React, { useState, useEffect } from 'react';
-import { StarIcon } from '@heroicons/react/24/outline';
-import './ChatStyles.css';
+import { useChat } from '../../hooks/useChat';
+import { useAuth } from '../../hooks/useAuth';
 import TypingIndicator from './TypingIndicator';
+import { Conversation } from '../../api/conversationApi';
+import './ChatStyles.css';
 
-interface Chat {
-  id: string;
-  participants: {
-    id: string;
-    name: string;
-    avatar: string;
-    isOnline: boolean;
-    typing?: boolean;
-  }[];
-  lastMessage: {
-    text: string;
-    time: string;
-    unread?: boolean;
-  };
-  hasNewMessages?: boolean;
-  newMessageCount?: number;
-}
-
-interface ChatSidebarProps{
-  selectedChat: string | null;
+interface chatsidebarProp{
+  
+  selectedChat:string;
   onSelectChat: (chatId: string) => void;
-  chats: Chat[];
+  chats: Conversation[];
+  activeConversation: Conversation | null;
+  setActiveConversation: (conversation: Conversation | null) => void;
   loading: boolean;
+  unreadCount: number;
+  typingUsers: Record<string, boolean>;
+  setTypingStatus: (isTyping: boolean) => void;
+
+
+
 }
 
-const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, chats, loading }) => {
-  // If no chats are provided, use mock data
-  const [localChats, setLocalChats] = useState<Chat[]>([
-    {
-      id: '1',
-      participants: [
-        { id: 'jm', name: 'James McIntyre', avatar: '/img/avatar-1.jpg', isOnline: true }
-      ],
-      lastMessage: {
-        text: 'That\'s why we created the challenge, so we can assess skills under a time constraint',
-        time: '11:24 AM'
+const ChatSidebar:React.FC<chatsidebarProp>=({
+  selectedChat,
+  onSelectChat,
+  chats,
+  activeConversation,
+  setActiveConversation,
+  loading,
+  unreadCount,
+  typingUsers,
+  setTypingStatus})=>{
+  const{ 
+    createConversation,
+  }=useChat();
+  const {user}=useAuth();
+  const [searchQuery,setSearchQuery]=useState('');
+  const [showNewChatModal,setShowNewChatModal]=useState(false);
+  const [newChatParticipantId,setNewChatParticipantId]=useState('');
+
+  const filteredConversations=searchQuery
+    ?chats.filter(conv=>{
+        return conv.participants.some(p=> 
+          p.id!==user?._id && p.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      })
+    : chats;
+
+  // Select a conversation
+  const handleSelectConversation = (conversation: Conversation) => {
+    setActiveConversation(conversation);
+  };
+
+  // Create a new conversation
+  const handleCreateConversation = async () => {
+    if (!newChatParticipantId.trim()) return;
+
+    try {
+      const newConversation = await createConversation([newChatParticipantId]);
+      if (newConversation) {
+        setActiveConversation(newConversation);
+        setShowNewChatModal(false);
+        setNewChatParticipantId('');
       }
-    },
-    {
-      id: '2',
-      participants: [
-        { id: 'mf', name: 'Maria Fernanda', avatar: '/img/avatar-2.jpg', isOnline: true, typing: true }
-      ],
-      lastMessage: {
-        text: 'Ok, let me check this out for a moment, thank you for your patience',
-        time: '10:52 AM'
-      }
-    },
-    {
-      id: '3',
-      participants: [
-        { id: 'lk', name: 'Liam K.', avatar: '/img/avatar-3.jpg', isOnline: false },
-        { id: 'or', name: 'Olivia Ruiz', avatar: '/img/avatar-4.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Trying to connect my account to a new device and could use a hand getting everything synced properly',
-        time: '10:04 AM'
-      },
-      hasNewMessages: true,
-      newMessageCount: 1
-    },
-    {
-      id: '4',
-      participants: [
-        { id: 'st', name: 'Sophia T.', avatar: '/img/avatar-5.jpg', isOnline: false },
-        { id: 'mj', name: 'Mike James', avatar: '/img/avatar-1.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Just started using eplan and figured you might help me through the first step',
-        time: '10:04 AM'
-      },
-      hasNewMessages: true,
-      newMessageCount: 2
-    },
-    {
-      id: '5',
-      participants: [
-        { id: 'eb', name: 'Emma B.', avatar: '/img/avatar-2.jpg', isOnline: false },
-        { id: 'cs', name: 'Carlos Sean', avatar: '/img/avatar-3.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Everything was working great until today—now the screen won\'t load properly and I\'d love to get it fixed',
-        time: '10:01 AM'
-      },
-      hasNewMessages: true,
-      newMessageCount: 1
-    },
-    {
-      id: '6',
-      participants: [
-        { id: 'nr', name: 'Noah R.', avatar: '/img/avatar-4.jpg', isOnline: false },
-        { id: 'cl', name: 'Chloe Lin', avatar: '/img/avatar-5.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Looking to update my settings but not sure where to find the right option in the app',
-        time: '09:52 AM'
-      }
-    },
-    {
-      id: '7',
-      participants: [
-        { id: 'lv', name: 'Lucas V.', avatar: '/img/avatar-1.jpg', isOnline: false },
-        { id: 'im', name: 'Isabella M.', avatar: '/img/avatar-2.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'I noticed something odd in the dashboard—could be a bug or maybe I\'m missing something',
-        time: '09:52 AM'
-      }
-    },
-    {
-      id: '8',
-      participants: [
-        { id: 'as', name: 'Ava S.', avatar: '/img/avatar-3.jpg', isOnline: false },
-        { id: 'mr', name: 'Michael Rivera', avatar: '/img/avatar-4.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Loving this platform so far, just need help sorting out one small technical thing',
-        time: '09:05 AM'
-      }
-    },
-    {
-      id: '9',
-      participants: [
-        { id: 'ew', name: 'Ethan W.', avatar: '/img/avatar-5.jpg', isOnline: false },
-        { id: 'gy', name: 'Grace Yamamoto', avatar: '/img/avatar-1.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'Just upgraded my account and want to make sure everything\'s set up correctly on your end',
-        time: '07:32 AM'
-      }
-    },
-    {
-      id: '10',
-      participants: [
-        { id: 'mh', name: 'Mason H.', avatar: '/img/avatar-2.jpg', isOnline: false },
-        { id: 'zl', name: 'Zoe Laurent', avatar: '/img/avatar-3.jpg', isOnline: false }
-      ],
-      lastMessage: {
-        text: 'I think I created the wrong thing and now a deadline is approaching!',
-        time: '06:52 AM'
-      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
     }
-  ]);
+  };
 
-  // Use provided chats or fall back to local mock data
-  const displayChats = chats.length > 0 ? chats : localChats;
-  
-  // Group messages by date
-  const yesterday = displayChats.slice(0, 2);
-  const newMessages = displayChats.slice(2, 5);
-  const previous = displayChats.slice(5);
+  // Get the other participant(s) in a conversation
+  const getOtherParticipants = (conversation: Conversation) => {
+    return conversation.participants.filter(p => p.id !== user?._id);
+  };
 
-  // State to track if the component is fully mounted
-  const [mounted, setMounted] = useState(false);
-  
-  // Set mounted to true after component mounts
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Function to format timestamp
+  const formatMessageTime = (timestamp: string) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // Format time as HH:MM AM/PM
+    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // If it's today
+    if (date.toDateString() === now.toDateString()) {
+      return timeString;
+    }
+    
+    // If it's yesterday
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday, ${timeString}`;
+    }
+    
+    // Otherwise show date
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
 
-  // If loading and not mounted yet, return a loading indicator
-  if (loading && !mounted) {
+  // Check if there are any unread messages in a conversation
+  const hasUnreadMessages = (conversation: Conversation) => {
+    // This would need to be implemented based on your data structure
+    // For now, we'll just return false
+    return false;
+  };
+
+  // Count unread messages in a conversation
+  const countUnreadMessages = (conversation: Conversation) => {
+    // This would need to be implemented based on your data structure
+    // For now, we'll just return 0
+    return 0;
+  };
+
+  // Check if someone is typing in a conversation
+  const isTypingInConversation = (conversation: Conversation) => {
+    return Object.keys(typingUsers).some(userId => 
+      conversation.participants.some(p => p.id === userId)
+    );
+  };
+
+  // Group conversations by recency
+  const todayConversations = filteredConversations.filter(conv => {
+    const date = new Date(conv.updatedAt);
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  });
+
+  const yesterdayConversations = filteredConversations.filter(conv => {
+    const date = new Date(conv.updatedAt);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.toDateString() === yesterday.toDateString();
+  });
+
+  const olderConversations = filteredConversations.filter(conv => {
+    const date = new Date(conv.updatedAt);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.toDateString() !== today.toDateString() && 
+           date.toDateString() !== yesterday.toDateString();
+  });
+
+  if (loading) {
     return (
       <div className="w-80 bg-gray-850 border-r border-gray-800 flex items-center justify-center">
         <div className="text-gray-400">Loading chats...</div>
@@ -174,15 +154,22 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, c
 
   return (
     <div className="w-80 bg-gray-850 border-r border-gray-800 overflow-y-auto hide-scrollbar">
-      {/* Header with archives */}
+      {/* Header with unread count */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
         <h2 className="text-lg font-semibold flex items-center">
-         AppBase Chats
-          <span className="ml-2 bg-gray-700 text-xs rounded-full px-2 py-0.5">3</span>
+          Messages
+          {unreadCount > 0 && (
+            <span className="ml-2 bg-blue-600 text-xs rounded-full px-2 py-0.5">
+              {unreadCount}
+            </span>
+          )}
         </h2>
-        <button className="text-gray-400 hover:text-white">
+        <button 
+          className="text-gray-400 hover:text-white"
+          onClick={() => setShowNewChatModal(true)}
+        >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
         </button>
       </div>
@@ -193,61 +180,68 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, c
           <input 
             type="text" 
             placeholder="Find a conversation"
-            className="w-full bg-gray-800 text-gray-200 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-gray-800 text-gray-200 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <svg className="w-5 h-5 text-gray-500 absolute  left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-5 h-5 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
 
-      {/* Conversation Filter */}
-      
-        <button className="flex items-center justify-center  pl-4">
+        {/* Filter button */}
+        <button className="flex items-center justify-center pl-4">
           <svg className="w-5 h-5 hover:text-gray-200 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
           </svg>
         </button>
-      
       </div>
 
-
-      {/* Chat list */}
+      {/* Conversation list */}
       <div>
-        {/* Yesterday's conversations */}
-        {yesterday.length > 0 && (
+        {/* Today's conversations */}
+        {todayConversations.length > 0 && (
           <>
-            <div className="px-4 py-2 text-xs font-medium text-gray-500">Yesterday</div>
-            {yesterday.map(chat=>(
+            <div className="px-4 py-2 text-xs font-medium text-gray-500">Today</div>
+            {todayConversations.map(conversation => (
               <div 
-                key={chat.id}
-                onClick={() => onSelectChat(chat.id)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${selectedChat === chat.id ? 'bg-gray-800' : ''}`}
+                key={conversation._id}
+                onClick={() => handleSelectConversation(conversation)}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
-                    <img 
-                      src={chat.participants[0].avatar} 
-                      alt={chat.participants[0].name} 
-                      className="w-10 h-10 rounded-full mr-4" 
-                    />
-                    {chat.participants[0].isOnline && (
+                    <div className="w-10 h-10 rounded-full mr-4 bg-gray-700 flex items-center justify-center text-white">
+                      {getOtherParticipants(conversation)[0]?.user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    {getOtherParticipants(conversation)[0]?.isOnline && (
                       <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-850"></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between">
                       <h3 className="text-sm font-medium text-white truncate">
-                        {chat.participants.map(p => p.name).join(' & ')}
+                        {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{chat.lastMessage.time}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
                     </div>
                     <div className="flex items-center mt-1">
-                      {chat.participants[0].typing ? (
+                      {isTypingInConversation(conversation) ? (
                         <p className="text-xs text-gray-400 truncate">
-                          <TypingIndicator />
+                          <TypingIndicator userName={getOtherParticipants(conversation)[0]?.user?.name} />
                         </p>
                       ) : (
-                        <p className="text-xs text-gray-400 truncate">{chat.lastMessage.text}</p>
+                        <p className="text-xs text-gray-400 truncate">
+                          {/* This would display the last message text */}
+                          {/* {conversation.lastMessage?.text || 'No messages yet'} */}
+                        </p>
+                      )}
+                      {hasUnreadMessages(conversation) && (
+                        <div className="ml-auto">
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                            {countUnreadMessages(conversation)}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -257,39 +251,42 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, c
           </>
         )}
 
-        {/* New Messages */}
-        {newMessages.length > 0 && (
+        {/* Yesterday's conversations */}
+        {yesterdayConversations.length > 0 && (
           <>
-            <div className="px-4 py-2 text-xs font-medium text-gray-500">New Messages ({newMessages.length})</div>
-            {newMessages.map(chat => (
+            <div className="px-4 py-2 text-xs font-medium text-gray-500">Yesterday</div>
+            {yesterdayConversations.map(conversation => (
               <div 
-                key={chat.id}
-                onClick={() => onSelectChat(chat.id)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${selectedChat === chat.id ? 'bg-gray-800' : ''}`}
+                key={conversation._id}
+                onClick={() => handleSelectConversation(conversation)}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
-                    <img 
-                      src={chat.participants[0].avatar} 
-                      alt={chat.participants[0].name} 
-                      className="w-10 h-10 rounded-full mr-4" 
-                    />
-                    {chat.participants[0].isOnline && (
+                    <div className="w-10 h-10 rounded-full mr-4 bg-gray-700 flex items-center justify-center text-white">
+                      {getOtherParticipants(conversation)[0]?.user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    {getOtherParticipants(conversation)[0]?.isOnline && (
                       <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-850"></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between">
                       <h3 className="text-sm font-medium text-white truncate">
-                        {chat.participants.map(p => p.name).join(' & ')}
+                        {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{chat.lastMessage.time}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs text-gray-400 truncate">{chat.lastMessage.text}</p>
-                      {chat.hasNewMessages && (
-                        <div className="ml-2 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {chat.newMessageCount}
+                    <div className="flex items-center mt-1">
+                      <p className="text-xs text-gray-400 truncate">
+                        {/* This would display the last message text */}
+                        {/* {conversation.lastMessage?.text || 'No messages yet'} */}
+                      </p>
+                      {hasUnreadMessages(conversation) && (
+                        <div className="ml-auto">
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                            {countUnreadMessages(conversation)}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -300,39 +297,42 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, c
           </>
         )}
         
-        {/* Previous conversations */}
-        {previous.length > 0 && (
+        {/* Older conversations */}
+        {olderConversations.length > 0 && (
           <>
-            <div className="px-4 py-2 text-xs font-medium text-gray-500">Previous</div>
-            {previous.map(chat => (
+            <div className="px-4 py-2 text-xs font-medium text-gray-500">Earlier</div>
+            {olderConversations.map(conversation => (
               <div 
-                key={chat.id}
-                onClick={() => onSelectChat(chat.id)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${selectedChat === chat.id ? 'bg-gray-800' : ''}`}
+                key={conversation._id}
+                onClick={() => handleSelectConversation(conversation)}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
-                    <img 
-                      src={chat.participants[0].avatar} 
-                      alt={chat.participants[0].name} 
-                      className="w-10 h-10 rounded-full mr-4" 
-                    />
-                    {chat.participants[0].isOnline && (
+                    <div className="w-10 h-10 rounded-full mr-4 bg-gray-700 flex items-center justify-center text-white">
+                      {getOtherParticipants(conversation)[0]?.user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    {getOtherParticipants(conversation)[0]?.isOnline && (
                       <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-850"></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between">
                       <h3 className="text-sm font-medium text-white truncate">
-                        {chat.participants.map(p => p.name).join(' & ')}
+                        {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{chat.lastMessage.time}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
                     </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs text-gray-400 truncate">{chat.lastMessage.text}</p>
-                      {chat.hasNewMessages && (
-                        <div className="ml-2 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {chat.newMessageCount}
+                    <div className="flex items-center mt-1">
+                      <p className="text-xs text-gray-400 truncate">
+                        {/* This would display the last message text */}
+                        {/* {conversation.lastMessage?.text || 'No messages yet'} */}
+                      </p>
+                      {hasUnreadMessages(conversation) && (
+                        <div className="ml-auto">
+                          <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                            {countUnreadMessages(conversation)}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -342,7 +342,50 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ selectedChat, onSelectChat, c
             ))}
           </>
         )}
+
+        {filteredConversations.length === 0 && (
+          <div className="px-4 py-8 text-center">
+            <div className="text-gray-500">No conversations found</div>
+            <button 
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              onClick={() => setShowNewChatModal(true)}
+            >
+              Start a new chat
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* New chat modal */}
+      {showNewChatModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-850 rounded-lg p-6 w-96">
+            <h3 className="text-lg font-medium text-white mb-4">Start a new conversation</h3>
+            <input
+              type="text"
+              placeholder="Enter user ID"
+              value={newChatParticipantId}
+              onChange={(e) => setNewChatParticipantId(e.target.value)}
+              className="w-full bg-gray-800 text-gray-200 px-4 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 mb-4"
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
+                onClick={() => setShowNewChatModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                onClick={handleCreateConversation}
+                disabled={!newChatParticipantId.trim()}
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
