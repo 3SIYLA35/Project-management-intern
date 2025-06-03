@@ -20,6 +20,7 @@ import { TaskProvider } from './Contexts/TaskContext';
 import { SprintProvider } from './Contexts/SprintContext';
 import {CommentProvider} from './Contexts/CommentContext';
 import { ProjectCommentProvider } from './Contexts/ProjectCommentContext';
+import { ChatProvider } from './Contexts/ChatContext';
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
   const { isAuthenticated, loading }=useAuth();
@@ -69,6 +70,7 @@ const AppRouter=()=> {
           <ProjectCommentProvider>
           <SprintProvider>
           <ProfileProvider>
+          <ChatProvider>
              
       <Routes>
         {/* Public routes */}
@@ -150,6 +152,7 @@ const AppRouter=()=> {
         {/* Default route - redirect to dashboard if authenticated, otherwise login */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+      </ChatProvider>
       </ProfileProvider>
         </SprintProvider>
         </ProjectCommentProvider>

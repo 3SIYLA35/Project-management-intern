@@ -44,57 +44,60 @@ const io=socketIo(server,{
 
 io.on('connection',(socket)=>{
   console.log('New client connected',socket.id);
-  // socket.on('join_conversation',(conversationId)=>{
-  //   socket.join(conversationId);
-  //   console.log(`User joined conversation: ${conversationId}`);
-  // });
-  // socket.on('leave_conversation',(conversationId)=>{
-  //   socket.leave(conversationId);
-  //   console.log(`User left conversation: ${conversationId}`);
-  // });
-  // socket.on('user_online',async(userId)=>{
-  //   console.log("user id  from socket ",userId);
-  //   if (userId){
-  //     await conversationService.updateUserOnlineStatus(userId,true);
-  //     socket.userId=userId;
-  //     io.emit('user_status_change',{userId,isOnline: true });
-  //   }
-  // });;
+  socket.on('join_conversation',(conversationId)=>{
+    socket.join(conversationId);
+    console.log(`User joined conversation: ${conversationId}`);
+  });
+  socket.on('leave_conversation',(conversationId)=>{
+    socket.leave(conversationId);
+    console.log(`User left conversation: ${conversationId}`);
+  });
+  socket.on('user_online',async(userId)=>{
+    console.log("user id  from socket ",userId);
+    if (userId){
+      await conversationService.updateUserOnlineStatus(userId,true);
+      socket.userId=userId;
+      io.emit('user_status_change',{userId,isOnline: true });
+    }
+  });;
  
-  // socket.on('send_message',async(messageData)=>{
-  //   try {
-  //     const {conversationId,sender,content}=messageData;
-  //     const newMessage=await messageService.createMessage({
-  //       conversationId,
-  //       sender,
-  //       content
-  //     });
+  socket.on('send_message',async(messageData)=>{
+    try {
+      console.log('send message from back-end',messageData);
+      const {conversationId,sender,content}=messageData;
+      console.log('messageData from socket',messageData);
+      const newMessage=await messageService.createMessage({
+        conversationId,
+        sender,
+        content
+      });;
      
-  //     io.to(conversationId).emit('receive_message', newMessage);
-  //   } catch (error){
-  //     console.error('error sending message:', error);
-  //     socket.emit('message_error', { error: error.message });
-  //   }
-  // });
+      io.to(conversationId).emit('receive_message', newMessage);
+    } catch (error){
+      console.error('error sending message:', error);
+      socket.emit('message_error', { error: error.message });
+    }
+  });
   
-  // socket.on('mark_messages_read',async(data)=>{
-  //   try {
-  //     const { conversationId,userId}=data;
-  //     await messageService.markMessagesAsRead(conversationId, userId);
-  //     io.to(conversationId).emit('messages_read',{conversationId,userId});
-  //   }catch(error){
-  //     console.error('error marking messages as read:', error);
-  //   }
-  // });
+  socket.on('mark_messages_read',async(data)=>{
+    try {
+      const {conversationId,userId}=data;
+      console.log('mark messagge read for this user',userId);
+      await messageService.markMessagesAsRead(conversationId, userId);
+      io.to(conversationId).emit('messages_read',{conversationId,userId});
+    }catch(error){
+      console.error('error marking messages as read:', error);
+    }
+  });
   
-  // socket.on('typing',(data)=>{
-  //   const { conversationId,userId,isTyping }=data;
-  //   socket.to(conversationId).emit('user_typing',{
-  //     conversationId,
-  //     userId,
-  //     isTyping
-  //   });
-  // });
+  socket.on('typing',(data)=>{
+    const { conversationId,userId,isTyping }=data;
+    socket.to(conversationId).emit('user_typing',{
+      conversationId,
+      userId,
+      isTyping
+    });
+  });
   
   socket.on('disconnect',async()=>{
     console.log('Client disconnected', socket.id);
@@ -103,7 +106,7 @@ io.on('connection',(socket)=>{
       io.emit('user_status_change', { userId: socket.userId, isOnline: false });
     }
   });
-});;;
+});;;;
 
 server.listen(port,()=>{
   console.log(`Server is running at port: ${port}`);

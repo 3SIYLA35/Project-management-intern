@@ -5,6 +5,7 @@ import TypingIndicator from './TypingIndicator';
 import { converstation, Participant } from '../Profile/types';
 import './ChatStyles.css';
 import { useProfile } from '../../hooks/useProfile';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 
 
@@ -19,7 +20,7 @@ const ChatSidebar:React.FC=()=>{
       typingUsers,
       unreadCount,
       setTypingStatus,
-    }=useChat();
+    }=useChatContext();
 
     useEffect(()=>{
       console.log('conversations',conversations);
@@ -39,7 +40,8 @@ const ChatSidebar:React.FC=()=>{
     : conversations;
 
   // Select a conversation
-  const handleSelectConversation = (conversation:converstation) => {
+  const handleSelectConversation=(conversation:converstation)=>{
+    // console.log('conversation from handleSelectConversation',conversation);
     setActiveConversation(conversation);
   };
 
@@ -205,16 +207,20 @@ const ChatSidebar:React.FC=()=>{
                 <div className="flex">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full mr-4 bg-gray-700 flex items-center justify-center text-white">
-                      {getOtherParticipants(conversation)[0]?.user?.name?.charAt(0).toUpperCase() || '?'}
+                      <img src={getOtherParticipants(conversation)[0]?.user?.avatar}
+                       alt={getOtherParticipants(conversation)[0]?.user?.name || '?'}
+                       className='w-10 h-10 rounded-full' 
+                        />
+                      
                     </div>
-                    {getOtherParticipants(conversation)[0]?.isOnline && (
+                    {/* {getOtherParticipants(conversation)[0]?.isOnline && (
                       <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-850"></div>
-                    )}
+                    )} */}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between">
                       <h3 className="text-sm font-medium text-white truncate">
-                        {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
+                        {getOtherParticipants(conversation).map(p=>p.user?.name).join(' & ')}
                       </h3>
                       <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString() )}</span>
                     </div>

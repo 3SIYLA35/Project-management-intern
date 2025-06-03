@@ -13,6 +13,7 @@ export const useProfile=()=>{
             setloading(true);
             const data=await userApi.getProfileinfo();
             setprofile(data);
+            // console.log('profile from useProfile',data);
 
         }catch(err){
             seterror('failed to load profile');

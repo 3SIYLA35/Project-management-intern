@@ -28,7 +28,7 @@ const UserService={
     },
     updateprofileinfo:async(userid,updatedData)=>{
         try{
-            console.log('updatedData',updatedData);
+            // console.log('updatedData',updatedData);
             const user=await Users.findByIdAndUpdate(userid,
                    {$set:updatedData} ,
                 {new:true});

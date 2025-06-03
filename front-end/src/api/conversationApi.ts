@@ -1,5 +1,5 @@
 import { apiClient, extractErrorDetails } from './apiClient';
-import { adaptConverstation, conversationApi as converstationapi, safeadaptconverstation} from '../adapters/converasationAdapter';
+import { adaptConverstation, conversationApiarray, conversationApi as converstationapi, safeadaptconverstation} from '../adapters/converasationAdapter';
 import { converstation } from '@/components/Profile/types';
 const conversationApi={
   createConversation: async(participants:string[])=>{
@@ -14,10 +14,11 @@ const conversationApi={
   getUserConversations:async():Promise<converstation[]>=>{
     try{
       // console.log('userId',userId);
-      const response= await apiClient.get<converstationapi>(`/conversations/get-user-converstation`);
+      const response= await apiClient.get<converstationapi|conversationApiarray>(`/conversations/get-user-converstation`);
       if(!response?.success){
         throw new Error(response?.message);
       }
+      console.log('response from getUserConversations',response);
       return safeadaptconverstation(response) as converstation[];
     } catch (error){
       console.error('error fetching conversations:', extractErrorDetails(error));

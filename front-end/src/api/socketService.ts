@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { Message } from './messageApi';
+import { use } from 'react';
 
 let socket: Socket|null=null;
 
@@ -18,16 +19,16 @@ export type SocketEventHandlers={
 
 const socketService={
   connect:(userId:string):Socket=>{
-    if (!socket || !socket.connected){
+    if(!socket ||!socket.connected){
       socket=io(SOCKET_URL);
       socket.on('connect',()=>{
-        console.log('Socket connected');
-        socket?.emit('user_online',userId);
-      });
-      socket.on('disconnect',()=>{
-        console.log('Socket disconnected');
-      });
+        console.log('socket connected');
+        socket?.emit('user_online',userId)
+      })
     }
+    socket.on('disconnect',()=>{
+      console.log('socket disconnected');
+    })
     return socket;
   },
   disconnect:():void=>{
@@ -99,8 +100,8 @@ const socketService={
       console.error('socket not connected Call connect() first');
       return;
     }
-    
-    socket.emit('send_message', data);
+    console.log('send message from socketService',data);
+    socket.emit('send_message',data);
   },
   
   markMessagesAsRead:(data:{conversationId:string;userId:string}):void=>{

@@ -4,7 +4,7 @@ exports.getProfileinfo=async(req,res)=>{
     try{
         const userID=req.user.id;
         const user =await UserService.getProfileData(userID);
-        console.log(user);
+        // console.log(user);
         return res.status(200).json(user);;
 
     }catch(err){

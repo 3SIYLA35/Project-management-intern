@@ -5,11 +5,12 @@ import conversationApi from '../api/conversationApi';
 import messageApi from '../api/messageApi';
 import socketService from '../api/socketService';
 import { useProfile } from './useProfile';
+import { useProfileContext } from '../Contexts/ProfileContext';
 
 export const useChat=()=>{
-  const {profile}=useProfile();
+  const {profile,fetchProfile}=useProfileContext();
+  
   const user=profile;
-  const {fetchProfile}=useProfile();
   const [conversations,setConversations]=useState<converstation[]>([]);
   const [activeConversation,setActiveConversation]=useState<converstation|null>(null);
   const [messages,setMessages]=useState<Message[]>([]);
@@ -22,11 +23,11 @@ export const useChat=()=>{
 
 
   const loadConversations=async()=>{
-    if (!user?.id) return;
+    console.log('loadConversations');
         try {
       setLoading(true);
       const response=await conversationApi.getUserConversations();
-      console.log('response',response);
+      console.log('response from loadConversations',response);
       setConversations(response as converstation[]);
       console.log('conversations',conversations);
       const unreadResponse=await messageApi.getUnreadMessageCount();
@@ -46,7 +47,7 @@ export const useChat=()=>{
       if(page===1){
         setMessages(response.messages);
       }else{
-        setMessages(prevMessages =>[...response.messages,...prevMessages]);
+        setMessages(prevMessages=>[...response.messages,...prevMessages]);
       }
       setTotalPages(response.totalPages);
       setCurrentPage(response.currentPage);
@@ -63,7 +64,8 @@ export const useChat=()=>{
   };
 
   const handleSetActiveConversation=(conversation:converstation|null)=>{
-    if (activeConversation){
+    // console.log('activeConversation from handleSetActiveConversation',activeConversation);
+    if(activeConversation){
       socketService.leaveConversation(activeConversation.id);
     }
     setActiveConversation(conversation);
@@ -80,15 +82,30 @@ export const useChat=()=>{
 
   const sendMessage=async(content:string)=>{
     if(!activeConversation||!user?.id ||!content.trim())return;
-    
     try {
+      const optimisticmessage:Message={
+        _id:'temp-'+Date.now(),
+        conversationId:activeConversation.id,
+        sender:{
+          _id:user.id,
+          name:user.name,
+          email:user.email,
+          profilePicture:user.avatar
+        },
+        content:content.trim(),
+        read:false,
+        createdAt:new Date().toISOString(),
+        updatedAt:new Date().toISOString()
+      }
+      setMessages(prevMessages=>[...prevMessages,optimisticmessage]);
       socketService.sendMessage({
-        conversationId: activeConversation.id,
+        conversationId:activeConversation.id,
         sender:user.id,
         content:content.trim()
       });
-    } catch (err: any) {
-      setError(err.message || 'Error sending message');
+    }catch(err:any){
+      setError(err.message||'Error sending message');
+      setMessages(prevMessages=>prevMessages.filter(msg=>msg._id!=='temp-'+Date.now()));
     }
   };
 
@@ -114,7 +131,7 @@ export const useChat=()=>{
 
       await loadConversations();
       
-      return response.conversation;
+        return ;
     } catch (err: any) {
       setError(err.message || 'Error creating conversation');
       return null;
@@ -145,55 +162,76 @@ export const useChat=()=>{
   };
 
   useEffect(()=>{
-    // if (!user?._id) return;
-    // const socket=socketService.connect(user._id);
-    // socketService.subscribe({
-    //   receiveMessage:(newMessage: Message)=>{
-    //     if (activeConversation?._id===newMessage.conversationId){
-    //       setMessages(prevMessages => [...prevMessages, newMessage]);
-    //       if (user._id!==newMessage.sender._id){
-    //         markMessagesAsRead();
-    //       }
-    //     }
-    //     if(user._id !== newMessage.sender._id){
-    //       setUnreadCount(prev=>prev+1);
-    //     }
-    //   },
+   
+    if(!user?.id){
+      console.log("No user ID available, skipping loadConversations",user);
+      return;
+    }
+    const socket=socketService.connect(user.id);
+    console.log("Socket connected for user:", user.id);
+    socketService.subscribe({
+      receiveMessage:(newMessage:Message)=>{
+        console.log('receive message from socket',newMessage);
+        if (activeConversation?.id===newMessage.conversationId){
+          setMessages(prevMessages=>{
+            const existsmessage=prevMessages.some(msg=>msg._id===newMessage._id);
+            if(!existsmessage){
+              if(activeConversation.id===newMessage.conversationId){
+                if(user.id!==newMessage.sender._id){
+                  markMessagesAsRead();
+                }
+                return [...prevMessages,newMessage];
+              }
+            }
+            
+            return prevMessages;
+          });
+          if(user.id!==newMessage.sender._id){
+            markMessagesAsRead();
+          }
+        }
+        if(user.id!==newMessage.sender._id){
+          setUnreadCount(prev=>prev+1);
+        }
+      },
         
-    //   messagesRead:({conversationId,userId})=>{
-    //     if (activeConversation?._id===conversationId && userId!==user._id) {
-    //       setMessages(prevMessages=> 
-    //         prevMessages.map(msg=> 
-    //           msg.sender._id===user._id ? { ...msg,read:true}:msg
-    //         )
-    //       );
-    //     }
-    //   },
+      messagesRead:({conversationId,userId})=>{
+        if(activeConversation?.id===conversationId && userId!==user.id){
+          setMessages(prevMessages=> 
+            prevMessages.map(msg=> 
+              msg.sender._id===user.id ?{ ...msg,read:true}:msg
+            )
+          );
+        }
+      },
       
-    //   userStatusChange:({userId,isOnline})=>{
-    //     setConversations(prevConversations=> 
-    //       prevConversations.map(conv=>({
-    //         ...conv,
-    //         participants:conv.participants.map(p=> 
-    //           p.id===userId?{...p, isOnline }:p
-    //         )
-    //       }))
-    //     );
-    //   },
+      userStatusChange:({userId,isOnline})=>{
+        setConversations(prevConversations=> 
+          prevConversations.map(conv=>({
+            ...conv,
+            participants:conv.participants.map(p=> 
+              p.user.id===userId?{...p, isOnline }:p
+            )
+          }))
+        );
+      },
       
-    //   userTyping:({conversationId,userId,isTyping})=>{
-    //     if (activeConversation?._id === conversationId && userId !== user._id) {
-    //       setTypingUsers(prev => ({ ...prev, [userId]: isTyping }));
-    //     }
-    //   }
-    // });
+      userTyping:({conversationId,userId,isTyping})=>{
+        if (activeConversation?.id === conversationId && userId !== user.id) {
+          setTypingUsers(prev => ({ ...prev, [userId]: isTyping }));
+        }
+      }
+    });
     
-      loadConversations();
+    console.log("About to call loadConversations");
+    loadConversations().catch(err => {
+      console.error("Error in loadConversations:", err);
+    });
     
-    // return () => {
-    //   socketService.disconnect();
-    // };
-  }, [activeConversation]);
+    return () => {
+      socketService.disconnect();
+    };
+  }, [activeConversation,user,messages]);
 
   return {
     conversations,
@@ -203,7 +241,7 @@ export const useChat=()=>{
     error,
     unreadCount,
     typingUsers,
-    setActiveConversation: handleSetActiveConversation,
+    setActiveConversation:handleSetActiveConversation,
     sendMessage,
     loadMoreMessages,
     markMessagesAsRead,

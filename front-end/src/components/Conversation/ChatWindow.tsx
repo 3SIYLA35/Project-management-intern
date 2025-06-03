@@ -7,10 +7,11 @@ import TypingIndicator from './TypingIndicator';
 import { Message } from '../../api/messageApi';
 import { useProfile } from '../../hooks/useProfile';
 import { Participant } from '../Profile/types';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 
 
-const ChatWindow: React.FC=()=>{
+const ChatWindow:React.FC=()=>{
   const { 
     activeConversation, 
     typingUsers,
@@ -18,19 +19,19 @@ const ChatWindow: React.FC=()=>{
     messages,
     loading,
     sendMessage
-  } = useChat();
-  const { profile } = useProfile();
-  const user = profile;
-  const [newMessage, setNewMessage] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  }=useChatContext();
+  const {profile}=useProfile();
+  const user=profile;
+  const [newMessage,setNewMessage]=useState('');
+  const [showEmojiPicker,setShowEmojiPicker]=useState(false);
+  const messagesEndRef=useRef<HTMLDivElement>(null);
+  const [isTyping,setIsTyping]=useState(false);
+  const typingTimeoutRef=useRef<NodeJS.Timeout | null>(null);
 
   // Scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages,activeConversation]);
 
   // Handle typing indicator
   useEffect(() => {
@@ -56,14 +57,10 @@ const ChatWindow: React.FC=()=>{
     };
   }, [isTyping, setTypingStatus]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
-    
-    // Clear typing indicator
+  const handleSendMessage=()=>{
+    if(newMessage.trim()==='') return;
     setIsTyping(false);
     setTypingStatus(false);
-    
-    // Send message using the chat context
     sendMessage(newMessage);
     setNewMessage('');
   };
@@ -78,9 +75,8 @@ const ChatWindow: React.FC=()=>{
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange=(e:React.ChangeEvent<HTMLTextAreaElement>)=>{
     setNewMessage(e.target.value);
-    // Indicate typing
     setIsTyping(true);
   };
 
@@ -110,7 +106,8 @@ const ChatWindow: React.FC=()=>{
     return activeConversation.participants.find((p:Participant) => p.user.id === participantId)?.isOnline || false;
   };
 
-  if (!activeConversation) {
+  if (!activeConversation){
+    // console.log('activeConversation from ChatWindow',activeConversation);
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-900">
         <div className="text-center">
@@ -219,9 +216,9 @@ const ChatWindow: React.FC=()=>{
               className="w-full bg-transparent text-white resize-none focus:outline-none min-h-[40px] max-h-[120px]"
               style={{ height: 'auto' }}
               onInput={(e) => {
-                const textarea = e.target as HTMLTextAreaElement;
-                textarea.style.height = 'auto';
-                textarea.style.height = `${textarea.scrollHeight}px`;
+                const textarea=e.target as HTMLTextAreaElement;
+                textarea.style.height='auto';
+                textarea.style.height=`${textarea.scrollHeight}px`;
               }}
             />
             <div className="flex justify-between items-center pt-2">
@@ -241,7 +238,7 @@ const ChatWindow: React.FC=()=>{
           <button 
             className="bg-blue-600 text-white rounded-lg p-3 hover:bg-blue-700"
             onClick={handleSendMessage}
-            disabled={newMessage.trim() === ''}
+            disabled={newMessage.trim()===''}
           >
             <FontAwesomeIcon icon={faPaperPlane} className="h-5 w-5" />
           </button>
