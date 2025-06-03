@@ -46,7 +46,7 @@ io.on('connection',(socket)=>{
   console.log('New client connected',socket.id);
   socket.on('join_conversation',(conversationId)=>{
     socket.join(conversationId);
-    console.log(`User joined conversation: ${conversationId}`);
+    console.log(`User ${socket.userId} joined conversation: ${conversationId}`);
   });
   socket.on('leave_conversation',(conversationId)=>{
     socket.leave(conversationId);
@@ -70,9 +70,10 @@ io.on('connection',(socket)=>{
         conversationId,
         sender,
         content
-      });;
+      });;;
      
       io.to(conversationId).emit('receive_message', newMessage);
+      console.log('message sent to socket',newMessage);
     } catch (error){
       console.error('error sending message:', error);
       socket.emit('message_error', { error: error.message });
@@ -88,7 +89,7 @@ io.on('connection',(socket)=>{
     }catch(error){
       console.error('error marking messages as read:', error);
     }
-  });
+  });;
   
   socket.on('typing',(data)=>{
     const { conversationId,userId,isTyping }=data;

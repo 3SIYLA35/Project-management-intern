@@ -82,9 +82,10 @@ export const useChat=()=>{
 
   const sendMessage=async(content:string)=>{
     if(!activeConversation||!user?.id ||!content.trim())return;
+    const tempId=Date.now().toString();
     try {
       const optimisticmessage:Message={
-        _id:'temp-'+Date.now(),
+        _id:tempId,
         conversationId:activeConversation.id,
         sender:{
           _id:user.id,
@@ -105,7 +106,7 @@ export const useChat=()=>{
       });
     }catch(err:any){
       setError(err.message||'Error sending message');
-      setMessages(prevMessages=>prevMessages.filter(msg=>msg._id!=='temp-'+Date.now()));
+      setMessages(prevMessages=>prevMessages.filter(msg=>msg._id!==tempId));
     }
   };
 
@@ -163,28 +164,37 @@ export const useChat=()=>{
 
   useEffect(()=>{
    
-    if(!user?.id){
-      console.log("No user ID available, skipping loadConversations",user);
+    if (!user?.id) {
+      console.log("No user ID available, skipping loadConversations", user);
       return;
     }
-    const socket=socketService.connect(user.id);
+    
+    const socket = socketService.connect(user.id);
     console.log("Socket connected for user:", user.id);
+    
     socketService.subscribe({
       receiveMessage:(newMessage:Message)=>{
         console.log('receive message from socket',newMessage);
         if (activeConversation?.id===newMessage.conversationId){
           setMessages(prevMessages=>{
-            const existsmessage=prevMessages.some(msg=>msg._id===newMessage._id);
-            if(!existsmessage){
-              if(activeConversation.id===newMessage.conversationId){
-                if(user.id!==newMessage.sender._id){
-                  markMessagesAsRead();
-                }
-                return [...prevMessages,newMessage];
-              }
-            }
-            
+           if(prevMessages.some(msg=>msg._id===newMessage._id)){
             return prevMessages;
+           }
+           const tempIndex = prevMessages.findIndex(msg => 
+            msg._id.startsWith('temp-') && 
+            msg.sender._id === newMessage.sender._id &&
+            msg.content === newMessage.content
+          );
+          
+          if (tempIndex >= 0) {
+            // Replace temp message with real one
+            const newMessages = [...prevMessages];
+            newMessages[tempIndex] = newMessage;
+            return newMessages;
+          }
+          return [...prevMessages,newMessage];
+            
+            
           });
           if(user.id!==newMessage.sender._id){
             markMessagesAsRead();
@@ -229,9 +239,10 @@ export const useChat=()=>{
     });
     
     return () => {
+      socket.off('receive_message');
       socketService.disconnect();
     };
-  }, [activeConversation,user,messages]);
+  }, [user]);
 
   return {
     conversations,

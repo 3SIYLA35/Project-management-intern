@@ -4,14 +4,17 @@ import { Authprovider } from './login-registre/Auth/authContext';
 import SocketInitializer from './components/Conversation/SocketInitializer';
 import { Toaster } from "./components/ui/sonner"
 import { ProfileProvider } from './Contexts/ProfileContext';
+import { ChatProvider } from './Contexts/ChatContext';
 
 function App() {
   return (
     <Authprovider>
       <ProfileProvider>
-        <SocketInitializer />
-        <AppRouter />
-        <Toaster />
+        <ChatProvider>
+          <SocketInitializer />
+          <AppRouter />
+          <Toaster />
+        </ChatProvider>
       </ProfileProvider>
       
       
