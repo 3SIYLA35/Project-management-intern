@@ -1,46 +1,24 @@
 import { apiClient, extractErrorDetails } from './apiClient';
-
-export interface Participant{
-  id: string;
-  user:{
-    _id:string;
-    name?:string;
-    email?:string;
-    profilePicture?:string;
-  };
-  isOnline: boolean;
-}
-
-export interface Conversation{
-  _id: string;
-  participants:Participant[];
-  createdAt:string;
-  updatedAt:string;
-}
-
-export interface ConversationResponse{
-  success:boolean;
-  conversation:Conversation;
-  message?:string;
-}
-
-export interface ConversationsResponse {
-  success: boolean;
-  conversations: Conversation[];
-}
+import { adaptConverstation, conversationApi as converstationapi, safeadaptconverstation} from '../adapters/converasationAdapter';
+import { converstation } from '@/components/Profile/types';
 const conversationApi={
   createConversation: async(participants:string[])=>{
     try{
-      return await apiClient.post<ConversationResponse>('/conversations/create-converstation',{participants});
+      return await apiClient.post<converstationapi>('/conversations/create-converstation',{participants});
     }catch(error){
       console.error('error creating conversation:', extractErrorDetails(error));
       throw error;
     }
   },
 
-  getUserConversations:async(userId:string)=>{
+  getUserConversations:async():Promise<converstation[]>=>{
     try{
-      return await apiClient.get<ConversationsResponse>(`/conversations/get-user-converstation/${userId}`);
+      // console.log('userId',userId);
+      const response= await apiClient.get<converstationapi>(`/conversations/get-user-converstation`);
+      if(!response?.success){
+        throw new Error(response?.message);
+      }
+      return safeadaptconverstation(response) as converstation[];
     } catch (error){
       console.error('error fetching conversations:', extractErrorDetails(error));
       throw error;
@@ -49,7 +27,11 @@ const conversationApi={
 
   getConversation:async(conversationId:string)=>{
     try{
-      return await apiClient.get<ConversationResponse>(`/conversations/get-converstation/${conversationId}`);
+      const response= await apiClient.get<converstationapi>(`/conversations/get-converstation/${conversationId}`);
+      if(!response?.success){
+        throw new Error(response?.message);
+      }
+      return safeadaptconverstation(response) as converstation;
     }catch(error){
       console.error('Error fetching conversation:', extractErrorDetails(error));
       throw error;
@@ -59,7 +41,11 @@ const conversationApi={
 
   deleteConversation:async(conversationId: string): Promise<{ success: boolean; message: string }> => {
     try {
-      return await apiClient.delete<{ success:boolean;message:string }>(`/conversations/delete-converstation/${conversationId}`);
+      const response= await apiClient.delete<{ success:boolean;message:string }>(`/conversations/delete-converstation/${conversationId}`);
+      if(!response?.success){
+        throw new Error(response?.message);
+      }
+      return response;
     } catch (error) {
       console.error('Error deleting conversation:',extractErrorDetails(error));
       throw error;

@@ -84,9 +84,11 @@ const messageApi={
     }
   },
 
-  getUnreadMessageCount: async(userId:string)=>{
+  getUnreadMessageCount: async()=>{
     try{
-      return await apiClient.get<UnreadCountResponse>(`/messages/get-unread-message/${userId}`);
+      const response=await apiClient.get<UnreadCountResponse>(`/messages/get-unread-message`);
+      console.log('response',response);
+      return response;
     } catch (error) {
       console.error('error getting unread count:', extractErrorDetails(error));
       throw error;

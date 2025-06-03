@@ -3,28 +3,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip, faFaceSmile, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import './ChatStyles.css';
 import { useChat } from '../../hooks/useChat';
-import { useAuth } from '../../hooks/useAuth';
 import TypingIndicator from './TypingIndicator';
 import { Message } from '../../api/messageApi';
+import { useProfile } from '../../hooks/useProfile';
+import { Participant } from '../Profile/types';
 
-interface chatwindowProps{
-  selectedChat:string;
-  messages:Message[];
-  loading:boolean;
-  sendMessage:(content:string)=>void;
-}
 
-const ChatWindow: React.FC<chatwindowProps>=({
-  selectedChat,
-  messages,
-  loading,
-  sendMessage})=>{
+
+const ChatWindow: React.FC=()=>{
   const { 
     activeConversation, 
     typingUsers,
-    setTypingStatus
+      setTypingStatus,
+    messages,
+    loading,
+    sendMessage
   } = useChat();
-  const { user } = useAuth();
+  const { profile } = useProfile();
+  const user = profile;
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -96,7 +92,7 @@ const ChatWindow: React.FC<chatwindowProps>=({
 
   // Function to check if message is from current user
   const isCurrentUserMessage = (message: Message) => {
-    return message.sender._id === user?._id;
+    return message.sender._id === user?.id;
   };
 
   // Function to get participant name from conversation
@@ -104,14 +100,14 @@ const ChatWindow: React.FC<chatwindowProps>=({
     if (!activeConversation) return 'User';
     
     // This is simplified - you would need to fetch user details or store them in the conversation
-    return activeConversation.participants.find(p => p.id === participantId)?.user?.name || 'User';
+    return activeConversation.participants.find((p:Participant) => p.user.id === participantId)?.user?.name || 'User';
   };
 
   // Function to get online status
   const getOnlineStatus = (participantId: string) => {
     if (!activeConversation) return false;
     
-    return activeConversation.participants.find(p => p.id === participantId)?.isOnline || false;
+    return activeConversation.participants.find((p:Participant) => p.user.id === participantId)?.isOnline || false;
   };
 
   if (!activeConversation) {
@@ -130,7 +126,7 @@ const ChatWindow: React.FC<chatwindowProps>=({
 
   // Find the other participant(s) in the conversation
   const otherParticipants = activeConversation.participants.filter(
-    p => p.id !== user?._id
+    (p:Participant) => p.user.id !== user?.id
   );
   
   // For simplicity, we'll just use the first other participant for the header
@@ -142,11 +138,11 @@ const ChatWindow: React.FC<chatwindowProps>=({
       <div className="border-b border-gray-800 p-4 flex justify-between items-center">
         <div className="flex items-center">
           <div className="h-10 w-10 rounded-full mr-3 bg-gray-700 flex items-center justify-center text-white">
-            {getParticipantName(chatPartner?.id).charAt(0).toUpperCase()}
+            {getParticipantName(chatPartner?.user.id).charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="text-lg font-medium text-white">{getParticipantName(chatPartner?.id)}</h2>
-            <p className={`text-xs ${getOnlineStatus(chatPartner?.id) ? 'text-green-500' : 'text-gray-400'}`}>
+            <h2 className="text-lg font-medium text-white">{getParticipantName(chatPartner?.user.id)}</h2>
+            <p className={`text-xs ${getOnlineStatus(chatPartner?.user.id) ? 'text-green-500' : 'text-gray-400'}`}>
               {/* {getOnlineStatus(chatPartner?.id) ? 'Online' : 'Offline'} */}
             </p>
           </div>

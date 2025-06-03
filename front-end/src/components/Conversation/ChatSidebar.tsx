@@ -2,53 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
 import TypingIndicator from './TypingIndicator';
-import { Conversation } from '../../api/conversationApi';
+import { converstation, Participant } from '../Profile/types';
 import './ChatStyles.css';
-
-interface chatsidebarProp{
-  
-  selectedChat:string;
-  onSelectChat: (chatId: string) => void;
-  chats: Conversation[];
-  activeConversation: Conversation | null;
-  setActiveConversation: (conversation: Conversation | null) => void;
-  loading: boolean;
-  unreadCount: number;
-  typingUsers: Record<string, boolean>;
-  setTypingStatus: (isTyping: boolean) => void;
+import { useProfile } from '../../hooks/useProfile';
 
 
 
-}
+const ChatSidebar:React.FC=()=>{
+    const{ 
+      loading,
+      error,
+      createConversation,
+      conversations,
+      activeConversation,
+      setActiveConversation,
+      typingUsers,
+      unreadCount,
+      setTypingStatus,
+    }=useChat();
 
-const ChatSidebar:React.FC<chatsidebarProp>=({
-  selectedChat,
-  onSelectChat,
-  chats,
-  activeConversation,
-  setActiveConversation,
-  loading,
-  unreadCount,
-  typingUsers,
-  setTypingStatus})=>{
-  const{ 
-    createConversation,
-  }=useChat();
-  const {user}=useAuth();
+    useEffect(()=>{
+      console.log('conversations',conversations);
+    },[]);
+  const {profile}=useProfile();
+  const user=profile;
   const [searchQuery,setSearchQuery]=useState('');
   const [showNewChatModal,setShowNewChatModal]=useState(false);
   const [newChatParticipantId,setNewChatParticipantId]=useState('');
 
   const filteredConversations=searchQuery
-    ?chats.filter(conv=>{
-        return conv.participants.some(p=> 
-          p.id!==user?._id && p.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    ?conversations.filter(conv=>{
+        return conv.participants.some((p:Participant)=> 
+          p.user.id!==user?.id && p.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
         );
       })
-    : chats;
+    : conversations;
 
   // Select a conversation
-  const handleSelectConversation = (conversation: Conversation) => {
+  const handleSelectConversation = (conversation:converstation) => {
     setActiveConversation(conversation);
   };
 
@@ -59,7 +50,7 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
     try {
       const newConversation = await createConversation([newChatParticipantId]);
       if (newConversation) {
-        setActiveConversation(newConversation);
+        setActiveConversation(newConversation as unknown as converstation);
         setShowNewChatModal(false);
         setNewChatParticipantId('');
       }
@@ -68,9 +59,10 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
     }
   };
 
-  // Get the other participant(s) in a conversation
-  const getOtherParticipants = (conversation: Conversation) => {
-    return conversation.participants.filter(p => p.id !== user?._id);
+
+  const getOtherParticipants=(conversation:converstation)=>{
+    // console.log('conversation',conversation);
+    return conversation.participants.filter(p=>p.user.id!==user?.id);
   };
 
   // Function to format timestamp
@@ -100,23 +92,23 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
   };
 
   // Check if there are any unread messages in a conversation
-  const hasUnreadMessages = (conversation: Conversation) => {
+  const hasUnreadMessages = (conversation: converstation) => {
     // This would need to be implemented based on your data structure
     // For now, we'll just return false
     return false;
   };
 
   // Count unread messages in a conversation
-  const countUnreadMessages = (conversation: Conversation) => {
+  const countUnreadMessages = (conversation: converstation) => {
     // This would need to be implemented based on your data structure
     // For now, we'll just return 0
     return 0;
   };
 
   // Check if someone is typing in a conversation
-  const isTypingInConversation = (conversation: Conversation) => {
+  const isTypingInConversation = (conversation: converstation) => {
     return Object.keys(typingUsers).some(userId => 
-      conversation.participants.some(p => p.id === userId)
+      conversation.participants.some((p:Participant) => p.user.id === userId)
     );
   };
 
@@ -144,8 +136,9 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
            date.toDateString() !== yesterday.toDateString();
   });
 
-  if (loading) {
-    return (
+  if (loading){
+  // console.log('loading',loading);
+    return(
       <div className="w-80 bg-gray-850 border-r border-gray-800 flex items-center justify-center">
         <div className="text-gray-400">Loading chats...</div>
       </div>
@@ -197,17 +190,17 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
         </button>
       </div>
 
-      {/* Conversation list */}
+      {/* converstation list */}
       <div>
         {/* Today's conversations */}
-        {todayConversations.length > 0 && (
+        {todayConversations.length>0&& (
           <>
             <div className="px-4 py-2 text-xs font-medium text-gray-500">Today</div>
-            {todayConversations.map(conversation => (
+            {todayConversations.map(conversation=>(
               <div 
-                key={conversation._id}
+                key={conversation.id}
                 onClick={() => handleSelectConversation(conversation)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?.id === conversation.id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
@@ -223,7 +216,7 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
                       <h3 className="text-sm font-medium text-white truncate">
                         {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString() )}</span>
                     </div>
                     <div className="flex items-center mt-1">
                       {isTypingInConversation(conversation) ? (
@@ -257,9 +250,9 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
             <div className="px-4 py-2 text-xs font-medium text-gray-500">Yesterday</div>
             {yesterdayConversations.map(conversation => (
               <div 
-                key={conversation._id}
+                key={conversation.id}
                 onClick={() => handleSelectConversation(conversation)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?.id === conversation.id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
@@ -275,7 +268,7 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
                       <h3 className="text-sm font-medium text-white truncate">
                         {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString())}</span>
                     </div>
                     <div className="flex items-center mt-1">
                       <p className="text-xs text-gray-400 truncate">
@@ -303,9 +296,9 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
             <div className="px-4 py-2 text-xs font-medium text-gray-500">Earlier</div>
             {olderConversations.map(conversation => (
               <div 
-                key={conversation._id}
+                  key={conversation.id}
                 onClick={() => handleSelectConversation(conversation)}
-                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?._id === conversation._id ? 'bg-gray-800' : ''}`}
+                className={`px-4 py-3 cursor-pointer hover:bg-gray-800 ${activeConversation?.id === conversation.id ? 'bg-gray-800' : ''}`}
               >
                 <div className="flex">
                   <div className="relative">
@@ -321,7 +314,7 @@ const ChatSidebar:React.FC<chatsidebarProp>=({
                       <h3 className="text-sm font-medium text-white truncate">
                         {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt)}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString())}</span>
                     </div>
                     <div className="flex items-center mt-1">
                       <p className="text-xs text-gray-400 truncate">

@@ -2,15 +2,15 @@ import React from 'react';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 import './ChatStyles.css';
-import { Conversation } from '@/api/conversationApi';
-import { Message } from '@/api/messageApi';
+import { converstation } from '../Profile/types';
+import { Message } from '../../api/messageApi';
 
 interface chatpageProps{
   selectedChat:string;
   onSelectChat:(chatId:string)=>void;
-  chats:Conversation[];
-  activeConversation:Conversation|null;
-  setActiveConversation:(conversation:Conversation|null)=>void;
+  chats:converstation[];
+  activeConversation:converstation|null;
+  setActiveConversation:(conversation:converstation|null)=>void;
   messages:Message[];
   loading:boolean;
   sendMessage:(content:string)=>void;
@@ -31,23 +31,9 @@ const ChatPage: React.FC<chatpageProps>=({selectedChat,
   setTypingStatus})=>{
   return (
     <div className="flex h-screen bg-gray-900">
-      <ChatSidebar 
-        selectedChat={selectedChat}
-        onSelectChat={onSelectChat}
-        chats={chats}
-        activeConversation={activeConversation}
-        setActiveConversation={setActiveConversation}
-        loading={loading}
-        unreadCount={unreadCount}
-        typingUsers={typingUsers}
-        setTypingStatus={setTypingStatus}
-      />
+      <ChatSidebar />
       <ChatWindow 
-        selectedChat={selectedChat}
-        messages={messages}
-        loading={loading}
-        sendMessage={sendMessage}
-      />
+       />
     </div>
   );
 };

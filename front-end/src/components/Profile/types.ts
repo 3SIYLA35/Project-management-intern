@@ -97,6 +97,16 @@ export interface Comment{
     createdAt:Date;
     updatedAt:Date;
 }
+export interface converstation{
+  id:string;
+  participants:Participant[];
+  createdAt:Date;
+  updatedAt:Date;
+}
+export interface Participant{
+  user:UserProfile;
+  isOnline:boolean;
+}
 
 export interface BaseProfileSectionProps {
   isEditing: boolean;

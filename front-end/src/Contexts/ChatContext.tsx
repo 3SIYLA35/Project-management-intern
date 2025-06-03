@@ -1,6 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { Message } from '../api/messageApi';
-import { Conversation } from '../api/conversationApi';
+
 import { useChat } from '../hooks/useChat';
 
 const ChatContext = createContext<ReturnType<typeof useChat> | undefined>(undefined);

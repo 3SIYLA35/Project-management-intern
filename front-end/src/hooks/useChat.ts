@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Message } from '../api/messageApi';
-import { Conversation } from '../api/conversationApi';
+import { converstation } from '../components/Profile/types';
 import conversationApi from '../api/conversationApi';
 import messageApi from '../api/messageApi';
 import socketService from '../api/socketService';
-import { useAuth } from './useAuth';
+import { useProfile } from './useProfile';
 
 export const useChat=()=>{
-  const {user}=useAuth();
-  const [conversations,setConversations]=useState<Conversation[]>([]);
-  const [activeConversation,setActiveConversation]=useState<Conversation|null>(null);
+  const {profile}=useProfile();
+  const user=profile;
+  const {fetchProfile}=useProfile();
+  const [conversations,setConversations]=useState<converstation[]>([]);
+  const [activeConversation,setActiveConversation]=useState<converstation|null>(null);
   const [messages,setMessages]=useState<Message[]>([]);
   const [loading,setLoading]=useState<boolean>(false);
   const [error,setError]=useState<string|null>(null);
@@ -20,15 +22,17 @@ export const useChat=()=>{
 
 
   const loadConversations=async()=>{
-    if (!user?._id) return;
-    try {
+    if (!user?.id) return;
+        try {
       setLoading(true);
-      const response=await conversationApi.getUserConversations(user._id);
-      setConversations(response.conversations);
-      const unreadResponse=await messageApi.getUnreadMessageCount(user._id);
+      const response=await conversationApi.getUserConversations();
+      console.log('response',response);
+      setConversations(response as converstation[]);
+      console.log('conversations',conversations);
+      const unreadResponse=await messageApi.getUnreadMessageCount();
       setUnreadCount(unreadResponse.unreadCount);
     }catch(err:any){
-      setError(err.message || 'Error loading conversations');
+      setError(err.message || 'error loading conversations');
     }finally{
       setLoading(false);
     }
@@ -55,32 +59,32 @@ export const useChat=()=>{
 
   const loadMoreMessages=async()=>{
     if (!activeConversation || currentPage >=totalPages)return;
-    await loadMessages(activeConversation._id,currentPage+1);
+    await loadMessages(activeConversation.id,currentPage+1);
   };
 
-  const handleSetActiveConversation=(conversation:Conversation|null)=>{
+  const handleSetActiveConversation=(conversation:converstation|null)=>{
     if (activeConversation){
-      socketService.leaveConversation(activeConversation._id);
+      socketService.leaveConversation(activeConversation.id);
     }
     setActiveConversation(conversation);
     setMessages([]);
     setCurrentPage(1);
     if(conversation){
-      loadMessages(conversation._id);
-      socketService.joinConversation(conversation._id);
-      if(user?._id){
+      loadMessages(conversation.id);
+      socketService.joinConversation(conversation.id);
+      if(user?.id){
         markMessagesAsRead();
       }
     }
   };
 
   const sendMessage=async(content:string)=>{
-    if(!activeConversation||!user?._id ||!content.trim())return;
+    if(!activeConversation||!user?.id ||!content.trim())return;
     
     try {
       socketService.sendMessage({
-        conversationId: activeConversation._id,
-        sender:user._id,
+        conversationId: activeConversation.id,
+        sender:user.id,
         content:content.trim()
       });
     } catch (err: any) {
@@ -89,12 +93,12 @@ export const useChat=()=>{
   };
 
   const markMessagesAsRead=async()=>{
-    if (!activeConversation || !user?._id) return;
+    if (!activeConversation || !user?.id) return;
     
     try{
       socketService.markMessagesAsRead({
-        conversationId:activeConversation._id,
-        userId:user._id
+        conversationId:activeConversation.id,
+        userId:user.id
       });
     }catch(err:any){
       console.error('Error marking messages as read:', err);
@@ -103,8 +107,8 @@ export const useChat=()=>{
 
   const createConversation=async(participants: string[])=>{
     try{
-      if(user?._id && !participants.includes(user._id)){
-        participants.push(user._id);
+      if(user?.id && !participants.includes(user.id)){
+        participants.push(user.id);
       }
       const response=await conversationApi.createConversation(participants);
 
@@ -119,7 +123,7 @@ export const useChat=()=>{
   const deleteConversation=async (conversationId: string)=> {
     try {
       await conversationApi.deleteConversation(conversationId);
-      if (activeConversation?._id===conversationId) {
+      if (activeConversation?.id===conversationId) {
         setActiveConversation(null);
         setMessages([]);
       }
@@ -132,64 +136,64 @@ export const useChat=()=>{
   };
 
   const setTypingStatus=(isTyping:boolean)=>{
-    if (!activeConversation || !user?._id) return;
+    if (!activeConversation || !user?.id) return;
     socketService.sendTypingStatus({
-      conversationId: activeConversation._id,
-      userId: user._id,
+      conversationId: activeConversation.id,
+      userId: user.id,
       isTyping
     });
   };
 
   useEffect(()=>{
-    if (!user?._id) return;
-    const socket=socketService.connect(user._id);
-    socketService.subscribe({
-      receiveMessage:(newMessage: Message)=>{
-        if (activeConversation?._id===newMessage.conversationId){
-          setMessages(prevMessages => [...prevMessages, newMessage]);
-          if (user._id!==newMessage.sender._id){
-            markMessagesAsRead();
-          }
-        }
-        if(user._id !== newMessage.sender._id){
-          setUnreadCount(prev=>prev+1);
-        }
-      },
+    // if (!user?._id) return;
+    // const socket=socketService.connect(user._id);
+    // socketService.subscribe({
+    //   receiveMessage:(newMessage: Message)=>{
+    //     if (activeConversation?._id===newMessage.conversationId){
+    //       setMessages(prevMessages => [...prevMessages, newMessage]);
+    //       if (user._id!==newMessage.sender._id){
+    //         markMessagesAsRead();
+    //       }
+    //     }
+    //     if(user._id !== newMessage.sender._id){
+    //       setUnreadCount(prev=>prev+1);
+    //     }
+    //   },
         
-      messagesRead:({conversationId,userId})=>{
-        if (activeConversation?._id===conversationId && userId!==user._id) {
-          setMessages(prevMessages=> 
-            prevMessages.map(msg=> 
-              msg.sender._id===user._id ? { ...msg,read:true}:msg
-            )
-          );
-        }
-      },
+    //   messagesRead:({conversationId,userId})=>{
+    //     if (activeConversation?._id===conversationId && userId!==user._id) {
+    //       setMessages(prevMessages=> 
+    //         prevMessages.map(msg=> 
+    //           msg.sender._id===user._id ? { ...msg,read:true}:msg
+    //         )
+    //       );
+    //     }
+    //   },
       
-      userStatusChange:({userId,isOnline})=>{
-        setConversations(prevConversations=> 
-          prevConversations.map(conv=>({
-            ...conv,
-            participants:conv.participants.map(p=> 
-              p.id===userId?{...p, isOnline }:p
-            )
-          }))
-        );
-      },
+    //   userStatusChange:({userId,isOnline})=>{
+    //     setConversations(prevConversations=> 
+    //       prevConversations.map(conv=>({
+    //         ...conv,
+    //         participants:conv.participants.map(p=> 
+    //           p.id===userId?{...p, isOnline }:p
+    //         )
+    //       }))
+    //     );
+    //   },
       
-      userTyping:({conversationId,userId,isTyping})=>{
-        if (activeConversation?._id === conversationId && userId !== user._id) {
-          setTypingUsers(prev => ({ ...prev, [userId]: isTyping }));
-        }
-      }
-    });
+    //   userTyping:({conversationId,userId,isTyping})=>{
+    //     if (activeConversation?._id === conversationId && userId !== user._id) {
+    //       setTypingUsers(prev => ({ ...prev, [userId]: isTyping }));
+    //     }
+    //   }
+    // });
     
       loadConversations();
     
-    return () => {
-      socketService.disconnect();
-    };
-  }, [user, activeConversation, loadConversations]);
+    // return () => {
+    //   socketService.disconnect();
+    // };
+  }, [activeConversation]);
 
   return {
     conversations,

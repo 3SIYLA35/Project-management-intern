@@ -290,8 +290,6 @@ const CommentService={
                 console.log('reply not found on deleteReply');
                 return null;
             }
-            
-            // Modified query to properly find and update the comment
             const comment=await commentmodel.findByIdAndUpdate(
                 commentId,
                 {$pull:{replies:replyId}},
