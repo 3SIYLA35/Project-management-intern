@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SideNav from '../../components/Main components/SideNav';
 import Header from '../../components/Main components/Header';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import ChatSidebar from '../../components/Conversation/ChatSidebar';
 import ChatWindow from '../../components/Conversation/ChatWindow';
-import { useChat } from '../../hooks/useChat';
+import { useChatContext } from '../../Contexts/ChatContext';
 
 export default function ConversationPage() {
   const [searchTerm, setSearchTerm]=useState('');
   const navigate=useNavigate();
+  const { activeConversation } = useChatContext();
 
   // Handle navigation for sidebar items
   const handleNavigation = (path: string) => {
     navigate(path);
   };
+  
+  // Add debug logging to monitor the activeConversation in this component
+  useEffect(() => {
+    console.log('💬 ConversationPage activeConversation:', activeConversation?.id);
+  }, [activeConversation]);
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -40,9 +46,7 @@ export default function ConversationPage() {
           <ChatSidebar />
           
           {/* Chat Window */}
-          <ChatWindow 
-            
-          />
+          <ChatWindow />
         </div>
       </div>
     </div>

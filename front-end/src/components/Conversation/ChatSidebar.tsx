@@ -41,8 +41,24 @@ const ChatSidebar:React.FC=()=>{
 
   // Select a conversation
   const handleSelectConversation=(conversation:converstation)=>{
-    // console.log('conversation from handleSelectConversation',conversation);
+    console.log('💬 Selecting conversation:', conversation);
+    
+    // Explicitly log the ID to debug
+    console.log('💬 Selected conversation ID:', conversation.id);
+    
+    // For debugging purposes
+    console.log('💬 Current active conversation before change:', activeConversation?.id);
+    
+    // Make sure we're explicitly setting the conversation in state
     setActiveConversation(conversation);
+    
+    // Log to confirm setting was triggered
+    console.log('💬 Active conversation should now be set to:', conversation.id);
+    
+    // Add a timeout to check if the active conversation was actually updated
+    setTimeout(() => {
+      console.log('💬 Active conversation after timeout:', activeConversation?.id);
+    }, 100);
   };
 
   // Create a new conversation

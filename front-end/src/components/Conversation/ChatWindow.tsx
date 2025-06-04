@@ -30,8 +30,25 @@ const ChatWindow:React.FC=()=>{
 
   // Scroll to bottom of messages
   useEffect(() => {
+    console.log('📜 ChatWindow messages updated:', messages.length);
+    console.log('📜 ChatWindow activeConversation:', activeConversation?.id);
+    
+    if (activeConversation) {
+      console.log('✅ Active conversation in ChatWindow:', activeConversation.id);
+    } else {
+      console.log('❌ No active conversation in ChatWindow');
+    }
+    
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages,activeConversation]);
+  }, [messages, activeConversation]);
+
+  // Add additional useEffect to log when active conversation changes
+  useEffect(() => {
+    if (activeConversation) {
+      console.log('🔄 ChatWindow active conversation changed to:', activeConversation.id);
+      console.log('🔄 ChatWindow participants:', activeConversation.participants.map(p => p.user.id));
+    }
+  }, [activeConversation]);
 
   // Handle typing indicator
   useEffect(() => {
@@ -56,6 +73,27 @@ const ChatWindow:React.FC=()=>{
       }
     };
   }, [isTyping, setTypingStatus]);
+
+  // Add a useEffect to log when messages are updated
+  useEffect(() => {
+    if (messages.length > 0) {
+      console.log('💬 ChatWindow received messages:', messages.length);
+      console.log('💬 First message:', messages[0].content);
+      console.log('💬 Last message:', messages[messages.length - 1].content);
+    } else {
+      console.log('💬 ChatWindow has no messages');
+    }
+  }, [messages]);
+
+  // When the component mounts, log that it's ready
+  useEffect(() => {
+    console.log('💬 ChatWindow component mounted');
+    console.log('💬 Initial activeConversation:', activeConversation?.id);
+    
+    return () => {
+      console.log('💬 ChatWindow component unmounting');
+    };
+  }, []);
 
   const handleSendMessage=()=>{
     if(newMessage.trim()==='') return;

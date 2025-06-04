@@ -7,17 +7,17 @@ import { ProfileProvider } from './Contexts/ProfileContext';
 import { ChatProvider } from './Contexts/ChatContext';
 
 function App() {
+  console.log('🔄 App component rendering');
+  
   return (
     <Authprovider>
       <ProfileProvider>
-        <ChatProvider>
+        <ChatProvider key="main-chat-provider">
           <SocketInitializer />
           <AppRouter />
           <Toaster />
         </ChatProvider>
       </ProfileProvider>
-      
-      
     </Authprovider>
     // <Registration/>
   );
