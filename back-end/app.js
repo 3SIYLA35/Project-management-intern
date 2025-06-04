@@ -8,6 +8,7 @@ const http=require('http');
 const socketIo=require('socket.io');
 const conversationService=require('./Services/conversationService');
 const messageService=require('./Services/messageService');
+const messagemodel=require('./Models/messages');
 app.use(express.json());
 require('dotenv').config();
 
@@ -43,10 +44,8 @@ const io=socketIo(server,{
 });;
 
 io.on('connection',(socket)=>{
-  console.log('New client connected', socket.id);
-  
-  // Store active rooms for this socket
-  socket.activeRooms = new Set();
+  console.log('new client connected', socket.id);
+  socket.activeRooms=new Set();
   
   socket.on('join_conversation',(conversationId)=>{
     socket.join(conversationId);
@@ -61,61 +60,46 @@ io.on('connection',(socket)=>{
   socket.on('leave_conversation',(conversationId)=>{
     socket.leave(conversationId);
     socket.activeRooms.delete(conversationId);
-    console.log(`User ${socket.userId} left conversation: ${conversationId}`);
-  });
+    console.log(`user ${socket.userId} left conversation:${conversationId}`);
+  });;
   
   socket.on('user_online',async(userId)=>{
-    console.log("User online: ", userId, "Socket ID:", socket.id);
-    if (userId){
+    console.log("User online: ", userId);
+    if(userId){
       await conversationService.updateUserOnlineStatus(userId,true);
-      socket.userId = userId;
-      io.emit('user_status_change',{userId, isOnline: true });
+      socket.userId=userId;
+      io.emit('user_status_change',{userId,isOnline:true});
     }
   });
  
   socket.on('send_message',async(messageData)=>{
     try {
-      console.log('📤 SEND_MESSAGE event received:', messageData);
-      console.log('📤 From socket:', socket.id);
-      
-      const {conversationId, sender, content} = messageData;
-      
-      if (!conversationId || !sender || !content) {
-        console.error('❌ Missing required fields in message data');
-        socket.emit('message_error', { error: 'Missing required fields' });
+      console.log('send message from socket',messageData);
+      const {conversationId,sender,content}=messageData;
+      if (!conversationId || !sender || !content){
+        console.error('missing required fields in message data');
+        socket.emit('message_error',{error:'Missing required fields'});
         return;
       }
-      
-      const newMessage = await messageService.createMessage({
+      const newMessage=await messageService.createMessage({
         conversationId,
         sender,
         content
       });
+      const populatedmessage=await messageService.getmessagebyID(newMessage._id);
       
-      console.log('✅ New message created:', newMessage);
-      console.log(`🚀 Broadcasting to room ${conversationId}`);
-      
-      // Check if any socket is in this room
-      const room = io.sockets.adapter.rooms.get(conversationId);
-      const socketsInRoom = room ? Array.from(room) : [];
-      console.log(`👥 Sockets in room ${conversationId}:`, socketsInRoom);
-      
-      if (socketsInRoom.length > 0) {
-        console.log(`📢 Broadcasting to ${socketsInRoom.length} sockets in room`);
-        io.to(conversationId).emit('receive_message', newMessage);
-      } else {
-        console.log('⚠️ No sockets in room, broadcasting to all');
-        io.emit('receive_message', newMessage);
-      }
-    } catch (error){
-      console.error('❌ Error sending message:', error);
-      socket.emit('message_error', { error: error.message });
+      console.log(' New message created:', newMessage);;
+      console.log(`Broadcasting to room ${conversationId}`);;
+        io.to(conversationId).emit('receive_message', populatedmessage);
+    }catch(error){
+      console.error('error sending message:',error);
+      socket.emit('message_error',{error:error.message});
     }
-  });
+  });;
   
   socket.on('mark_messages_read',async(data)=>{
-    try {
-      const {conversationId,userId}=data;
+    try{
+      const {conversationId,userId}=data;;
       console.log('mark messagge read for this user',userId);
       await messageService.markMessagesAsRead(conversationId, userId);
       io.to(conversationId).emit('messages_read',{conversationId,userId});
@@ -125,7 +109,7 @@ io.on('connection',(socket)=>{
   });;
   
   socket.on('typing',(data)=>{
-    const { conversationId,userId,isTyping }=data;
+    const {conversationId,userId,isTyping}=data;
     socket.to(conversationId).emit('user_typing',{
       conversationId,
       userId,

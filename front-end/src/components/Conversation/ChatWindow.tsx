@@ -28,19 +28,16 @@ const ChatWindow:React.FC=()=>{
   const [isTyping,setIsTyping]=useState(false);
   const typingTimeoutRef=useRef<NodeJS.Timeout | null>(null);
 
-  // Scroll to bottom of messages
   useEffect(() => {
-    console.log('📜 ChatWindow messages updated:', messages.length);
-    console.log('📜 ChatWindow activeConversation:', activeConversation?.id);
-    
-    if (activeConversation) {
-      console.log('✅ Active conversation in ChatWindow:', activeConversation.id);
-    } else {
-      console.log('❌ No active conversation in ChatWindow');
+    console.log('chatWindow messages updated:',messages.length);
+    console.log('chatWindow activeConversation:',activeConversation?.id);
+    if(activeConversation){
+      console.log('active conversation in ChatWindow:', activeConversation.id);
+    }else{
+      console.log('no active conversation in ChatWindow');
     }
-    
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, activeConversation]);
+  }, [messages,activeConversation]);
 
   // Add additional useEffect to log when active conversation changes
   useEffect(() => {

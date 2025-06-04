@@ -78,12 +78,12 @@ const  ConversationService={
         {'participants.id': userId },
         {$set:{'participants.$.isOnline': isOnline } }
       );
-      if(isOnline){
-        await Conversation.updateMany(
-          {'participants.id':{$ne:userId}},
-          {$set:{'participants.$.isOnline':false}}
-        );
-      }
+      // if(isOnline){
+      //   await Conversation.updateMany(
+      //     {'participants.id':{$ne:userId}},
+      //     {$set:{'participants.$.isOnline':false}}
+      //   );
+      // }
       return true;
     } catch (err){
       const error=new Error('Failed to update user online status');

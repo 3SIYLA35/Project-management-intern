@@ -16,27 +16,30 @@ export const useChat=()=>{
   const [messages,setMessages]=useState<Message[]>([]);
   const [loading,setLoading]=useState<boolean>(false);
   const [error,setError]=useState<string|null>(null);
-  const [unreadCount,setUnreadCount]=useState<number>(0);
-  const [typingUsers,setTypingUsers]=useState<Record<string, boolean>>({});
+  const [unreadCount,setundreadCcount]=useState<number>(0);
+  const [typingUsers,setTypingUsers]=useState<Record<string,boolean>>({});
   const [currentPage,setCurrentPage]=useState<number>(1);
   const [totalPages, setTotalPages]=useState<number>(1);
+  const activeConversationRef=useRef<converstation|null>(null);
+  const userRef=useRef(user);
+  const processedMessageIds=new Set<string>();
 
-  // Create refs to hold current state values for use in socket callbacks
-  const activeConversationRef = useRef<converstation|null>(null);
-  const userRef = useRef(user);
+  useEffect(()=>{
+    activeConversationRef.current=activeConversation;
+    if(activeConversation){
+      console.log('-------------------------joining conversation from useChat:',activeConversation.id);
+      socketService.joinConversation(activeConversation.id);
+      if(user?.id){
+        socketService.markMessagesAsRead({conversationId:activeConversation.id,
+          userId:user.id
+        })
+      }
+    }
+  },[activeConversation]);
 
-  // Create a set to track already processed message IDs
-  const processedMessageIds = new Set<string>();
-
-  // Update refs when state changes
-  useEffect(() => {
-    activeConversationRef.current = activeConversation;
-  }, [activeConversation]);
-
-  useEffect(() => {
-    userRef.current = user;
-  }, [user]);
-
+  useEffect(()=>{
+    userRef.current=user;
+  },[user]);
   const loadConversations=async()=>{
     console.log('loadConversations');
         try {
@@ -46,7 +49,7 @@ export const useChat=()=>{
       setConversations(response as converstation[]);
       console.log('conversations',conversations);
       const unreadResponse=await messageApi.getUnreadMessageCount();
-      setUnreadCount(unreadResponse.unreadCount);
+      setundreadCcount(unreadResponse.unreadCount);
     }catch(err:any){
       setError(err.message || 'error loading conversations');
     }finally{
@@ -62,53 +65,36 @@ export const useChat=()=>{
       if(page===1){
         setMessages(response.messages);
       }else{
-        setMessages(prevMessages=>[...response.messages,...prevMessages]);
+        setMessages(prevmessages=>[...response.messages,...prevmessages]);
       }
       setTotalPages(response.totalPages);
       setCurrentPage(response.currentPage);
-    } catch(err:any){
-      setError(err.message || 'Error loading messages');
-    } finally {
+    }catch(err:any){
+      setError(err.message||'error loading messages');
+    }finally{
       setLoading(false);
     }
   };
-
   const loadMoreMessages=async()=>{
     if (!activeConversation || currentPage >=totalPages)return;
     await loadMessages(activeConversation.id,currentPage+1);
   };
 
   const handleSetActiveConversation=(conversation:converstation|null)=>{
-    console.log('🔄 handleSetActiveConversation called with:', conversation?.id);
-    
-    // Leave current conversation if any
+    console.log('handleSetAactiveconversation called with:',conversation?.id);
     if(activeConversation){
-      console.log('🚪 Leaving conversation from handleSetActiveConversation:', activeConversation.id);
+      console.log('leaving conversation from handleSetactiveconversation:',activeConversation.id);
       socketService.leaveConversation(activeConversation.id);
     }
-    
-    // Important: update both state and ref simultaneously
     setActiveConversation(conversation);
-    activeConversationRef.current = conversation;
-    
-    // Log that we've set the active conversation
-    console.log('✅ Active conversation set to:', conversation?.id);
-    console.log('✅ Active conversation ref set to:', activeConversationRef.current?.id);
-    
-    // Reset messages and page when selecting a new conversation
+    // activeConversationRef.current=conversation;
     setMessages([]);
     setCurrentPage(1);
-    
-    // If a conversation was selected (not null)
     if(conversation){
-      console.log('📋 Loading messages for conversation:', conversation.id);
+      console.log('loading messages for conversation:',conversation.id);
       loadMessages(conversation.id);
-      
-      console.log('🚪 Joining conversation from handleSetActiveConversation:', conversation.id);
-      socketService.joinConversation(conversation.id);
-      
       if(user?.id){
-        console.log('📑 Marking messages as read for conversation:', conversation.id);
+        console.log('marking messages as read for conversation:', conversation.id);
         markMessagesAsRead();
       }
     }
@@ -132,11 +118,7 @@ export const useChat=()=>{
         createdAt:new Date().toISOString(),
         updatedAt:new Date().toISOString()
       }
-      
-      // Add the tempId to processed IDs to avoid duplicates when the real message comes back
       processedMessageIds.add(tempId);
-      console.log('🔄 Adding optimistic message ID to processed set:', tempId);
-      
       setMessages(prevMessages=>[...prevMessages,optimisticmessage]);
       socketService.sendMessage({
         conversationId:activeConversation.id,
@@ -146,22 +128,20 @@ export const useChat=()=>{
     }catch(err:any){
       setError(err.message||'Error sending message');
       setMessages(prevMessages=>prevMessages.filter(msg=>msg._id!==tempId));
-      
-      // Remove the tempId from processed IDs if we had to remove the optimistic message
+      console.log('removing tempId from processedIds:',tempId);
       processedMessageIds.delete(tempId);
     }
   };
 
   const markMessagesAsRead=async()=>{
     if (!activeConversation || !user?.id) return;
-    
     try{
       socketService.markMessagesAsRead({
         conversationId:activeConversation.id,
         userId:user.id
       });
     }catch(err:any){
-      console.error('Error marking messages as read:', err);
+      console.error('error marking messages as read:', err);
     }
   };
 
@@ -196,50 +176,25 @@ export const useChat=()=>{
   };
 
   const setTypingStatus=(isTyping:boolean)=>{
-    if (!activeConversation || !user?.id) return;
+    if(!activeConversation || !user?.id) return;
     socketService.sendTypingStatus({
-      conversationId: activeConversation.id,
-      userId: user.id,
+      conversationId:activeConversation.id,
+      userId:user.id,
       isTyping
     });
   };
 
   useEffect(()=>{
    
-    if (!user?.id) {
-      console.log("❌ No user ID available, skipping loadConversations", user);
+    if(!user?.id){
+      console.log("no user ID available skipping loadConversations",user);
       return;
     }
-    
-    console.log("🔌 CONNECTING SOCKET for user:", user?.id);
-    const socket = socketService.connect(user.id);
-    
-    // Debug socket connection events
-    socket.on('connect', () => {
-      console.log("✅ SOCKET CONNECTED with id:", socket.id);
-    });
-    
-    socket.on('disconnect', () => {
-      console.log("❌ SOCKET DISCONNECTED");
-    });
-    
-    socket.on('connect_error', (error) => {
-      console.error("🚨 SOCKET CONNECTION ERROR:", error);
-    });
-    
-    // Add direct event listener for debugging
-    socket.on('receive_message', (data) => {
-      console.log("🚨 DIRECT SOCKET EVENT: receive_message", data);
-    });
-    
-    console.log("🎧 Setting up socket event handlers");
-    socketService.subscribe({
+    console.log("connecting socket for user:",user?.id);
+    const socket=socketService.connect(user.id);  
+  socketService.subscribe({
       receiveMessage:(newMessage:Message)=>{
-        console.log('🔔 RECEIVE_MESSAGE EVENT FIRED with message:', newMessage);
-        // Use the ref instead of the state value
-        console.log('🔔 Current activeConversation (ref):', activeConversationRef.current?.id);
-        console.log('🔔 Message conversationId:', newMessage.conversationId);
-        
+        console.log('receive_message event fired with message:',newMessage);
         processNewMessage(newMessage);
       },
       
@@ -258,111 +213,84 @@ export const useChat=()=>{
           prevConversations.map(conv=>({
             ...conv,
             participants:conv.participants.map(p=> 
-              p.user.id===userId?{...p, isOnline }:p
+              p.user.id===userId?{...p,isOnline}:p
             )
           }))
         );
       },
       
       userTyping:({conversationId,userId,isTyping})=>{
-        if (activeConversationRef.current?.id === conversationId && userRef.current && userId !== userRef.current.id) {
-          setTypingUsers(prev => ({ ...prev, [userId]: isTyping }));
+        if(activeConversationRef.current?.id===conversationId && userRef.current && userId!==userRef.current.id){
+          setTypingUsers(prev=>({ ...prev,[userId]:isTyping}));
         }
+      },
+      messageError:({error})=>{
+        console.error('message error:',error);
+        setError(error);
       }
     });
-    
-    console.log("📋 About to call loadConversations");
     loadConversations().catch(err => {
-      console.error("❌ Error in loadConversations:", err);
+      console.error("error in loadConversations:",err);
     });
     
-    return () => {
-      console.log("🧹 Cleaning up socket connection");
+    return ()=>{
       socket.off('receive_message');
       socketService.disconnect();
     };
-  }, [user]);
+  },[user]);
 
-  const processNewMessage = (newMessage: Message) => {
-    console.log('🔄 Processing new message:', newMessage);
-    
-    // First check to make sure we're not missing any required data
-    if (!newMessage || !newMessage.conversationId || !newMessage._id) {
-      console.error('❌ Invalid message received:', newMessage);
+  const processNewMessage=(newMessage:Message)=>{
+    if(!newMessage || !newMessage.conversationId || !newMessage._id){
+      console.error('invalid message received:',newMessage);
       return;
     }
-    
-    // Check if we've already processed this message ID
-    if (processedMessageIds.has(newMessage._id)) {
-      console.log('🔄 Message already processed, skipping:', newMessage._id);
+    if(processedMessageIds.has(newMessage._id)){
+      console.log('message already processed:',newMessage._id);
       return;
-    }
-    
-    // Add this message ID to the processed set
+      }
     processedMessageIds.add(newMessage._id);
-    console.log('🔄 Adding message to processed set:', newMessage._id);
-    
-    // Use the ref instead of the state value
-    const currentActiveConversation = activeConversationRef.current;
-    const currentUser = userRef.current;
-    
-    // Get the active conversation ID from the ref
-    const activeConvId = currentActiveConversation?.id;
-    
-    console.log('🔄 Active conversation ID (from ref):', activeConvId);
-    console.log('🔄 Message conversation ID:', newMessage.conversationId);
-    
-    // Important: Do a direct string comparison
-    const isForActiveConversation = activeConvId === newMessage.conversationId;
-    console.log('🔄 Is for active conversation?', isForActiveConversation);
-    
-    // Check if this message belongs to the current active conversation
-    if (isForActiveConversation) {
-      console.log('✅ Message is for current active conversation');
-      
-      setMessages(prevMessages => {
-        // Check for duplicate messages
-        if (prevMessages.some(msg => msg._id === newMessage._id)) {
-          console.log('⚠️ Duplicate message detected, skipping');
-          return prevMessages;
+    const currentUser=userRef.current;
+    const activeConvId=activeConversationRef.current?.id;
+    const isforActiveconverstation=activeConvId===newMessage.conversationId;
+    console.log('is for active conversation?',isforActiveconverstation);
+    if(isforActiveconverstation){
+      console.log('message is for current active conversation');
+      setMessages(prevmessages=>{
+        console.log('prevmessages',prevmessages);
+        if(prevmessages.some(msg=>msg._id===newMessage._id)){
+          console.log('duplicate message detected skipping');
+          return prevmessages;
         }
-        
-        // Check for temporary message to replace
-        const tempIndex = prevMessages.findIndex(msg => 
-          msg._id && msg._id.toString().startsWith('temp-') && 
-          msg.sender._id === newMessage.sender._id &&
-          msg.content === newMessage.content
+        const tempIndex=prevmessages.findIndex(msg=> 
+          msg._id && msg._id.startsWith('temp-') && 
+          msg.sender._id===newMessage.sender._id &&
+          msg.content===newMessage.content
         );
         
-        if (tempIndex >= 0) {
-          console.log('🔄 Replacing temp message with real one at index:', tempIndex);
-          const newMessages = [...prevMessages];
-          newMessages[tempIndex] = newMessage;
+        if(tempIndex>=0){
+          console.log('replacing temp message with realone at index:',tempIndex);
+          const newMessages=[...prevmessages];
+          newMessages[tempIndex]=newMessage;
           return newMessages;
         }
-        
-        console.log('➕ Adding new message to state, messages count:', prevMessages.length + 1);
-        return [...prevMessages, newMessage];
+        console.log('adding new message to state, messages count:',prevmessages.length+1);
+        return [...prevmessages,newMessage];
       });
-      
-      // Mark messages as read if they're from another user
-      if (currentUser?.id && currentUser.id !== newMessage.sender._id) {
-        console.log('📝 Marking messages as read');
+      if(currentUser?.id && currentUser.id!==newMessage.sender._id){
+        console.log('marking messages as read');
         markMessagesAsRead();
       }
-    } else {
-      console.log('❌ Message is NOT for current active conversation');
-      
-      // If this message is for another conversation, update the unread count
-      if (currentUser?.id && currentUser.id !== newMessage.sender._id) {
-        console.log('🔔 Incrementing unread count for other conversation');
-        setUnreadCount(prev => prev + 1);
+    }else{
+      console.log('message is not for current active conversation');
+      if(currentUser?.id && currentUser.id!==newMessage.sender._id){
+        console.log('increment unread count for other conversation');
+        setundreadCcount(prev=>prev+1);
       }
     }
   };
 
   // Add cleanup function for processedMessageIds to prevent memory leaks
-  useEffect(() => {
+  useEffect(()=>{
     // Clean up processed message IDs periodically (every 5 minutes)
     const cleanupInterval = setInterval(() => {
       // Only keep the last 100 message IDs to prevent memory leaks

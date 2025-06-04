@@ -68,7 +68,7 @@ const MessageService={
           read:false 
         },
         {$set:{read:true}}
-      );
+      );;
       
       return result.modifiedCount;
     }catch(err){  
@@ -117,6 +117,23 @@ const MessageService={
         const error=new Error('');
          
       throw new Error(`Error getting unread message count: ${error.message}`);
+    }
+  },
+   getmessagebyID:async(messageid)=>{
+    try{
+      const message=await Message.findById(messageid)
+      .populate('sender')
+      .lean();
+      if(!message){
+        return null;
+      }
+      return message;
+    }catch(err){
+      const error=new Error('Failed to get message by ID');
+      error.status=500;
+      error.message='Failed to get message by ID';
+      error.name='MessageServiceError';
+      throw error;
     }
   }
 }
