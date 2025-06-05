@@ -1,47 +1,14 @@
 import { apiClient, extractErrorDetails } from './apiClient';
+import {adaptmessage, adaptmessageforapi, messageApi as messageapi,messagesApi} from '../adapters/messagesAdapter';
+import { Message } from '@/components/Profile/types';
 
-export interface Message{
-  _id: string;
-  conversationId:string;
-  sender:{
-    _id:string;
-    name?:string;
-    email?:string;
-    profilePicture?:string;
-  };
-  content:string;
-  read:boolean;
-  createdAt:string;
-  updatedAt:string;
-}
-
-export interface MessageResponse{
-  success:boolean;
-  data?:Message;
-  message?:string;
-}
-
-export interface MessagesResponse{
-  success:boolean;
-  messages:Message[];
-  totalMessages:number;
-  totalPages:number;
-  currentPage:number;
-}
-
-export interface UnreadCountResponse{
-  success: boolean;
-  unreadCount: number;
-}
 
 const messageApi={
-  sendMessage:async(conversationId:string,sender:string,content:string)=>{
+  sendMessage:async(payload:Partial<Message>)=>{
     try{
-      return await apiClient.post<MessageResponse>('/messages/send-message',{
-        conversationId,
-        sender,
-        content
-      });
+      const formattedpayload=adaptmessageforapi(payload);
+      const response=await apiClient.post<messagesApi>('/messages/send-message',formattedpayload);
+      return adaptmessage(response);
     }catch(error){
       console.error('Error sending message:', extractErrorDetails(error));
       throw error;
@@ -54,9 +21,15 @@ const messageApi={
     limit:number=20
   )=>{
     try{
-      return await apiClient.get<MessagesResponse>(
+      const response=await apiClient.get<messageapi>(
         `/conversations/get-conversation-messages/${conversationId}?page=${page}&limit=${limit}`
       );
+      return{
+        messages:response.messages.map(adaptmessage),
+        totalMessages:response.totalMessages,
+        totalPages:response.totalPages,
+        currentPage:response.currentPage,
+      }
     }catch(error){
       console.error('Error fetching messages:', extractErrorDetails(error));
       throw error;
@@ -86,10 +59,9 @@ const messageApi={
 
   getUnreadMessageCount: async()=>{
     try{
-      const response=await apiClient.get<UnreadCountResponse>(`/messages/get-unread-message`);
-      console.log('response',response);
-      return response;
-    } catch (error) {
+      const response=await apiClient.get<{success:boolean;unreadCount:number}>(`/messages/get-unread-message`);
+      return response.unreadCount;
+    }catch(error){
       console.error('error getting unread count:', extractErrorDetails(error));
       throw error;
     }

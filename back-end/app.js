@@ -41,7 +41,7 @@ const io=socketIo(server,{
     methods:['GET','POST'],
     credentials: true
   }
-});;
+});;;
 
 io.on('connection',(socket)=>{
   console.log('new client connected', socket.id);
@@ -52,11 +52,8 @@ io.on('connection',(socket)=>{
     socket.activeRooms.add(conversationId);
     console.log(`User ${socket.userId} joined conversation: ${conversationId}`);
     console.log(`Socket ${socket.id} rooms: `, Array.from(socket.rooms));
-    
-    // Notify others in the room that someone joined
-    socket.to(conversationId).emit('user_joined', { userId: socket.userId, conversationId });
+    socket.to(conversationId).emit('user_joined',{userId:socket.userId,conversationId});
   });
-  
   socket.on('leave_conversation',(conversationId)=>{
     socket.leave(conversationId);
     socket.activeRooms.delete(conversationId);
@@ -64,7 +61,7 @@ io.on('connection',(socket)=>{
   });;
   
   socket.on('user_online',async(userId)=>{
-    console.log("User online: ", userId);
+    console.log("User online: ",userId);
     if(userId){
       await conversationService.updateUserOnlineStatus(userId,true);
       socket.userId=userId;
@@ -85,12 +82,23 @@ io.on('connection',(socket)=>{
         conversationId,
         sender,
         content
-      });
+      });;
       const populatedmessage=await messageService.getmessagebyID(newMessage._id);
-      
+      const countunreadconverstation=await conversationService.getunreadMessageCount(sender,conversationId);
+      console.log('countunreadconverstation',countunreadconverstation);
       console.log(' New message created:', newMessage);;
       console.log(`Broadcasting to room ${conversationId}`);;
+      // if(socket.activeRooms.has(conversationId)){
+        console.log('user in conversation');
         io.to(conversationId).emit('receive_message', populatedmessage);
+      // }else{
+        console.log('user not in conversation');
+        io.emit('recieve_message_outside_conversation',{
+          lastmessage:populatedmessage.content,
+          conversationId,
+          unreadCount:countunreadconverstation
+        });;
+      // }
     }catch(error){
       console.error('error sending message:',error);
       socket.emit('message_error',{error:error.message});
@@ -121,10 +129,11 @@ io.on('connection',(socket)=>{
     console.log('Client disconnected', socket.id);
     if (socket.userId) {
       await conversationService.updateUserOnlineStatus(socket.userId, false);
-      io.emit('user_status_change', { userId: socket.userId, isOnline: false });
+      io.emit('user_status_change',{userId: socket.userId, isOnline: false });
+      
     }
   });
-});;;;
+});;;;;
 
 server.listen(port,()=>{
   console.log(`Server is running at port: ${port}`);

@@ -101,11 +101,22 @@ export interface converstation{
   id:string;
   participants:Participant[];
   createdAt:Date;
-  updatedAt:Date;
+  updatedAt:Date; 
+  unreadCount:number;
+  lastMessage:string|null;
 }
 export interface Participant{
   user:UserProfile;
   isOnline:boolean;
+}
+export interface Message{
+  id:string;
+  content:string;
+  sender:UserProfile;
+  conversationId:string;
+  createdAt:Date;
+  updatedAt:Date;
+  read:boolean;
 }
 
 export interface BaseProfileSectionProps {

@@ -10,6 +10,8 @@ export interface conversationApi{
         participants:ParticipantApi[];
         createdAt:string;
         updatedAt:string;
+        unreadCount:number;
+        lastMessage:string|null;
     };
 }
 export interface conversationApiarray{
@@ -20,6 +22,8 @@ export interface conversationApiarray{
         participants:ParticipantApi[];
         createdAt:string;
         updatedAt:string;
+        unreadCount:number;
+        lastMessage:string|null;
     }[];
 }
 
@@ -38,7 +42,9 @@ export const adaptConverstation=(conversation:conversationApi):converstation=>{
             isOnline:participant.isOnline
         }))||[],
         createdAt:new Date(conversation.conversations?.createdAt||''),
-        updatedAt:new Date(conversation.conversations?.updatedAt||'')
+        updatedAt:new Date(conversation.conversations?.updatedAt||''),
+        unreadCount:conversation.conversations?.unreadCount||0,
+        lastMessage:conversation.conversations?.lastMessage||null
     }
 }
 export const adaptconversationforapi=(converstation:Partial<converstation>):Partial<conversationApi>=>{
@@ -50,7 +56,9 @@ export const adaptconversationforapi=(converstation:Partial<converstation>):Part
             _id:converstation.id||'',
             participants:[],
             createdAt:converstation.createdAt?.toISOString()||'',
-            updatedAt:converstation.updatedAt?.toISOString()||''
+            updatedAt:converstation.updatedAt?.toISOString()||'',
+            unreadCount:converstation.unreadCount||0,
+            lastMessage:converstation.lastMessage||null
         }
     }
     if(converstation.participants!==undefined) converstationapi.conversations!.participants=converstation.participants
@@ -68,6 +76,7 @@ export const adaptconversationforapi=(converstation:Partial<converstation>):Part
 export const safeadaptconverstation=(conversation:conversationApi|conversationApiarray):any=>{
     console.log('conversation from safeadaptconverstation',conversation);
     if(Array.isArray(conversation.conversations)){
+        console.log('conversation is array',conversation);
         return (conversation as conversationApiarray).conversations?.map(conv=>{
             return{
                 id:conv._id,
@@ -76,7 +85,9 @@ export const safeadaptconverstation=(conversation:conversationApi|conversationAp
                     isOnline:participant.isOnline
                 })),
                 createdAt:new Date(conv.createdAt),
-                updatedAt:new Date(conv.updatedAt)
+                updatedAt:new Date(conv.updatedAt),
+                unreadCount:conv.unreadCount||0,
+                lastMessage:conv.lastMessage||null
             }
         });
     }

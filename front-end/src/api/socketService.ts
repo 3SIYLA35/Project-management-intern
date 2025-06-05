@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
-import { Message } from './messageApi';
+import { Message } from '../components/Profile/types';
 import { use } from 'react';
+import { messagesApi } from '@/adapters/messagesAdapter';
 
 let socket: Socket|null=null;
 
@@ -11,12 +12,13 @@ const SERVICE_ID = Math.random().toString(36).substring(2, 9);
 let activerooms=new Set<string>();
 
 export type SocketEventHandlers={
-  receiveMessage?:(message: Message)=>void;
+  receiveMessage?:(message:messagesApi)=>void;
   messagesRead?:(data:{conversationId:string;userId:string })=>void;
   userStatusChange?:(data:{ userId:string;isOnline:boolean})=>void;
   userTyping?:(data:{conversationId:string;userId:string;isTyping:boolean})=>void;
   messageError?:(error:{error:string})=>void;
   connect?():void;
+  recieveMessageOutsideConversation?:(data:{lastmessage:string;conversationId:string;unreadCount:number})=>void;
   disconnect?():void;
 };
 
@@ -30,111 +32,100 @@ const socketService={
         console.log(`socketService:${SERVICE_ID} emitting user_online event for user:`,userId);
         socket?.emit('user_online',userId);
         
-        // Rejoin all active rooms on reconnect
-        if (activerooms.size > 0) {
-          console.log(`🔄 [socketService:${SERVICE_ID}] Rejoining ${activerooms.size} rooms after reconnect`);
+        // rejoin all active rooms on reconnect
+        if(activerooms.size>0){
+          console.log(`socketService:${SERVICE_ID} Rejoining ${activerooms.size} rooms after reconnect`);
           activerooms.forEach(roomId => {
-            console.log(`🚪 [socketService:${SERVICE_ID}] Rejoining room:`, roomId);
+            console.log(`socketService:${SERVICE_ID} Rejoining room:`, roomId);
             socket?.emit('join_conversation', roomId);
           });
         }
       });
       
       socket.on('reconnect', () => {
-        console.log(`🔄 [socketService:${SERVICE_ID}] Socket reconnected with ID:`, socket?.id);
-        console.log(`📤 [socketService:${SERVICE_ID}] Re-emitting user_online event for user:`, userId);
+        console.log(`socketService:${SERVICE_ID}] Socket reconnected with ID:`,socket?.id);
+        console.log(`socketService:${SERVICE_ID}] Re-emitting user_online event for user:`,userId);
         socket?.emit('user_online', userId);
       });
       
       if (socket) {
-        socket.on('connect_error', (error) => {
-          console.error(`🔴 [socketService:${SERVICE_ID}] Socket connection error:`, error.message);
+        socket.on('connect_error', (error)=>{
+          console.error(`socketService:${SERVICE_ID} Socket connection error:`, error.message);
         });
       }
     } else {
-      console.log(`⚠️ [socketService:${SERVICE_ID}] Socket already connected, reusing existing connection`);
+      console.log(`socketService:${SERVICE_ID} Socket already connected`);
     }
     
     socket.on('disconnect',()=>{
-      console.log(`❌ [socketService:${SERVICE_ID}] Socket disconnected`);
-    });
-    
+      console.log('socket disconnected');
+    })
     return socket;
   },
-  
   disconnect:():void=>{
     if(socket){
-      console.log("🔌 Disconnecting socket");
       socket.disconnect();
       socket=null;
     } else {
-      console.log("⚠️ No socket to disconnect");
+      console.log("no  socket to disconnect");
     }
   },
   
   subscribe:(eventHandlers:SocketEventHandlers):void=>{
     if(!socket){
-      console.error('❌ Socket not connected. Call connect() first');
+      console.error('socket not connected Call connect() first');
       return;
     }
     
-    console.log("🎧 Setting up event handlers:", Object.keys(eventHandlers).join(', '));
     
     if(eventHandlers.receiveMessage){
-      console.log("🎧 Subscribing to 'receive_message' event");
       socket.off('receive_message');
       socket.on('receive_message', (data) => {
         console.log("📩 Raw 'receive_message' event received:", data);
         eventHandlers.receiveMessage?.(data);
       });
     }
-    
     if(eventHandlers.messagesRead){
-      console.log("🎧 Subscribing to 'messages_read' event");
       socket.on('messages_read',eventHandlers.messagesRead);
     }
     if(eventHandlers.userStatusChange){
-      console.log("🎧 Subscribing to 'user_status_change' event");
       socket.on('user_status_change',eventHandlers.userStatusChange);
     }    
     if(eventHandlers.userTyping){
-      console.log("🎧 Subscribing to 'user_typing' event");
       socket.on('user_typing', eventHandlers.userTyping);
     }
     
     if(eventHandlers.messageError){
-      console.log("🎧 Subscribing to 'message_error' event");
       socket.on('message_error',eventHandlers.messageError);
     }
     if(eventHandlers.connect){
-      console.log("🎧 Subscribing to 'connect' event");
       socket.on('connect',eventHandlers.connect);
+    }
+    if(eventHandlers.recieveMessageOutsideConversation){
+      socket.on('recieve_message_outside_conversation',eventHandlers.recieveMessageOutsideConversation);
     }
     
     if(eventHandlers.disconnect){
-      console.log("🎧 Subscribing to 'disconnect' event");
       socket.on('disconnect', eventHandlers.disconnect);
     }
   },
   
   unsubscribe:(eventName:string):void=>{
     if(!socket){
-      console.error('❌ Socket not connected. Call connect() first');
+      console.error('socket not connected Call connect() first');
       return;
     }
     
-    console.log(`🔕 Unsubscribing from '${eventName}' event`);
     socket.off(eventName);
   },
   
   
   joinConversation:(conversationId:string):void=>{
     if(!socket){
-      console.error(`❌ [socketService:${SERVICE_ID}] Socket not connected. Call connect() first`);
+      console.error('socket not connected Call connect() first');
       return;
     }
     
-    console.log(`🚪 [socketService:${SERVICE_ID}] Joining conversation room:`, conversationId);
     socket.emit('join_conversation', conversationId);
     activerooms.add(conversationId);
   },

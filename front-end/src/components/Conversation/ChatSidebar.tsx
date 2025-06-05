@@ -23,21 +23,17 @@ const ChatSidebar:React.FC=()=>{
     }=useChatContext();
 
     useEffect(()=>{
-      console.log('conversations',conversations);
+      console.log('conversations---------------',conversations);
     },[]);
   const {profile}=useProfile();
   const user=profile;
   const [searchQuery,setSearchQuery]=useState('');
   const [showNewChatModal,setShowNewChatModal]=useState(false);
   const [newChatParticipantId,setNewChatParticipantId]=useState('');
-
-  const filteredConversations=searchQuery
-    ?conversations.filter(conv=>{
-        return conv.participants.some((p:Participant)=> 
-          p.user.id!==user?.id && p.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      })
-    : conversations;
+  const [filteredConversations,setFilteredConversations]=useState(conversations);
+  const [todayConversations,setTodayConversations]=useState<converstation[]>([]);
+  const [yesterdayConversations,setYesterdayConversations]=useState<converstation[]>([]);
+  const [olderConversations,setOlderConversations]=useState<converstation[]>([]);
 
   // Select a conversation
   const handleSelectConversation=(conversation:converstation)=>{
@@ -130,29 +126,45 @@ const ChatSidebar:React.FC=()=>{
     );
   };
 
-  // Group conversations by recency
-  const todayConversations = filteredConversations.filter(conv => {
-    const date = new Date(conv.updatedAt);
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  });
-
-  const yesterdayConversations = filteredConversations.filter(conv => {
-    const date = new Date(conv.updatedAt);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return date.toDateString() === yesterday.toDateString();
-  });
-
-  const olderConversations = filteredConversations.filter(conv => {
-    const date = new Date(conv.updatedAt);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return date.toDateString() !== today.toDateString() && 
-           date.toDateString() !== yesterday.toDateString();
-  });
+  useEffect(()=>{
+    console.log('conversations use effetct2---------------',conversations);
+    setFilteredConversations(conversations);
+  },[conversations]);
+  
+  // Separate useEffect to process categorized conversations after filteredConversations is set
+  useEffect(() => {
+    // Process categorized conversations
+    const processConversations = () => {
+      const filtredconv = filteredConversations;
+      
+      // Set today's conversations
+      setTodayConversations(filtredconv.filter(conv=>{
+        const date=new Date(conv.updatedAt);
+        const today=new Date();
+        return date.toDateString()===today.toDateString();
+      }));
+      
+      // Set yesterday's conversations
+      setYesterdayConversations(filtredconv.filter(conv=>{  
+        const date=new Date(conv.updatedAt);
+        const today=new Date();
+        const yesterday=new Date(today);
+        yesterday.setDate(yesterday.getDate()-1);
+        return date.toDateString()===yesterday.toDateString();
+      }));
+      
+      // Set older conversations
+      setOlderConversations(filtredconv.filter(conv=>{
+        const date=new Date(conv.updatedAt);
+        const today=new Date();
+        const yesterday=new Date(today);
+        yesterday.setDate(yesterday.getDate()-1);
+        return date.toDateString()!==today.toDateString() && date.toDateString()!==yesterday.toDateString();
+      }));
+    };
+    
+    processConversations();
+  }, [filteredConversations]);
 
   if (loading){
   // console.log('loading',loading);
@@ -169,7 +181,7 @@ const ChatSidebar:React.FC=()=>{
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
         <h2 className="text-lg font-semibold flex items-center">
           Messages
-          {unreadCount > 0 && (
+          {unreadCount>0&& (
             <span className="ml-2 bg-blue-600 text-xs rounded-full px-2 py-0.5">
               {unreadCount}
             </span>
@@ -229,9 +241,9 @@ const ChatSidebar:React.FC=()=>{
                         />
                       
                     </div>
-                    {/* {getOtherParticipants(conversation)[0]?.isOnline && (
+                    {getOtherParticipants(conversation)[0]?.isOnline && (
                       <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-850"></div>
-                    )} */}
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between">
@@ -240,24 +252,23 @@ const ChatSidebar:React.FC=()=>{
                       </h3>
                       <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString() )}</span>
                     </div>
-                    <div className="flex items-center mt-1">
+                    <div className="flex items-center justify-between mt-1">
                       {isTypingInConversation(conversation) ? (
                         <p className="text-xs text-gray-400 truncate">
                           <TypingIndicator userName={getOtherParticipants(conversation)[0]?.user?.name} />
                         </p>
-                      ) : (
+                      ):(
                         <p className="text-xs text-gray-400 truncate">
-                          {/* This would display the last message text */}
-                          {/* {conversation.lastMessage?.text || 'No messages yet'} */}
+                          {conversation.lastMessage||''}
                         </p>
                       )}
-                      {hasUnreadMessages(conversation) && (
-                        <div className="ml-auto">
+                      {conversation.unreadCount>0?(
+                        
                           <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
-                            {countUnreadMessages(conversation)}
+                            {conversation.unreadCount||''}
                           </span>
-                        </div>
-                      )}
+                        
+                      ):''}
                     </div>
                   </div>
                 </div>
@@ -290,7 +301,7 @@ const ChatSidebar:React.FC=()=>{
                       <h3 className="text-sm font-medium text-white truncate">
                         {getOtherParticipants(conversation).map(p => p.user?.name || 'User').join(' & ')}
                       </h3>
-                      <span className="text-xs text-gray-500">{formatMessageTime(conversation.updatedAt.toISOString())}</span>
+                      <span className="text-xs text-gray-500">{formatMessageTime(conversation?.updatedAt?.toISOString()||'')}</span>
                     </div>
                     <div className="flex items-center mt-1">
                       <p className="text-xs text-gray-400 truncate">

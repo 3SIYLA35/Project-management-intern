@@ -1,5 +1,6 @@
-const Conversation = require('../Models/conversation');
-const User = require('../Models/USERS');;
+const Conversation=require('../Models/conversation');
+const User=require('../Models/USERS');
+const Message=require('../Models/messages');
 
 const  ConversationService={
    createConversation:async(participants)=>{
@@ -29,7 +30,29 @@ const  ConversationService={
       if(!conversations){
         return [];
       }
-      return conversations;
+      console.log('conversations',conversations);
+      const conversttionwithids=await Promise.all(conversations.map(async conv=>{
+        const count=await Message.countDocuments({
+               conversationId:conv._id,
+               sender:{$ne:userId},
+               read:false
+        });
+        const lastmessage=await Message.findOne({
+          conversationId:conv._id,
+          sender:{$ne:userId},
+          read:false
+        }).sort({createdAt:-1});
+        return{
+          _id:conv._id,
+          participants:conv.participants,
+          createdAt:conv.createdAt,
+          updatedAt:conv.updatedAt,
+          unreadCount:count,
+          lastMessage:lastmessage?.content||null
+        }
+      }));
+      console.log('conversttionwithids',conversttionwithids);
+      return conversttionwithids;
     }catch(err){
       const error=new Error('Failed to get user conversations');
       error.status=500;
@@ -104,6 +127,23 @@ const  ConversationService={
       const error=new Error('Failed to delete conversation');
       error.status=500;
       error.message='Failed to delete conversation';
+      error.name='ConversationServiceError';
+      throw error;
+    }
+  },
+  getunreadMessageCount:async(userId,conversationId)=>{
+    try{
+      const count=await Message.countDocuments({
+        read:false,
+        sender:userId,
+        conversationId:conversationId
+      });
+      console.log('count',count);
+      return count;
+    }catch(err){
+      const error=new Error('Failed to get unread message count');
+      error.status=500;
+      error.message='Failed to get unread message count';
       error.name='ConversationServiceError';
       throw error;
     }

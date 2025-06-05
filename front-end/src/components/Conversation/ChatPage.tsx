@@ -3,7 +3,7 @@ import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 import './ChatStyles.css';
 import { converstation } from '../Profile/types';
-import { Message } from '../../api/messageApi';
+import { Message } from '../Profile/types';
 
 interface chatpageProps{
   selectedChat:string;
