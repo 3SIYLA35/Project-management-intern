@@ -35,23 +35,21 @@ export default function Dashboard() {
   
   const projectContext=useProjectContext();
   const {projects}=projectContext;
-
-  // Mock tasks data
-  const [tasks, setTasks] = useState([
+  const [tasks,setTasks]=useState([
     {
       id: '1',
-      name: 'Return a package',
+      name: 'return a package',
       status: 'to_do' as 'to_do',
       dueDate: '05 • 08',
       assignees: [
-        { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
+        { id: '1',name:'User 1',avatar:'/img/avatar-1.jpg' },
       ],
       comments: 3,
       attachments: 2
     },
     {
       id: '2',
-      name: 'Help Dstudio get more customers',
+      name: 'return slide components',
       status: 'in_progress' as 'in_progress',
       dueDate: '07 • 02',
       assignees: [
@@ -62,7 +60,7 @@ export default function Dashboard() {
     },
     {
       id: '3',
-      name: 'Plan a trip',
+      name: 'return auth api',
       status: 'in_progress' as 'in_progress',
       dueDate: '10 • 03',
       assignees: [
@@ -84,8 +82,7 @@ export default function Dashboard() {
     }
   ]);
 
-  // Mock meetings data
-  const [meetings, setMeetings] = useState([
+  const [meetings,setMeetings]=useState([
     {
       id: '1',
       title: 'Kickoff meeting',
@@ -118,32 +115,32 @@ export default function Dashboard() {
       id: '1',
       sender: {
         id: 'fm1',
-        name: 'Floyd Miles',
+        name: 'haytham lkbir',
         avatar: '/img/avatar-1.jpg'
       },
-      text: "Yes, I've taken a look at the concepts. Overall, they're solid, but I have...",
+      text: "Yes i am trying to do...",
       time: '10 minutes ago'
     },
     {
       id: '2',
       sender: {
         id: 'mm2',
-        name: 'Marvin McKinney',
+        name: 'ilyas toubi',
         avatar: '/img/avatar-2.jpg'
       },
-      text: "Discuss the MVP version of Apex Mobile and Desktop app.",
+      text: "okii ca marche",
       time: '1 hour ago'
     },
     {
       id: '3',
       sender: {
         id: 'tf3',
-        name: 'Thomas L. Fletcher',
+        name: 'amina lmekaoui',
         avatar: '/img/avatar-3.jpg'
       },
-      text: "",
+      text: "oki j'arrive",
       time: '2 hours ago',
-      isMissedCall: true
+      isMissedCall: false
     }
   ]);
   

@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const context=useProfile();
-  const {fetchallemployee}=context;
+  const {fetchallemployee,profile}=context;
   // Close profile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({
           <PlusIcon className="h-5 w-5 mr-1" />
           Add
         </button>
-        
+  
         {/* Time Tracker Button */}
         <button 
           className="ml-4 text-gray-300 hover:text-white p-2 rounded-full hover:bg-gray-700"
@@ -115,8 +115,8 @@ const Header: React.FC<HeaderProps> = ({
             onClick={handleProfileMenuToggle}
           >
             <img
-              className="h-8 w-8 rounded-full border-2 border-purple-500"
-              src="https://via.placeholder.com/40"
+              className="h-8 w-8 rounded-full border-2"
+              src={profile?.avatar}
               alt="User profile"
             />
           </button>

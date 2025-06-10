@@ -271,7 +271,7 @@ export default function ProjectDashboard() {
                             {columns.assigned && (
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex -space-x-2">
-                                  {project?.members?.slice(0, 3).map((member, index) => (
+                                  {project?.members?.slice(0, 3).map((member, index)=>(
                                     <img 
                                       key={index} 
                                       src={member.avatar} 
