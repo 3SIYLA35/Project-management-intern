@@ -16,8 +16,8 @@ const viewtoggle:React.FC<ViewtoggleProps>=({
         <div className="flex items-center space-x-2">
           <div className="bg-gray-700 rounded-lg p-1 flex">
             <button
-              className={`p-1.5 rounded-md ${viewmode === 'grid' ? 'bg-gray-600 text-white' : 'text-gray-400'}`}
-              onClick={() => onviewchange('grid')}
+              className={`p-1.5 rounded-md ${viewmode==='grid'?'bg-gray-600 text-white':'text-gray-400'}`}
+              onClick={()=>onviewchange('grid')}
               title="Grid"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -28,8 +28,8 @@ const viewtoggle:React.FC<ViewtoggleProps>=({
               </svg>
             </button>
             <button
-              className={`p-1.5 rounded-md ${viewmode === 'list' ? 'bg-gray-600 text-white' : 'text-gray-400'}`}
-              onClick={() => onviewchange('list')}
+              className={`p-1.5 rounded-md ${viewmode==='list'?'bg-gray-600 text-white':'text-gray-400'}`}
+              onClick={()=>onviewchange('list')}
               title="List"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

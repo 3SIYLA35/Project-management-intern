@@ -101,7 +101,7 @@ const ProjectDetailPanel: React.FC<ProjectDetailProps>=({isOpen,onClose,project}
     }
   },[project,fetchComments]);
   
-  //initial fetch
+ 
   useEffect(()=>{
     refreshComments();
   },[project]);

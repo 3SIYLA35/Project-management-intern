@@ -204,12 +204,12 @@ export default function ProjectDashboard() {
                               )}
                             </div>
                             <div>
-                              {/* <span className={`text-xs px-2 py-1 rounded-full bg-${
-                                project?.priority === 'high' ? 'red' : 
-                                project?.priority === 'medium' ? 'yellow' : 'green'
+                            <span className={`text-xs px-2 py-1 rounded-full bg-${
+                                project?.status==='in_progress'?'yellow' : 
+                                project?.status==='completed'?'green':'blue'
                               }-500 text-white`}>
-                                {project.priority.charAt(0).toUpperCase() + project.priority.slice(1)}
-                              </span> */}
+                                {project?.status!.charAt(0).toUpperCase() + project?.status!.slice(1)}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -308,16 +308,16 @@ export default function ProjectDashboard() {
                             )}
                             {columns.lastmodified && (
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-300">{project?.endDate.toLocaleDateString()}</div>
+                                {/* <div className="text-sm text-gray-300">{project?.endDate.toLocaleDateString()}</div> */}
                               </td>
                             )}
                             <td className="px-6 py-4 whitespace-nowrap">
-                              {/* <span className={`text-xs px-2 py-1 rounded-full bg-${
-                                project?.priority === 'high' ? 'red' : 
-                                project?.priority === 'medium' ? 'yellow' : 'green'
+                              <span className={`text-xs px-2 py-1 rounded-full bg-${
+                                project?.status==='in_progress'?'yellow' : 
+                                project?.status==='completed'?'green':'blue'
                               }-500 text-white`}>
-                                {project?.priority?.charAt(0).toUpperCase() + project?.priority?.slice(1)}
-                              </span> */}
+                                {project?.status!.charAt(0).toUpperCase() + project?.status!.slice(1)}
+                              </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                               <button className="text-gray-400 hover:text-white px-2">

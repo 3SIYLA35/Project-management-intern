@@ -4,10 +4,16 @@ const taskmodel=require('../Models/tasks');
     createtask:async(taskdata,iduser)=>{
         try{
             console.log("taskdata",taskdata);
-            const {name,description,status,priority,startDate,dueDate,projectId,assignedTo,sprintId}=taskdata;
-            const projecctiid=projectId.id;
-            const sprintidd=sprintId.id;
-            const assignedtooid=assignedTo.id;
+            const {name,description,status,priority,startDate,dueDate,projectId,assignedTo,sprintId}=taskdata.task;
+            console.log("projectId",projectId);
+            console.log("assignedTo",assignedTo);
+            let sprintidd=null;
+            if(sprintId && typeof sprintId._id==='string'){
+                sprintidd=new mongoose.Types.ObjectId(sprintId);
+            }
+            console.log("sprintId",sprintidd);
+            const projecctiid=projectId.id;;
+            const assignedtooid=assignedTo._id;
             const  task=await taskmodel.create({
                 name,
                 description,

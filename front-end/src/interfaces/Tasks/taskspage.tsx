@@ -14,13 +14,13 @@ import {Task} from '../../components/Profile/types';
 import { useCommentContext } from '../../Contexts/CommentContext';
 
 export default function TasksPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [viewmode, setViewmode] = useState<'grid' | 'list'>('list');
-  const [showfilters, setShowfilters] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [showTaskDetail, setShowTaskDetail] = useState(false);
-  const navigate = useNavigate();
+  const [searchTerm,setSearchTerm]=useState('');
+  const [filter,setFilter]=useState('all');
+  const [viewmode,setViewmode]=useState<'grid'|'list'>('list');
+  const [showfilters,setShowfilters]=useState(false);
+  const [selectedTask,setSelectedTask]=useState<Task|null>(null);
+  const [showTaskDetail,setShowTaskDetail]=useState(false);
+  const navigate=useNavigate();
   const CommentCOntext=useCommentContext();
   const fetchcomments=CommentCOntext?.fetchcomments;
 

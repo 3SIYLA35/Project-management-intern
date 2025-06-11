@@ -13,12 +13,13 @@ const taskSchema=new mongoose.Schema({
         type:String,
         enum:['pending','in_progress','completed','cancelled'],
         default:'pending',
-        required:true
+        required:false
     },
     priority:{
         type:String,
         enum:['low','medium','high'],
         default:'medium',
+        required:false
     },
     startDate:{
         type:Date,
@@ -46,8 +47,8 @@ const taskSchema=new mongoose.Schema({
     sprintId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'sprints',
-        required:true
+        required:false
     },
 }, {timestamps:true});
 
-module.exports=mongoose.model('tasks',taskSchema);
+module.exports=mongoose.model('tasks',taskSchema)

@@ -10,15 +10,10 @@ import { TaskApi } from "../api/Taskapi"
         try{
             setloading(true);
             const data=await TaskApi.createTask(task,attachment);
-            if(data){
-                settasks(prev=>[...(prev||[]),data])
+            await fetchmytasks();
+                console.log('daaaaaaaaaaaaaaaaaaaata',data);
+                // settasks(prev=>[...(prev||[]),data])
                 setloading(false);
-                return data;
-            }else{
-                seterror('failed to create task');
-                setloading(false);
-                return null;
-            }
 
         }catch(err){
             console.error('error on create task',err);

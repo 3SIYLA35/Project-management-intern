@@ -46,7 +46,7 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
             _id:task.id || '',
             name:task.name || '',
             description:task.description || '',
-            status:task.status || '',
+            status:'pending',
             priority:task.priority || '',
             startDate:task.startDate || new Date(),
             dueDate:task.dueDate || new Date(),
