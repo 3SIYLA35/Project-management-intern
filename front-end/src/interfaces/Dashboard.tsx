@@ -108,75 +108,73 @@ export default function Dashboard() {
       ]
     }
   ]);
-
-  // Mock communications data
-  const [communications, setCommunications] = useState([
+  const [communications,setCommunications]=useState([
     {
-      id: '1',
-      sender: {
-        id: 'fm1',
-        name: 'haytham lkbir',
-        avatar: '/img/avatar-1.jpg'
+      id:'1',
+      sender:{
+        id:'fm1',
+        name:'haytham lkbir',
+        avatar:'/img/avatar-1.jpg'
       },
-      text: "Yes i am trying to do...",
-      time: '10 minutes ago'
+      text:"Yes i am trying to do...",
+      time:'10 minutes ago'
     },
     {
       id: '2',
-      sender: {
-        id: 'mm2',
-        name: 'ilyas toubi',
-        avatar: '/img/avatar-2.jpg'
+      sender:{
+        id:'mm2',
+        name:'ilyas toubi',
+        avatar:'/img/avatar-2.jpg'
       },
-      text: "okii ca marche",
-      time: '1 hour ago'
+      text:"okii ca marche",
+      time:'1 hour ago'
     },
     {
       id: '3',
-      sender: {
-        id: 'tf3',
-        name: 'amina lmekaoui',
-        avatar: '/img/avatar-3.jpg'
+      sender:{
+        id:'tf3',
+        name:'amina lmekaoui',
+        avatar:'/img/avatar-3.jpg'
       },
-      text: "oki j'arrive",
-      time: '2 hours ago',
-      isMissedCall: false
+      text:"oki j'arrive",
+      time:'2 hours ago',
+      isMissedCall:false
     }
   ]);
   
-  const handleNavigation = (path: string) => {
+  const handleNavigation=(path:string)=>{
     navigate(path);
   };
   
-  const toggleProjectModal = () => {
+  const toggleProjectModal=()=>{
     setprojectmodal(!showProjectmodal);
   };
   
-  const toggleJumpToProject = () => {
+  const toggleJumpToProject=()=>{
     setShowJumpModal(!showJumpModal);
   };
   
-  const toggleTimeTracker = () => {
+  const toggleTimeTracker=()=>{
     setShowTimeTracker(!showTimeTracker);
   };
   
-  const handleViewProject = (project: Project) => {
+  const handleViewProject=(project:Project)=>{
     navigate(`/project/${project.id}`);
   };
 
-  const handleTaskClick = (taskId: string) => {
+  const handleTaskClick=(taskId:string)=>{
     navigate(`/tasks?id=${taskId}`);
   };
 
-  const handleViewAllTasks = () => {
+  const handleViewAllTasks=()=>{
     navigate('/tasks');
   };
 
-  const handleViewAllSchedule = () => {
+  const handleViewAllSchedule=()=>{
     navigate('/calendar');
   };
 
-  const handleViewAllCommunication = () => {
+  const handleViewAllCommunication=()=>{
     navigate('/conversation');
   };
 

@@ -10,18 +10,18 @@ interface State {
   error: Error | null;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
+class ErrorBoundary extends Component<Props,State>{
+  public state:State={
+    hasError:false,
+    error:null
   };
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+  static getDerivedStateFromError(error:Error):State{
+    return {hasError:true,error};
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+  componentDidCatch(error:Error,errorInfo:ErrorInfo){
+    console.error("Uncaught error:",error,errorInfo);
   }
 
   render() {

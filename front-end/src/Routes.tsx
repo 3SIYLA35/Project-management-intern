@@ -147,7 +147,6 @@ const AppRouter=()=> {
             </ProtectedRoute>
         }/>
 
-        {/* Default route - redirect to dashboard if authenticated, otherwise login */}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
       </ProfileProvider>
