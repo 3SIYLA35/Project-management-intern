@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "../components/ui/ui";
 import {jwtDecode} from 'jwt-decode';
 import { registerUser } from '../api/RegestrationService';
+import { Navigate, useNavigate } from 'react-router-dom';
 interface UserData{
     firstName?:string;
     lastName?:string;
@@ -16,6 +17,7 @@ interface UserData{
 }
 
 export default function Registration(){
+    const navigate=useNavigate();
     // const [registrevisible,setregistrevisible]=useState(false);
     const [userdata,setuserdata]=useState<UserData|null>(null);
     const [passwordsection,setpasswordsection]=useState(true);
@@ -205,7 +207,9 @@ export default function Registration(){
                 className="w-full  bg-green-300 text-white py-3 rounded-xl font-semibold 
                            hover:bg-green-400 transform transition-all duration-300 hover:scale-[1.02]  tracking-widest 
                            shadow-lg hover:shadow-purple-300"
-                >Select</button>
+               
+                  onClick={()=>navigate('/dashboard')}
+               >Select</button>
             </div>
           </>
         )}

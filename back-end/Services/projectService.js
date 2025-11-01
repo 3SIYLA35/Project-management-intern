@@ -11,6 +11,7 @@ const ProjectService={
     },
     getallprojects:async()=>{
         try{
+            console.log("fetching all projects");
             const projects=await projectmodel.find();
             return projects;
         }catch(err){

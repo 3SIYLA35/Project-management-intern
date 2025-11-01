@@ -1,10 +1,10 @@
 import { useProfile } from "../hooks/useProfile";
 import { Value } from "@radix-ui/react-select";
-import React, { createContext ,useContext} from "react";
+import React, { createContext ,useContext,memo} from "react";
 
 const ProfileContext=createContext<ReturnType<typeof useProfile>|undefined>(undefined);
 
-export const ProfileProvider=({children}:{children:React.ReactNode})=>{
+export const ProfileProvider=memo(({children}:{children:React.ReactNode})=>{
     const profileData=useProfile();
     return(
         <ProfileContext.Provider value={profileData}>
@@ -12,7 +12,7 @@ export const ProfileProvider=({children}:{children:React.ReactNode})=>{
         </ProfileContext.Provider>
     );
 
-}
+});
 
 export const useProfileContext=()=>{
     const context=useContext(ProfileContext);

@@ -26,8 +26,8 @@ export interface Project{
   id: string;
   name: string;
   description?:string;
-  startDate:Date;
-  endDate:Date;
+  startDate:string;
+  endDate:string;
   color?:string;
   role?:string;
   status?:string;
@@ -47,8 +47,8 @@ export interface Task{
   description:string;
   status:string;
   priority:string;
-  startDate:Date;
-  dueDate:Date;
+  startDate:string;
+  dueDate:string;
   projectId:Project;
   attachment?:Attachment[];
   assignedBy:UserProfile;
@@ -71,8 +71,8 @@ export interface Attachment{
     id:string;
     name:string;
     projectId:Project;
-    startDate:Date;
-    endDate:Date;
+    startDate:string;
+    endDate:string;
     status:string;
     goals:string;
   }

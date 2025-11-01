@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { userApi } from "../api/UserApi";
 import { UserProfile } from "../components/Profile/types";
 
@@ -8,6 +8,8 @@ export const useProfile=()=>{
     const [loading,setloading]=useState(false);
     const [error,seterror]=useState<string|null>(null);
     const [employees,setemployees]=useState<UserProfile[]>([]);
+    const countcallProfilehook=useRef(0);
+    const hasinitialized=useRef(false);
     const fetchProfile=async()=>{
         try{
             setloading(true);
@@ -35,8 +37,8 @@ export const useProfile=()=>{
 
     const fetchallemployee=async()=>{
         try{
-
-            console.log('fetching employees');
+            countcallProfilehook.current++;
+            console.log('fetching employees',countcallProfilehook.current);
             setloading(true);
             const data=await userApi.getallemployee();
             setemployees(data);
@@ -48,8 +50,11 @@ export const useProfile=()=>{
         }
     }
     useEffect(()=>{
-        fetchProfile();
-        fetchallemployee();
+        if(!hasinitialized.current){
+            // hasinitialized.current=true;
+        console.log("sssssssssssss")
+        fetchProfile();}
+        // fetchallemployee();
     },[]);
     return {profile,loading,error,updateprofile,fetchProfile,fetchallemployee,employees};
 }

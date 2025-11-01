@@ -11,8 +11,6 @@ import {
 } from "../../components/ui/select"
 
 // Import components
-import SideNav from '../../components/Main components/SideNav';
-import Header from '../../components/Main components/Header';
 import JumpToProject from '../../components/Projects/JumpToProject';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import ProjectForm from '../../components/Projects/ProjectForm';
@@ -20,7 +18,6 @@ import ProjectFilters from '../../components/Projects/projectfilters';
 import Viewtoggle from '../../components/Main components/viewtoggle';
 import ProjectDetailPanel from './ProjectDetailPanel';
 import { useProjectContext } from '../../Contexts/ProjectContext';
-import { useProfile } from '../../hooks/useProfile';
 
 export default function ProjectDashboard() {
 
@@ -39,8 +36,6 @@ export default function ProjectDashboard() {
   });
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showProjectDetail, setShowProjectDetail] = useState(false);
-  const context=useProfile();
-  const {fetchallemployee ,employees}=context;
   const projectContext=useProjectContext();
   const {projects}=projectContext;
   const handlecolumnchange=(column:keyof typeof columns,value:boolean)=>{
@@ -85,31 +80,8 @@ export default function ProjectDashboard() {
   const previousProjects=projects?.slice(4, 8);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <ErrorBoundary>
-        <SideNav activeItem="projects" handleNavigation={handleNavigation} />
-      </ErrorBoundary>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <ErrorBoundary>
-          <Header 
-            searchTerm={searchTerm} 
-            setSearchTerm={setSearchTerm}
-            toggleProjectModal={toggleProjectModal}
-            toggleJumpToProject={toggleJumpToProject}
-            sourcepage='projects'
-          />
-        </ErrorBoundary>
-
-        {/* Content */}
-
-        <ProjectForm
-          showmodal={showProjectmodal}
-          togglemodal={toggleProjectModal}
-          sourcepage='projects'
-        />
-        <main className="flex-1 overflow-y-auto p-4">
+    <ErrorBoundary>
+      <div className="p-4">
           <div className="flex space-x-4  mb-4">
             <h1 className="text-2xl flex-1 font-bold">Project</h1>
             <Viewtoggle 
@@ -346,18 +318,7 @@ export default function ProjectDashboard() {
               </div>
             )}
           </div>
-        </main>
       </div>
-
-      {/* Jump to project dialog */}
-      <JumpToProject 
-        showModal={showJumpModal}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        projects={projects}
-        toggleModal={toggleJumpToProject}
-        handleViewProject={handleViewProject}
-       />
-    </div>
+    </ErrorBoundary>
   );
 }

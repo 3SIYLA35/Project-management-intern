@@ -27,8 +27,16 @@ export const adaptprojecct=(apiclient:ApiProject):Project=>{
         id:apiclient._id,
         name:apiclient.name,
         description:apiclient.description,
-        startDate:apiclient.startDate,
-        endDate:apiclient.endDate,
+        startDate:apiclient.startDate.toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+        }),
+        endDate:apiclient.endDate.toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+        }),
         color:apiclient.color,
         status:apiclient.status,
         progress:apiclient.progress||0,
@@ -47,8 +55,8 @@ export const adaptprojectforapi=(project:Partial<Project>):Partial<ApiProject>=>
     console.log('project',project);
     if(project.name!==undefined)apiProject.name=project.name;
     if(project.description!==undefined)apiProject.description=project.description;
-    if(project.endDate!==undefined)apiProject.endDate=project.endDate;
-    if(project.startDate!==undefined)apiProject.startDate=project.startDate;
+    if(project.endDate!==undefined)apiProject.endDate=new Date(project.endDate)
+    if(project.startDate!==undefined)apiProject.startDate=new Date(project.startDate)
     if(project.color!==undefined)apiProject.color=project.color;
     if(project.status!==undefined)apiProject.status=project.status;
     if(project.progress!==undefined)apiProject.progress=project.progress;

@@ -2,23 +2,29 @@ import React, { useState, useRef, useEffect } from 'react';
 import { PlusIcon, MagnifyingGlassIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import TimeTracker from '../TimeTracker/TimeTracker';
-import { useProfile } from '../../hooks/useProfile';
+import { useProfileContext } from '../../Contexts/ProfileContext';
 
 interface HeaderProps {
+  avatar?:string;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   toggleJumpToProject: () => void;
   toggleProjectModal: () => void;
   toggleTimeTracker?: () => void;
   sourcepage: string;
+  setCloseNav?:(prev:boolean)=>void;
+  CloseNav?:boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
+  avatar,
   searchTerm,
   setSearchTerm,
   toggleJumpToProject,
   toggleProjectModal,
   toggleTimeTracker,
+  setCloseNav,
+  CloseNav,
   sourcepage
 }) => {
   const navigate = useNavigate();
@@ -26,8 +32,8 @@ const Header: React.FC<HeaderProps> = ({
   const [showTimeTracker, setShowTimeTracker] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const context=useProfile();
-  const {fetchallemployee,profile}=context;
+  const {profile}=useProfileContext();
+  console.log('profile from header',profile);
   // Close profile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,19 +66,20 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const handleLogout = () => {
-    // Implement logout logic here
     console.log('Logging out');
-    // navigate('/login');
   };
 
   return (
     <header className="flex justify-between items-center p-4 border-b border-gray-800">
       <div className="flex items-center">
-        <button className="mr-4 text-gray-300" onClick={toggleJumpToProject}>
+        {setCloseNav && (
+        <button onClick={()=>setCloseNav(!CloseNav)}
+        className="mr-4 text-gray-300" >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
+        )}
         <div className="relative">
           <input
             type="text"
@@ -116,7 +123,7 @@ const Header: React.FC<HeaderProps> = ({
           >
             <img
               className="h-8 w-8 rounded-full border-2"
-              src={profile?.avatar}
+              src={avatar}
               alt="User profile"
             />
           </button>

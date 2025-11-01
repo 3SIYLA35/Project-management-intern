@@ -31,7 +31,7 @@ const EventForm: React.FC<EventFormProps> = ({ isOpen, onClose, onSave, initialD
     }
   );
 
-  // Sample users for participant selection
+ 
   const users = [
     { id: '1', name: 'User 1', avatar: '/img/avatar-1.jpg' },
     { id: '2', name: 'User 2', avatar: '/img/avatar-2.jpg' },

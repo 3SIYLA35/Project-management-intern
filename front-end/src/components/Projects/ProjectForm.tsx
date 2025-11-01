@@ -29,8 +29,16 @@ const ProjectForm: React.FC<ProjectModalprops>=({
     {
     name: '',
     description: '',
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: new Date().toLocaleDateString('en-US',{
+      year:'numeric',
+      month:'long',
+      day:'numeric'
+    }),
+    endDate: new Date().toLocaleDateString('en-US',{
+      year:'numeric',
+      month:'long',
+      day:'numeric'
+    }),
     color: 'purple',
     members: [],
     

@@ -1,7 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../../components/Main components/SideNav';
-import Header from '../../components/Main components/Header';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import { UserProfile } from '../../components/Profile/types';
 
@@ -149,19 +147,7 @@ export default function ProfilePage() {
 
   return (
     <ErrorBoundary>
-      <div className='flex h-screen bg-gray-900 text-white'>
-        <SideNav activeItem="profile" handleNavigation={handleNavigation} />
-
-        <div className='flex-1 flex flex-col overflow-hidden'>
-          <Header 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            toggleProjectModal={() => {}}
-            toggleJumpToProject={() => {}}
-            sourcepage='profile'
-          />
-          
-          <div className='flex-1 overflow-auto p-6'>
+      <div className='p-6'>
             <div className="max-w-5xl mx-auto">
               {/* Profile Header with Actions */}
               <div className="flex justify-between items-center mb-6">
@@ -321,8 +307,6 @@ export default function ProfilePage() {
                 </Suspense>
               </div>
             </div>
-          </div>
-        </div>
       </div>
     </ErrorBoundary>
   );

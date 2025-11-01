@@ -34,6 +34,7 @@ export const useProject=()=>{
     }
     const fetchprojects=async()=>{
         try{
+            console.log('fetching projects');
             setloading(true);
             const data=await ProjectApi.getprojects();
             setprojects(data);

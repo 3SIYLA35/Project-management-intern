@@ -7,8 +7,8 @@ let socket: Socket|null=null;
 
 const SOCKET_URL='http://localhost:8000';
 
-// Add a unique ID for this service instance
-const SERVICE_ID = Math.random().toString(36).substring(2, 9);
+//id  unique to the socket session 
+const SERVICE_ID=Math.random().toString(36).substring(2, 9);
 let activerooms=new Set<string>();
 
 export type SocketEventHandlers={

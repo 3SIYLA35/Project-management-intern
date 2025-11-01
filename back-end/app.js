@@ -12,7 +12,7 @@ const messagemodel=require('./Models/messages');
 app.use(express.json());
 require('dotenv').config();
 
-database.Connect();;
+database.Connect();
 
 const corsOptions={
   origin: 'http://localhost:3000',
@@ -97,7 +97,7 @@ io.on('connection',(socket)=>{
           lastmessage:populatedmessage.content,
           conversationId,
           unreadCount:countunreadconverstation
-        });;
+        });;;
       // }
     }catch(error){
       console.error('error sending message:',error);

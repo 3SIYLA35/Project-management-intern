@@ -9,6 +9,7 @@ const INSTANCE_ID = Math.random().toString(36).substring(2, 9);
 
 const SocketInitializer:React.FC=()=>{
    const {profile} = useProfileContext();
+   console.log('profile from socket initializer',profile);
    const {activeConversation, conversations} = useChatContext();
    const socketRef = useRef<Socket|null>(null);
    

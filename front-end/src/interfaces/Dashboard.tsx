@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Project } from '../components/Profile/types';
 
 // Import components
-import SideNav from '../components/Main components/SideNav';
-import Header from '../components/Main components/Header';
-import JumpToProject from '../components/Projects/JumpToProject';
 import ErrorBoundary from '../components/Main components/ErrorBoundary';
-import ProjectForm from '../components/Projects/ProjectForm';
 
 // Import Dashboard components
 import StatCard from '../components/Dashboard/StatCard';
@@ -20,14 +16,8 @@ import Communication from '../components/Dashboard/Communication';
 import TimeTracker from '../components/TimeTracker/TimeTracker';
 import { useProjectContext } from '../Contexts/ProjectContext';
 
-export default function Dashboard() {
+const Dashboard=()=>{
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showJumpModal, setShowJumpModal] = useState(false);
-  const [showProjectmodal, setprojectmodal] = useState(false);
-  
-  // Time tracking state
-  const [showTimeTracker, setShowTimeTracker] = useState(false);
   const [timeTracked, setTimeTracked] = useState({
     today: 4.5,
     week: 24.5
@@ -146,21 +136,9 @@ export default function Dashboard() {
     navigate(path);
   };
   
-  const toggleProjectModal=()=>{
-    setprojectmodal(!showProjectmodal);
-  };
   
-  const toggleJumpToProject=()=>{
-    setShowJumpModal(!showJumpModal);
-  };
   
-  const toggleTimeTracker=()=>{
-    setShowTimeTracker(!showTimeTracker);
-  };
   
-  const handleViewProject=(project:Project)=>{
-    navigate(`/project/${project.id}`);
-  };
 
   const handleTaskClick=(taskId:string)=>{
     navigate(`/tasks?id=${taskId}`);
@@ -180,20 +158,7 @@ export default function Dashboard() {
 
   return (
     <ErrorBoundary>
-      <div className='flex h-screen bg-gray-900 text-white'>
-        <SideNav activeItem="dashboard" handleNavigation={handleNavigation} />
-
-        <div className='flex-1 flex flex-col overflow-hidden'>
-          <Header 
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            toggleProjectModal={toggleProjectModal}
-            toggleJumpToProject={toggleJumpToProject}
-            toggleTimeTracker={toggleTimeTracker}
-            sourcepage='dashboard'
-          />
-          
-          <div className='flex-1 overflow-auto p-6'>
+      <div className='p-6'>
             {/* Stats Cards */}
             <div className=" border-2 border-gray-700  rounded-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <StatCard 
@@ -282,29 +247,8 @@ export default function Dashboard() {
               </div>
             </div>
         </div>
-      </div>
-
-        {/* Jump to project modal */}
-        <JumpToProject 
-          showModal={showJumpModal}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          projects={projects}
-          toggleModal={toggleJumpToProject}
-          handleViewProject={handleViewProject}
-        />
-        <ProjectForm
-          showmodal={showProjectmodal}
-          togglemodal={toggleProjectModal}
-          sourcepage='dashboard'
-        />
-        
-        {/* Time Tracker */}
-        <TimeTracker 
-          isOpen={showTimeTracker}
-          onClose={toggleTimeTracker}
-        />
-      </div>
     </ErrorBoundary>
   );
 }
+
+export default Dashboard;

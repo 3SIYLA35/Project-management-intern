@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../../components/Main components/SideNav';
-import Header from '../../components/Main components/Header';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import Viewtoggle from '../../components/Main components/viewtoggle';
 import ProjectFilters from '../../components/Projects/projectfilters';
@@ -102,24 +100,8 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <ErrorBoundary>
-        <SideNav activeItem="tasks" handleNavigation={handleNavigation} />
-      </ErrorBoundary>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <ErrorBoundary>
-          <Header 
-            searchTerm={searchTerm} 
-            setSearchTerm={setSearchTerm}
-            toggleProjectModal={() => {}}
-            toggleJumpToProject={() => {}}
-            sourcepage='tasks'
-          />
-        </ErrorBoundary>
-
-        <main className="flex-1 overflow-y-auto p-4">
+    <ErrorBoundary>
+      <div className="p-4">
           <div className="flex space-x-4 mb-4 justify-between">
             
             <Viewtoggle 
@@ -316,9 +298,7 @@ export default function TasksPage() {
               </div>
             )}
           </div>
-        </main>
       </div>
-
-    </div>
+    </ErrorBoundary>
   );
 }

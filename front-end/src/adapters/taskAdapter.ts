@@ -9,8 +9,8 @@ export interface taskApi{
     description:string,
     status:string,
     priority:string,
-    startDate:Date,
-    dueDate:Date,
+    startDate:string,
+    dueDate:string,
     projectId:Project,
     assignedBy:ApiUserProfile,
     assignedTo?:ApiUserProfile|null,
@@ -48,8 +48,16 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
             description:task.description || '',
             status:'pending',
             priority:task.priority || '',
-            startDate:task.startDate || new Date(),
-            dueDate:task.dueDate || new Date(),
+            startDate:task.startDate || new Date().toLocaleDateString('en-US',{
+                year:'numeric',
+                month:'long',
+                day:'numeric'
+            }),
+            dueDate:task.dueDate || new Date().toLocaleDateString('en-US',{
+                year:'numeric',
+                month:'long',
+                day:'numeric'
+            }),
             projectId:task.projectId || {}as Project,
             assignedBy:task.assignedBy as ApiUserProfile | {}as ApiUserProfile,
             assignedTo:task.assignedTo as ApiUserProfile | null,
@@ -67,8 +75,16 @@ export const adaptTaskForAPi=(task:Partial<Task>):Partial<taskApi>=>{
     if(task.description!==undefined) adaptedtask.task!.description=task.description;
     if(task.status!==undefined) adaptedtask.task!.status=task.status;
     if(task.priority!==undefined) adaptedtask.task!.priority=task.priority;
-    if(task.startDate!==undefined) adaptedtask.task!.startDate=new Date(task.startDate);
-    if(task.dueDate!==undefined) adaptedtask.task!.dueDate=new Date(task.dueDate);
+    if(task.startDate!==undefined) adaptedtask.task!.startDate=new Date(task.startDate).toLocaleDateString('en-US',{
+        year:'numeric',
+        month:'long',
+        day:'numeric'
+    });
+    if(task.dueDate!==undefined) adaptedtask.task!.dueDate=new Date(task.dueDate).toLocaleDateString('en-US',{
+        year:'numeric',
+        month:'long',
+        day:'numeric'
+    });
     if(task.projectId!==undefined) adaptedtask.task!.projectId=task.projectId;
     if(task.assignedBy!==undefined) adaptedtask.task!.assignedBy=addaptProfileforapi(task.assignedBy)as ApiUserProfile;
     if(task.assignedTo!==undefined) adaptedtask.task!.assignedTo=task?.assignedTo?addaptProfileforapi(task.assignedTo)as ApiUserProfile:null;

@@ -63,21 +63,47 @@ const TaskForm: React.FC<TaskFormProps> = ({ onClose, onSave, isopen }) => {
             id:'',
             name:'',
             description:'',
-            startDate:new Date(),
-            endDate:new Date(),
+            startDate:new Date().toLocaleDateString('en-US',{
+              year:'numeric',
+              month:'long',
+              day:'numeric'
+            }),
+            endDate:new Date().toLocaleDateString('en-US',{
+              year:'numeric',
+              month:'long',
+              day:'numeric'
+            }),
             progress:0,
             owner:null as unknown as UserProfile,
             status:'',
 
           }as Project,
-          startDate:new Date(),
-          endDate:new Date(),
+          startDate:new Date().toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+          }),
+          endDate:new Date().toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+          }),
           status:'',
           goals:'',
         }as Sprint,
-         projectId:null as unknown as Project,
-        startDate:new Date(),
-        dueDate:new Date(),
+        projectId:null as unknown as Project,
+        startDate:new Date().toLocaleDateString('en-US',{
+          year:'numeric',
+          month:'long',
+          day:'numeric'
+        }),
+        dueDate:new Date().toLocaleDateString('en-US',
+          {
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+          }
+        ),
       } as Task)
     }
    

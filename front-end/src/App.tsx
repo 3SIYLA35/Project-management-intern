@@ -1,6 +1,6 @@
 import React from 'react';
 import AppRouter from './Routes';
-import { Authprovider } from './login-registre/Auth/authContext';
+import { AuthProvider } from './Contexts/authContext';
 import SocketInitializer from './components/Conversation/SocketInitializer';
 import { Toaster } from "./components/ui/sonner"
 import { ProfileProvider } from './Contexts/ProfileContext';
@@ -10,15 +10,15 @@ function App() {
   console.log('🔄 App component rendering');
   
   return (
-    <Authprovider>
-      <ProfileProvider>
+    <ProfileProvider>
+     <AuthProvider>
         <ChatProvider key="main-chat-provider">
           <SocketInitializer />
           <AppRouter />
           <Toaster />
         </ChatProvider>
-      </ProfileProvider>
-    </Authprovider>
+     </AuthProvider>
+  </ProfileProvider>
     // <Registration/>
   );
 }

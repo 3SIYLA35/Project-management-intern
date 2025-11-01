@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../../components/Main components/SideNav';
-import Header from '../../components/Main components/Header';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
 import CalendarHeader from '../../components/Calendar/CalendarHeader';
 import WeeklyCalendar from '../../components/Calendar/WeeklyCalendar';
@@ -232,24 +230,8 @@ export default function CalendarPage() {
     : events;
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <ErrorBoundary>
-        <SideNav activeItem="calendar" handleNavigation={handleNavigation} />
-      </ErrorBoundary>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <ErrorBoundary>
-          <Header 
-            searchTerm={searchTerm} 
-            setSearchTerm={setSearchTerm}
-            toggleProjectModal={() => {}}
-            toggleJumpToProject={() => {}}
-            sourcepage='calendar'
-          />
-        </ErrorBoundary>
-
-        <div className="flex-1 overflow-auto p-6">
+    <ErrorBoundary>
+      <div className="p-6">
           <ErrorBoundary>
             <CalendarHeader 
               currentDate={currentDate}
@@ -289,15 +271,14 @@ export default function CalendarPage() {
               </ErrorBoundary>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Event Form Modal */}
-      <EventForm 
-        isOpen={isEventFormOpen}
-        onClose={() => setIsEventFormOpen(false)}
-        onSave={handleSaveEvent}
-      />
-    </div>
+        {/* Event Form Modal */}
+        <EventForm 
+          isOpen={isEventFormOpen}
+          onClose={() => setIsEventFormOpen(false)}
+          onSave={handleSaveEvent}
+        />
+      </div>
+    </ErrorBoundary>
   );
 } 

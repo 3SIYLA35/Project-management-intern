@@ -15,8 +15,16 @@ export const adaptSprint=(sprintApi:SprintApi[]):Sprint[]=>{
         id:sprint._id,
         name:sprint.name,
         projectId:sprint.projectId,
-        startDate:sprint.startDate,
-        endDate:sprint.endDate,
+        startDate:sprint.startDate.toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+        }),
+        endDate:sprint.endDate.toLocaleDateString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+        }),
         status:sprint.status,
         goals:sprint.goals,
     }))
@@ -28,8 +36,8 @@ export const adaptsprintforApi=(sprintApi:Partial<Sprint>):Partial<SprintApi>=>{
     }
     if(sprintApi.name!==undefined) sprintapi.name=sprintApi.name;
     if(sprintApi.projectId!==undefined) sprintapi.projectId=sprintApi.projectId;
-    if(sprintApi.startDate!==undefined) sprintapi.startDate=sprintApi.startDate;
-    if(sprintApi.endDate!==undefined) sprintapi.endDate=sprintApi.endDate;
+    if(sprintApi.startDate!==undefined) sprintapi.startDate=new Date(sprintApi.startDate);
+    if(sprintApi.endDate!==undefined) sprintapi.endDate=new Date(sprintApi.endDate);
     if(sprintApi.status!==undefined) sprintapi.status=sprintApi.status;
     if(sprintApi.goals!==undefined) sprintapi.goals=sprintApi.goals;
 

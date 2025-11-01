@@ -79,20 +79,13 @@ export default function Dashboard(){
     }
 
     return (
-        <ErrorBoundary>
-            <div className="flex h-screen bg-gray-900 text-white">
-                 <SideNav activeItem="invite" handleNavigation={handlenavigation}></SideNav>
-                 <div className="flex flex-1 flex-col overflow-hidden">
-                    <Header
-                     searchTerm={searchTerm}
-                     setSearchTerm={setSearchTerm}
-                     toggleProjectModal={toggleProjectModal}
-                     toggleJumpToProject={toggleProjectModal}
-                     toggleTimeTracker={toggleTimeTrackerModal}
-                     sourcepage='invite'
-                    ></Header>
+        // <ErrorBoundary>
+            // <div className="flex h-screen bg-gray-900 text-white">
+                //  <SideNav activeItem="invite" handleNavigation={handlenavigation}></SideNav>
+                //  <div className="flex flex-1 flex-col overflow-hidden">
+                   
 
-                     <div className=" py-6 sm:px-6 lg:px-8">
+            <div className=" py-6 sm:px-6 lg:px-8">
                 {/* Notification */}
                 {notification.show &&(
                     <div className={`mb-6 p-4 rounded-md ${notification.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
@@ -220,11 +213,11 @@ export default function Dashboard(){
                 </div>
             </div>
 
-                 </div>
+                                    
            
             
-            </div>
-        </ErrorBoundary>
+            // </div>
+        // </ErrorBoundary>
 
        
     );

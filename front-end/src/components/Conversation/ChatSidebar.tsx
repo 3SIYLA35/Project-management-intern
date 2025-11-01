@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useChat } from '../../hooks/useChat';
-import { useAuth } from '../../hooks/useAuth';
 import TypingIndicator from './TypingIndicator';
 import { converstation, Participant } from '../Profile/types';
 import './ChatStyles.css';
@@ -37,7 +35,7 @@ const ChatSidebar:React.FC=()=>{
 
   // Select a conversation
   const handleSelectConversation=(conversation:converstation)=>{
-    console.log('💬 Selecting conversation:', conversation);
+    console.log('💬 Selecting conversation:', conversation);;
     
     // Explicitly log the ID to debug
     console.log('💬 Selected conversation ID:', conversation.id);
@@ -305,7 +303,6 @@ const ChatSidebar:React.FC=()=>{
                     </div>
                     <div className="flex items-center mt-1">
                       <p className="text-xs text-gray-400 truncate">
-                        {/* This would display the last message text */}
                         {/* {conversation.lastMessage?.text || 'No messages yet'} */}
                       </p>
                       {hasUnreadMessages(conversation) && (

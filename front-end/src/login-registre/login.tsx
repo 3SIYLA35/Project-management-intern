@@ -58,8 +58,8 @@ export default function Login(){
 
              type="button" 
                     className="w-full flex items-center bg-gray-8 00 justify-center gap-2  bg-white-300 text-white border-2 border-gray-700 hover:text-gray-500 py-3 rounded-lg font-semibold 
-                           hover:bg-gray-50 hover:border-white transform transition-all duration-300 hover:scale-[1.02]  tracking-widest 
-                           shadow-lg hover:shadow-gray-300
+                           hover:bg-gray-50 hover:border-white transform  duration-300 hover:scale-[1.02]  tracking-widest 
+                           shadow-lg hover:shadow-gray-300 
                            
                            ">
               <img src={Google_log} className="w-5 h-5" alt="Google" />
