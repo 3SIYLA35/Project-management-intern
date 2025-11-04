@@ -11,9 +11,7 @@ import {
 } from "../../components/ui/select"
 
 // Import components
-import JumpToProject from '../../components/Projects/JumpToProject';
 import ErrorBoundary from '../../components/Main components/ErrorBoundary';
-import ProjectForm from '../../components/Projects/ProjectForm';
 import ProjectFilters from '../../components/Projects/projectfilters';
 import Viewtoggle from '../../components/Main components/viewtoggle';
 import ProjectDetailPanel from './ProjectDetailPanel';

@@ -23,12 +23,13 @@ export default function Main(){
    const {projects}=projectContext;
    const getactivepage=()=>{
         const path=location.pathname;
-        if(path==='/Dashboard') return 'Dashboard';
-        if(path.startsWith('/project')) return 'projects';
+        if(path.startsWith('/Dashboard')) return 'Dashboard';
+        if(path.startsWith('/projects')) return 'projects';
         if(path.startsWith('/tasks')) return 'tasks';
-        if(path.startsWith('/calendar')) return 'calendar';
-        if(path.startsWith('/conversation')) return 'conversation';
-        if(path.startsWith('/profile')) return 'profile';
+        if(path.startsWith('/Calendar')) return 'calendar';
+        if(path.startsWith('/Conversation')) return 'conversation';
+        if(path.startsWith('/Profile')) return 'profile';
+        if(path.startsWith('/admin/invite') ) return 'invite';
         return 'Dashboard';
    }
    const toggleProjectModal=()=>{
@@ -42,6 +43,7 @@ export default function Main(){
     setShowTimeTracker(!showTimeTracker);
   };
   const handlenavigate=(path:string)=>{
+    console.log("current path -->"+path)
         navigate(path);
     }
   const handleViewProject=(project:Project)=>{
@@ -55,6 +57,7 @@ export default function Main(){
           <SideNav activeItem={getactivepage()}
            handleNavigation={handlenavigate}
            CloseNav={closeSideNav}
+           role={profile?.role}
            ></SideNav>
           <div className="flex-1 flex flex-col overflow-hidden">
             <Header 

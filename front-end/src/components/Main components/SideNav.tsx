@@ -11,14 +11,13 @@ interface SideNavProps{
 
 const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNav})=>{
   const sidenavRef=useRef<HTMLDivElement>(null);  
-  const {profile}=useProfileContext();
   const [displayedtext,setdisplayedtext]=useState({
     Dashboard:'Dashboard',
     projects:'Project',
-    tasks:'My tasks',
-    converstation:'Conversation',
+    tasks:'tasks',
+    conversation:'Conversation',
     calendar:'Calendar',
-    invite:'Invite',
+    invite:'invite',
     profile:'Profile',
     Logout:'Logout'
   });
@@ -32,21 +31,21 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
       )
     },
     projects:{
-      name:'Project',
+      name:'projects',
       svg:(
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
       )
     },
-    tasks:{name:'My tasks',
+    tasks:{name:'tasks',
       svg:(
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
       )
     },
-    converstation:{name:'Conversation',
+    conversation:{name:'Conversation',
       svg:(
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -60,7 +59,7 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
               </svg>
       )
     },
-    invite:{name:'Invite',
+    invite:{name:'invite',
       svg:(
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -84,12 +83,14 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
   }
 
   useEffect(()=>{
+    const intervals:NodeJS.Timeout[]=[];
     Object.keys(navtext).forEach((key)=>{
       let currenttext=navtext[key as keyof typeof navtext];
       if(CloseNav){
       let currentIndex=currenttext.name.length;
       const interval=setInterval(()=>{
         currentIndex--;
+        console.log(key+'....................'+currenttext.name);
         if(currentIndex>=0){
           setdisplayedtext(prev=>({
             ...prev,
@@ -100,8 +101,8 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
           clearInterval(interval);
         }
       },80);
-      return ()=>clearInterval(interval);
-    }else{
+        intervals.push(interval)
+     }else{
       let currentindex=0;
       let typeinterval=setInterval(() => {
         currentindex++;
@@ -114,10 +115,13 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
           clearInterval(typeinterval);
         }
       }, 80);
-      return ()=>clearInterval(typeinterval)
+      intervals.push(typeinterval);
     }
-  })
-
+        });
+     return ()=>{
+       intervals.forEach(interval=>{
+      clearInterval(interval); })
+       };
   },[CloseNav]);
   console.log('profile from side nav',activeItem,CloseNav);
   return (
@@ -134,13 +138,16 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
       <nav>
         <div className="space-y-1">
           {Object.keys(displayedtext).map((key)=>{
-            const item=navtext[key as keyof typeof navtext]
+            const item=navtext[key as keyof typeof navtext];
+            if(key==='invite' &&  role!=='hr' &&  role!=='admin') return null;
             return (
           <button key={key}
             className={`flex items-center   px-4 py-2 w-full ${activeItem===key?'text-white  bg-purple-600':'text-gray-300 hover:bg-gray-700'} rounded-lg
             
             `} 
-            onClick={() => handleNavigation('/'+key)}
+            onClick={() => {handleNavigation('/'+(key==='invite'?'admin/invite':item.name))
+              console.log("---------t---------"+key)
+            }}
           >
             <span key={key} className={`inline-block transition-all
               duration-[1s]
@@ -150,7 +157,7 @@ const SideNav: React.FC<SideNavProps>=({role,activeItem,handleNavigation,CloseNa
             </span>
             <span className={``}>{displayedtext[key as keyof typeof displayedtext]}</span>        
           </button>
-              
+                
             )
           })}
           

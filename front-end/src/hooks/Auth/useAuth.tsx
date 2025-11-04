@@ -91,8 +91,10 @@ export const useAuth=()=>{
         });
     }
 
-    const hasrole=(role:UserProfile['role'])=>{
-        return user && user?.role===role;
+    const hasrole=(roles:String[])=>{
+        return roles.map((role)=>{
+            return user && user?.role===role;
+        });
     }
 
     return{
@@ -101,7 +103,7 @@ export const useAuth=()=>{
         loading,
         login,
         logout,
-        isAdmin:hasrole(user?.role),
+        isAdmin:hasrole(['hr','admin']),
         isAuthenticated
 
     }

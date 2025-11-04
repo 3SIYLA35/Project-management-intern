@@ -48,6 +48,7 @@ export const useProject=()=>{
 
     useEffect(()=>{
         fetchprojects();
+        console.log('projectsssss'+projects);
         
     },[]);
     return{projects,error,loading,createproject,updateproject,fetchprojects}
