@@ -14,6 +14,7 @@ export const useAuth=()=>{
         joinDate:'',
         skills:[]
     });
+    
     const [token,settoken]=useState(localStorage.getItem('token'));
     const [loading,setLoading]=useState(true);
     const [isAuthenticated,setisAuthenticated]=useState(false);

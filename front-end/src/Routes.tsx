@@ -21,6 +21,8 @@ import { SprintProvider } from './Contexts/SprintContext';
 import {CommentProvider} from './Contexts/CommentContext';
 import { ProjectCommentProvider } from './Contexts/ProjectCommentContext';
 import Main from './interfaces/main';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { Loader } from 'lucide-react';
 
   // Protected route component
 const ProtectedRoute=({ children }:{ children: React.ReactNode })=>{
@@ -41,6 +43,15 @@ const AdminRoute=({ children }: { children: React.ReactNode })=>{
   
   return <>{children}</>;
 };
+const LogOut=()=>{
+  const {logout}=useAuth();
+  const navigate=useNavigate();
+  useEffect(()=>{
+   logout();
+    navigate('/login')
+  },[]);
+  return <Loader className='h-6 w-6 animate-spin text-purple-600'/>;
+}
 
 // Auth callback handler for Google OAuth
 const AuthCallback=()=> {
@@ -97,7 +108,8 @@ const AppRouter=()=> {
           <AdminRoute>
             <Invitepage />
           </AdminRoute>
-        } />
+          } />
+          <Route path="/logout" element={<LogOut/>}></Route>
         </Route>
 
         

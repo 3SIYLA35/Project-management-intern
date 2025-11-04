@@ -2,17 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project } from '../components/Profile/types';
 
-// Import components
 import ErrorBoundary from '../components/Main components/ErrorBoundary';
 
-// Import Dashboard components
 import StatCard from '../components/Dashboard/StatCard';
 import TaskCard from '../components/Dashboard/TaskCard';
 import TimeTracking from '../components/Dashboard/TimeTracking';
 import ScheduleCard from '../components/Dashboard/ScheduleCard';
 import Communication from '../components/Dashboard/Communication';
 
-// Import time tracking component
 import TimeTracker from '../components/TimeTracker/TimeTracker';
 import { useProjectContext } from '../Contexts/ProjectContext';
 
@@ -136,10 +133,6 @@ const Dashboard=()=>{
     navigate(path);
   };
   
-  
-  
-  
-
   const handleTaskClick=(taskId:string)=>{
     navigate(`/tasks?id=${taskId}`);
   };
@@ -163,32 +156,43 @@ const Dashboard=()=>{
             <div className=" border-2 border-gray-700  rounded-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <StatCard 
                 title="Task Due today" 
-                value="07" 
+                value={7} 
                 color="green"
                 subtext="3 task completed"
                 leftborder={false}
+                icon={(
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5h10M9 9h10M9 13h10M9 17h10M5 5h.01M5 9h.01M5 13h.01M5 17h.01" />
+                  </svg>
+                )}
               />
               <StatCard 
                 title="Meetings today" 
-                value="05" 
+                value={5}  
                 color="purple"
                 subtext="Next kickoff Meeting at 1:00 PM"
-                leftborder={true}
+                icon={(<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>)}
               />
               <StatCard 
                 title="Hours Tracked" 
-                value="12" 
+                value={12} 
                 color="blue"
-                subtext="Daily goal: 8 hours 
-                "
-                leftborder={true}
+                subtext="Daily goal: 8 hours "
+                icon={(<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>)}
               />
               <StatCard 
                 title="Active Projects" 
-                value="05" 
+                value={20} 
                 color="purple"
                 subtext="2 Nearing deadline"
                 leftborder={false}
+                icon={(<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7a2 2 0 012-2h5l2 2h7a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                </svg>)}
               />
             </div>
 

@@ -17,12 +17,12 @@ const StatCard: React.FC<StatCardProps> = ({
   subtext,
   leftborder=true
 }) => {
-  const getColorClasses = () => {
-    switch (color) {
+  const getColorClasses=()=>{
+    switch (color){
       case 'green':
         return 'bg-green-500 text-white';
       case 'blue':
-        return 'bg-blue-500 text-white';
+        return 'bg-blue-200 text-white';
       case 'purple':
         return 'bg-purple-500 text-white';
       case 'orange':
@@ -34,22 +34,24 @@ const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div className={`relative   p-4 w-full`}>
-      <div className={`flex space-x-4 items-center    `}>
+      <div className={` flex space-x-4 items-center `}>
         {leftborder?
-        <div className='h-[90px]   w-[2px] bg-gray-700'></div>
-         :''}
-        <div className=''>
-        <p className="text-gray-400 text-sm mb-2">{title}</p>
-        <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-white">{value}</h2>
-          {icon && (
-            <div className={`rounded-full p-2 ${getColorClasses()}`}>
-              {icon}
+         <div className='h-[90px]   w-[2px] bg-gray-700'></div>
+           :''}
+         <div className=''>
+            <div className=''>
+           <p className="text-gray-400 text-sm mb-2">{title}</p>
+           <h2 className="text-3xl font-bold text-white">{value}</h2>
             </div>
-          )}
-        </div>
-        {subtext && <p className="text-gray-400 text-xs mt-2">{subtext}</p>}
-        </div>
+            {/* <div className='flex '> */}
+            {icon && (
+             <div className={`flex items-center  rounded-xl p-1 ${getColorClasses()}`}>
+              <span className='bg-blue-'>{icon}</span>
+              {subtext && <p className="text-gray-400 text-xs mt-2">{subtext}</p>}
+             </div>
+              )}
+            {/* </div> */}
+         </div>
       </div>
     </div>
   );
