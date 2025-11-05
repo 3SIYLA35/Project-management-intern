@@ -127,11 +127,6 @@ export default function ProfilePage() {
         avatar:URL.createObjectURL(tempavatar as unknown as Blob) 
       })
     }
-
-    // setProfile({
-    //   ...profile,
-    //   avatar:URL.createObjectURL(tempavatar as unknown as Blob)
-    // })
   }
   const fileinputRef=useRef<HTMLInputElement>(null)
   const handleuploadimage=()=>{

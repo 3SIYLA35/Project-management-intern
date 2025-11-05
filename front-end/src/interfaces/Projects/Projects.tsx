@@ -36,6 +36,10 @@ export default function ProjectDashboard() {
   const [showProjectDetail, setShowProjectDetail] = useState(false);
   const projectContext=useProjectContext();
   const {projects}=projectContext;
+  useEffect(()=>{
+      
+    console.log('projects fetches',projects);
+  },[projects]);
   const handlecolumnchange=(column:keyof typeof columns,value:boolean)=>{
     setcolumns({
       ...columns,

@@ -8,9 +8,24 @@ export const userApi={
         // console.log('response profile',response);
         return adaptuserProfile(response);
     },
-    updateprofileinfo:async(updatedData:Partial<UserProfile>)=>{
+    updateprofileinfo:async(updatedData:Partial<UserProfile>,formData:FormData)=>{
+        const formatedData=addaptProfileforapi(updatedData);
+        Object.keys(formatedData).forEach(key=>{
+            const value=formatedData[key as keyof typeof formatedData];
+            if(value!==undefined && value!==null){
+                if(Array.isArray(value)){
+                    formData.append(key,JSON.stringify(value))
+                }
+                else if(typeof value==='object'){
+                    formData.append(key,JSON.stringify(value))
+                }
+                else{
+                    formData.append(key,String(value))
+                }
+            }
+        })
         const response=await apiClient.put<ApiUserProfile>('/employee/update-profile-info',
-            addaptProfileforapi(updatedData)
+            formData
         )
         return adaptuserProfile(response);
     },

@@ -14,6 +14,15 @@ exports.getProfileinfo=async(req,res)=>{
 exports.updateprofileinfo=async(req,res)=>{
     try{
         const userid=req.user.id;
+        console.log(req.body);
+        const updatedata={...req.body};
+        // if(req.files?.coverImage?.[0]){
+        //     // updatedata.coverImage=await uploadbuffertocloudinary(req.files.banner,'banner');
+        // }
+        // if(req.files?.avatar?.[0]){
+        //     updatedata.avatar=await uploadbuffertocloudinary(req.files.avatar,'avatar');
+        // }
+        console.log(updatedData);
         const updatedData=await UserService.updateprofileinfo(userid,req.body);
         return res.status(200).json(updatedData);
     }catch(err){
@@ -38,4 +47,5 @@ exports.getallemployee=async(req,res)=>{
         return res.status(500).json({error:"failed to get all employee"});
     }
 }
+
 

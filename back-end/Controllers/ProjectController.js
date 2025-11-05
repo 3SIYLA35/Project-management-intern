@@ -1,5 +1,5 @@
 const projectService=require('../Services/projectService');
-
+const uploadbuffertocloudinary=require('../utils/uploadbuffertocloudinary');
 exports.createProject=async(req,res)=>{
     try{
         console.log("project controller called");
@@ -24,6 +24,7 @@ exports.getallprojects=async(req,res)=>{
         if(!userId){
             return res.status(401).json({message:"unauthorized"});
         }
+        
         const projects=await projectService.getallprojects();
         if(!projects){
             return res.status(404).json({message:"no projects found"});

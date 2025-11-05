@@ -35,7 +35,7 @@ export const ProjectApi={
         try{
             console.log('fetching projects from api');
             const response=await apiClient.get<Apiproject[]>('/project/get-all-projects');
-            console.log('projects fetched from api',response);
+            console.log('projects fetched from api',response);  
             return response.map(adaptprojecct);
         }catch(err){
             console.error('error on getprojects',err);

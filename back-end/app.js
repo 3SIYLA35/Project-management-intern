@@ -12,7 +12,7 @@ const messagemodel=require('./Models/messages');
 app.use(express.json());
 require('dotenv').config();
 
-database.Connect();
+database.Connect();;
 
 const corsOptions={
   origin: 'http://localhost:3000',

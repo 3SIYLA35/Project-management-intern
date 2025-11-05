@@ -1,5 +1,7 @@
 const express=require('express');
 const Users=require('../Models/USERS');
+const cloudinary=require('../utils/cloudinary');
+
 
 const UserService={
     getProfileData:async(userID)=>{
@@ -28,7 +30,7 @@ const UserService={
     },
     updateprofileinfo:async(userid,updatedData)=>{
         try{
-            // console.log('updatedData',updatedData);
+            
             const user=await Users.findByIdAndUpdate(userid,
                    {$set:updatedData} ,
                 {new:true});
@@ -38,6 +40,11 @@ const UserService={
             return user;
         }catch(err){
             console.error(err.message);
+            const  error=new Error('failed save data',err.message);
+            error.status=500;
+            error.name='userServiceUpdate';
+            error.message='failed save data';
+            throw error;
         }
     },
     getallemployees:async()=>{

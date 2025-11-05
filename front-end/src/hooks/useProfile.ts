@@ -23,10 +23,19 @@ export const useProfile=()=>{
             setloading(false);
         }
     }
-    const updateprofile=async(updatedata:Partial<UserProfile>)=>{
+    const updateprofile=async(updatedata:Partial<UserProfile>,
+                    avatar?:File,
+                    banner?:File )=>{
         try{
             setloading(true);
-            const updated=await userApi.updateprofileinfo(updatedata);
+            const formData=new FormData();
+            if(avatar){
+                formData.append('avatar',avatar);
+            }
+            if(banner){
+                formData.append('banner',banner);
+            }
+            const updated=await userApi.updateprofileinfo(updatedata,formData);
             setprofile(updated);
         }catch(err){
             seterror('failed to update profile');

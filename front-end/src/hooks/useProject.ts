@@ -39,6 +39,8 @@ export const useProject=()=>{
             const data=await ProjectApi.getprojects();
             setprojects(data);
             setloading(false);
+            console.log('fetching projects',projects);
+
         }catch(err){
             seterror('failed to fetch projects');
             console.error('error on fetchprojects',err);

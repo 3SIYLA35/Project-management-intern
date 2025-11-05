@@ -6,8 +6,8 @@ export interface ApiProject{
     _id:string;
     name:string;
     description?:string;
-    startDate:Date;
-    endDate:Date;
+    startDate:string;
+    endDate:string;
     color?:string;
     status?:string;
     progress?:number;
@@ -23,16 +23,19 @@ export interface ApiProject{
 export type Apiproject=ApiProject;
 
 export const adaptprojecct=(apiclient:ApiProject):Project=>{
+
+    const startD=new Date(apiclient.startDate);
+    const endD=new Date(apiclient.endDate);
     return{
         id:apiclient._id,
         name:apiclient.name,
         description:apiclient.description,
-        startDate:apiclient.startDate.toLocaleDateString('en-US',{
+        startDate:startD.toLocaleDateString('en-US',{
             year:'numeric',
             month:'long',
             day:'numeric'
         }),
-        endDate:apiclient.endDate.toLocaleDateString('en-US',{
+        endDate:endD.toLocaleDateString('en-US',{
             year:'numeric',
             month:'long',
             day:'numeric'
@@ -55,8 +58,8 @@ export const adaptprojectforapi=(project:Partial<Project>):Partial<ApiProject>=>
     console.log('project',project);
     if(project.name!==undefined)apiProject.name=project.name;
     if(project.description!==undefined)apiProject.description=project.description;
-    if(project.endDate!==undefined)apiProject.endDate=new Date(project.endDate)
-    if(project.startDate!==undefined)apiProject.startDate=new Date(project.startDate)
+    if(project.endDate!==undefined)apiProject.endDate=new Date(project.endDate).toISOString();
+    if(project.startDate!==undefined)apiProject.startDate=new Date(project.startDate).toISOString();
     if(project.color!==undefined)apiProject.color=project.color;
     if(project.status!==undefined)apiProject.status=project.status;
     if(project.progress!==undefined)apiProject.progress=project.progress;
