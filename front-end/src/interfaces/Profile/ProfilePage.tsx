@@ -36,7 +36,7 @@ export default function ProfilePage() {
   const [avataruser,setAvataruser]=useState<File|null>(null);
   const context=useProfileContext();
   const {profile,loading,error,updateprofile}=context||{};
-  const [formData, setFormData] = useState<Partial<UserProfile>|null>(null);
+  const [formData,setFormData]=useState<Partial<UserProfile>|null>(null);
   
 
   // Update form data when profile changes
@@ -44,13 +44,14 @@ export default function ProfilePage() {
     if(profile){
       setFormData(profile);
     }
+    
   }, [profile]);
   
-  const handleNavigation = (path: string) => {
+  const handleNavigation=(path:string)=>{
     navigate(path);
   };
   
-  const handleInputChange=(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange=(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if(formData){
       setFormData({
@@ -71,25 +72,17 @@ export default function ProfilePage() {
     }
   };
   
-  const handleSaveProfile = () => {
+  const handleSaveProfile=()=> {
     
     const updatedProfile = {
       ...formData,
     };
     console.log('updatedProfile',updatedProfile);
     if(updateprofile){
-      updateprofile(updatedProfile);
+      updateprofile(updatedProfile,avataruser||undefined,coverImageFile||undefined);
     }                 
     
-    // Here you would typically upload the cover image and get a URL
-    if (coverImageFile) {
-      // This would be replaced with an actual upload and URL retrieval
-      console.log('Uploading cover image:', coverImageFile.name);
-      // updatedProfile.coverImage = uploadedUrl;
-    }
-    
-    // Save the updated profile
-    // setProfile(updatedProfile);
+
     setIsEditing(false);
   };
   
@@ -126,6 +119,7 @@ export default function ProfilePage() {
         ...formData,
         avatar:URL.createObjectURL(tempavatar as unknown as Blob) 
       })
+      // console.log("-----------------changge avatar")
     }
   }
   const fileinputRef=useRef<HTMLInputElement>(null)
@@ -177,7 +171,17 @@ export default function ProfilePage() {
               
               
               {/* Profile Banner & Avatar */}
-              <div className="bg-gray-800 rounded-lg overflow-hidden mb-6 shadow-md">
+              <div className="bg-gray-800 relative rounded-lg overflow-hidden mb-6 shadow-md">
+                {loading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                  <svg className="h-8 w-8 animate-spin text-white" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10"
+                      stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                 </div>
+                )}
                 <div 
                   className="relative h-48 bg-gradient-to-r from-purple-800 to-blue-700"
                   style={
@@ -187,13 +191,23 @@ export default function ProfilePage() {
                 >
                   <div className="absolute -bottom-12 left-8">
                     <div className="relative">
+                      {loading && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                          <svg className="h-8 w-8 animate-spin text-white" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10"
+                              stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                          </svg>
+                        </div>
+                      )}
                       <img 
-                        src={profile?.avatar || '/img/default-avatar.webp'} 
-                        alt={profile?.name} 
+                        src={formData?.avatar || '/img/default-avatar.webp'} 
+                        alt={formData?.name} 
                         className="w-24 h-24 rounded-full border-4 border-gray-800"
                       />
                       {isEditing && (
-                        <button className="absolute bottom-0 right-0 bg-purple-600 rounded-full p-1 shadow-lg"
+                        <button className="absolute bottom-0 right-0 bg-purple-500 rounded-full p-1 shadow-lg"
                          onClick={handleuploadimage}
                         >
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -211,7 +225,7 @@ export default function ProfilePage() {
                       )}
                     </div>
                   </div>      
-                            </div>
+               </div>
                 <div className="pt-16 px-8 pb-8">
                   <h1 className="text-2xl font-bold">{profile?.name}</h1>
                   <p className="text-gray-400">{profile?.role} • {profile?.department}</p>

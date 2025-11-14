@@ -8,13 +8,13 @@ const axiosinstance=axios.create({
     },
 });
 
-// Helper function to extract error details
+// helper function to extract error details
 export const extractErrorDetails = (error: any): { 
     message: string, 
     context?: string,
     statusCode?: number,
     originalError?: any
-} => {
+}=>{
     // If it's an Axios error
     if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
@@ -53,6 +53,13 @@ export const extractErrorDetails = (error: any): {
 };
 
 axiosinstance.interceptors.request.use((config)=>{
+    const data=typeof config.data!=='undefined'
+     && config.data instanceof FormData;
+     if(data){
+        if(config.headers){
+            delete config.headers['Content-Type'];
+        }
+     }
     const token=localStorage.getItem('token');
     if(token){
         config.headers['Authorization']=`Bearer ${token}`;

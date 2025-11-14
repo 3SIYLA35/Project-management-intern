@@ -30,12 +30,14 @@ export const useProfile=()=>{
             setloading(true);
             const formData=new FormData();
             if(avatar){
-                formData.append('avatar',avatar);
+                formData.append('avatarUrl',avatar);
             }
             if(banner){
-                formData.append('banner',banner);
+                formData.append('coverImage',banner);
+                console.log('----------------FormData coverImage\n',formData.get('coverImage'));
             }
             const updated=await userApi.updateprofileinfo(updatedata,formData);
+            console.log("*********************loading",loading)
             setprofile(updated);
         }catch(err){
             seterror('failed to update profile');

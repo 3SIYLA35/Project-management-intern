@@ -1,4 +1,6 @@
 const UserService=require('../Services/User');
+const { parseFormData } = require('../utils/parseFormData');
+const uploadbuffertocloudinary=require('../utils/uploadbuffertocloudinary');
 
 exports.getProfileinfo=async(req,res)=>{
     try{
@@ -14,16 +16,20 @@ exports.getProfileinfo=async(req,res)=>{
 exports.updateprofileinfo=async(req,res)=>{
     try{
         const userid=req.user.id;
-        console.log(req.body);
-        const updatedata={...req.body};
-        // if(req.files?.coverImage?.[0]){
-        //     // updatedata.coverImage=await uploadbuffertocloudinary(req.files.banner,'banner');
-        // }
-        // if(req.files?.avatar?.[0]){
-        //     updatedata.avatar=await uploadbuffertocloudinary(req.files.avatar,'avatar');
-        // }
-        console.log(updatedData);
-        const updatedData=await UserService.updateprofileinfo(userid,req.body);
+        console.log('-------------before parse from data ',req.body);
+        console.log('--------files',req.files?Object.keys(req.files):null);
+        const updatedata=parseFormData(req.body);
+        if(req.files?.coverImage?.[0]){
+            // console.log('-----------------coverImage  uploaded to cloudinary ',updatedata.coverImage);
+            updatedata.coverImage=await uploadbuffertocloudinary(req.files.coverImage[0].buffer,'coverImage');
+
+        }
+        if(req.files?.avatarUrl?.[0]){
+            updatedata.avatarUrl=await uploadbuffertocloudinary(req.files.avatarUrl[0].buffer,'avatar');
+            // console.log('-----------------avatarUrl uploaded to cloudinary ',updatedata.avatarUrl);
+        }
+        console.log('-----------------after parse form data and upload to cloudinary ',updatedata);
+        const updatedData=await UserService.updateprofileinfo(userid,updatedata);
         return res.status(200).json(updatedData);
     }catch(err){
         console.error("error on controller",err.message);

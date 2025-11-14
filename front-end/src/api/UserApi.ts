@@ -10,6 +10,7 @@ export const userApi={
     },
     updateprofileinfo:async(updatedData:Partial<UserProfile>,formData:FormData)=>{
         const formatedData=addaptProfileforapi(updatedData);
+        
         Object.keys(formatedData).forEach(key=>{
             const value=formatedData[key as keyof typeof formatedData];
             if(value!==undefined && value!==null){

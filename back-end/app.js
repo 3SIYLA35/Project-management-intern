@@ -61,7 +61,7 @@ io.on('connection',(socket)=>{
   });;
   
   socket.on('user_online',async(userId)=>{
-    console.log("User online: ",userId);
+    console.log("User online: ",userId);;
     if(userId){
       await conversationService.updateUserOnlineStatus(userId,true);
       socket.userId=userId;
