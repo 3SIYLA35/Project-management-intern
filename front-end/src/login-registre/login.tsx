@@ -49,7 +49,7 @@ export default function Login(){
              <button onClick={()=>{
                 console.log('btn-clicked');
                 const clientId="296586086073-pdi232soithudp2u7jvltrucg9q0s8t0.apps.googleusercontent.com";
-                const redirectUri=encodeURIComponent("http://localhost:8000/auth/google/Login");
+                const redirectUri=encodeURIComponent("https://localhost/api/auth/google/Login");
                 const scope=encodeURIComponent("openid profile email");
                 const authUrl=`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
                 window.location.href=authUrl;

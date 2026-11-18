@@ -52,7 +52,7 @@ class invitationService{
         return date;
     }
     static async sendinvitationEmail(invitation){
-        const registrationlink=`http://localhost:3000/register?token=${invitation.token}`;
+        const registrationlink=`https://localhost/register?token=${invitation.token}`;
 
         const emaildata={
             to:invitation.email,

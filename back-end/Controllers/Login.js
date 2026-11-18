@@ -45,12 +45,12 @@ exports.LoginWithgoogle = async (req, res) => {
     if (!code){
       return res.status(400).json({message: 'Authorization code missing' });
     }
-
+    console.log("google client id ",process.env.GOOGLE_CLIENT_ID)
     const {data} = await axios.post('https://oauth2.googleapis.com/token',{
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri:'http://localhost:8000/auth/google/Login',
+      redirect_uri:'https://localhost/api/auth/google/Login',
       grant_type: 'authorization_code',
     });
 
@@ -64,10 +64,11 @@ exports.LoginWithgoogle = async (req, res) => {
         return  res.status(401).json({message:'user not foundd'});
     }
     const token=generatetoken(user);
-    res.redirect(`http://localhost:3000/auth-callback?token=${token}`);
+    const FRONTEND_URL=process.env.FRONTEND_URL || 'https://localhost';
+    res.redirect(`${FRONTEND_URL}/auth-callback?token=${token}`);
   } catch (error) {
     console.error('google login error:', error.response?.data || error.message);
-    res.redirect(`http://localhost:3000/login?error=google_auth_failed`);
+    res.redirect(`https://localhost/login?error=google_auth_failed`);
   }
 };
 

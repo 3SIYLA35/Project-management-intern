@@ -14,10 +14,11 @@ require('dotenv').config();
 
 database.Connect();;
 
-const corsOptions={
-  origin: 'http://localhost:3000',
+const corsOptions = {
+  origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:3000'],
   credentials: true,
-  optionsSuccessStatus: 200
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
@@ -34,10 +35,10 @@ app.use('/comments',require('./Routes/Comment'));
 app.use('/conversations', require('./Routes/conversation'));
 app.use('/messages', require('./Routes/message'));
 
-const server=http.createServer(app);
+const server=http.createServer(app);;
 const io=socketIo(server,{
   cors:{
-    origin:'http://localhost:3000',
+    origin:'https://localhost',
     methods:['GET','POST'],
     credentials: true
   }
@@ -132,12 +133,12 @@ io.on('connection',(socket)=>{
       io.emit('user_status_change',{userId: socket.userId, isOnline: false });
       
     }
-  });
-});;;;;
+  });;
+});;;;;;
 
 server.listen(port,()=>{
   console.log(`Server is running at port: ${port}`);
-});
+});;;
 
 app.use((err, req, res, next) => {
   console.error(err.stack);;;
@@ -147,3 +148,9 @@ app.use((err, req, res, next) => {
     error: err.stack
   });
 });;;;;;;
+
+// Add this right before your app.use('/auth', ...) routes
+app.use((req, res, next) => {
+  console.log(`[EXPRESS RECV] Method: ${req.method} | OriginalUrl: ${req.originalUrl} | URL: ${req.url}`);
+  next();
+});;

@@ -1,6 +1,7 @@
 import axios ,{AxiosRequestConfig,AxiosResponse, AxiosError} from 'axios';
 import { error } from 'console';
-const API_URL='http://localhost:8000';
+// const API_URL='http://localhost:8000';
+const API_URL='/api';
 const axiosinstance=axios.create({
     baseURL:API_URL,
     headers:{

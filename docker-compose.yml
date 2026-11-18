@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  backend:
+    build: ./back-end
+    image: backend:latest
+    container_name: backend
+    environment:
+      - MONGODB_URL=${MONGODB_URL}
+      - JWT_SECRET=${}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM_NAME=${EMAIL_FROM_NAME}
+      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS}
+      - EMAIL_SECURE=${EMAIL_SECURE}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+    networks:
+      - pfa-network
+  frontend:
+    build: ./front-end
+    image: frontend:latest
+    container_name: frontend
+    ports:
+      - "443:443"
+    networks:
+      - pfa-network
+    depends_on:
+      - backend
+networks:
+  pfa-network:
+    driver: bridge

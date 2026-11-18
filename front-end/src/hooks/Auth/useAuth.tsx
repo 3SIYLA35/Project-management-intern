@@ -23,7 +23,7 @@ export const useAuth=()=>{
     const checkAuth=async()=>{
         if(token){
             try{
-                const response=await fetch("http://localhost:8000/auth/verify",{
+                const response=await fetch("https://localhost/api/auth/verify",{
                     headers:{Authorization:`Bearer ${token}`}
                 });
                 if(response.ok){
